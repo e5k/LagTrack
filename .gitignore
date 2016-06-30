@@ -1,5 +1,7 @@
 *.mat
+*.asc
 *.nc
 *.m~
 *.asv
 .DS_Store
+input/
