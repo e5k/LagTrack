@@ -5,3 +5,6 @@
 *.asv
 .DS_Store
 input/
+!projects/Etna/Etna.mat
+!input/dem/Etna/Etna.mat
+!input/wind/Etna_Nov_2013/Etna_Nov_2013.mat

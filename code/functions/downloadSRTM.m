@@ -17,7 +17,7 @@ end
 % Make output folder
 mkdir(['input/dem/', filename])
 
-% If longitudes are expressed in degrees west up to 360, correct them in
+% If longitudes are expressed in degrees east up to 360, correct them in
 % negtive values
 if lon_min > 180
     lon_min = -360+lon_min;

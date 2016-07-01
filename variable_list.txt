@@ -1,7 +1,33 @@
 PROJECT
+ 	- name
 	- vent	.lon
 			.lat
 			.elevation			
 	- eruption .date	
 	- dem
 	- wind
+	
+	
+SIMULATION
+	- name
+	- particle 	.diameter
+				.density
+				.flatness
+				.elongation
+				
+	- release 	.x
+				.y
+				.z
+				.t
+				.vx
+				.vy
+				.vz
+				
+	- options
+	
+	- solver 	.dt
+				.method
+				
+	- interp	.method
+				.neighbour
+				.time 	
