@@ -1,3 +1,4 @@
-*.*
-!dem/Etna
-!wind/Etna_Nov_2013
+dem/*
+!dem/Etna/
+wind/*
+!wind/Etna_Nov_2013/
