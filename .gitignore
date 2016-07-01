@@ -1,12 +1,4 @@
-*.mat
 *.asc
-*.nc
 *.m~
 *.asv
 .DS_Store
-input/dem/
-!input/dem/Etna/Etna.mat
-projects/
-!projects/Etna/Etna.mat
-input/wind/
-!input/wind/Etna_Nov_2013/Etna_Nov_2013.mat
