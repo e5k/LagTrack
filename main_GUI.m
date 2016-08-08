@@ -7,10 +7,10 @@ ypos = ceil((screensize(4)-sz(1))/2); % center the figure on the
 
 
 
-f = figure( 'Name', 'LagTrack', 'position',[xpos, ypos, sz(2), sz(1)] );
+f = figure( 'Name', 'LagTrack', 'position',[xpos, ypos, sz(2), sz(1)], 'Toolbar','none' );
 
 % Main container
-main    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC );
+main    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
 
     % Top container
     top     = uix.HBox( 'Parent', main , 'BackgroundColor', BGC);
@@ -18,46 +18,92 @@ main    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC );
         % Top left box
         topL = uix.BoxPanel( 'Parent', top, 'Title', 'Input', 'FontWeight', 'Bold', 'TitleColor', [.2 .2 .2], 'BackgroundColor', BGC,  'Padding', 5 );
         topL2= uix.VBox( 'Parent', topL);
-
+            
+            %Pannels
             topLT = uix.TabPanel( 'Parent', topL2, 'Padding', 5 , 'BackgroundColor', BGC );
-            
-                topL_proj = uix.Grid( 'Parent', topLT, 'Padding', 15, 'Spacing', 15, 'BackgroundColor', PC );
-                    topL_proj_nameL     = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Run name', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left'); remove_frame(topL_proj_nameL  );
-                    topL_proj_latL      = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Latitude', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left'); remove_frame(topL_proj_latL  );
-                    topL_proj_lonL      = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Longitude', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left'); remove_frame(topL_proj_lonL );
-                    topL_proj_dateL     = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Eruption date', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left'); remove_frame(topL_proj_dateL );
-                    uix.Empty( 'Parent', topL_proj )
-                    topL_proj_atmL     = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Atmospheric data', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left'); remove_frame(topL_proj_atmL );
-                    topL_proj_demL     = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'DEM', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left'); remove_frame(topL_proj_demL );
-
-                    topL_proj_name      = uicontrol( 'Parent', topL_proj, 'Style', 'Edit');
-                    topL_proj_lat       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit');
-                    topL_proj_lon       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit');
-                    topL_proj_date      = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', datestr(now));
-                    uix.Empty( 'Parent', topL_proj )
-                    topL_proj_atm       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', datestr(now));
-                    topL_proj_dem       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', datestr(now));
-
-                    uix.Empty( 'Parent', topL_proj );
-                    uix.Empty( 'Parent', topL_proj );
-                    uix.Empty( 'Parent', topL_proj );
-                    uix.Empty( 'Parent', topL_proj );
-                    uix.Empty( 'Parent', topL_proj );
-                    topL_proj_atmP      = uicontrol( 'Parent', topL_proj, 'Style', 'Pushbutton', 'String', '...');
-                    topL_proj_demP      = uicontrol( 'Parent', topL_proj, 'Style', 'Pushbutton', 'String', '...');
-                    
-                    set( topL_proj,  'Heights', [35 35 35 35 0 35 35], 'Widths', [-2, -4 -1] );
+                topL_PROJ = uix.Panel( 'Parent', topLT );
+                topL_PART = uix.Panel( 'Parent', topLT );
+                topL_POS  = uix.Panel( 'Parent', topLT );
+                topL_VEL  = uix.Panel( 'Parent', topLT );
+                topL_OPT  = uix.Panel( 'Parent', topLT );
+                topLT.TabTitles = {'Project', 'Particle', 'Position', 'Velocity','Option'};
                 
-            topL_erup = uicontrol( 'Parent', topLT );
-            topL_part = uicontrol( 'Parent', topLT );
-            topL_pos  = uicontrol( 'Parent', topLT );
-            topL_vel  = uicontrol( 'Parent', topLT );
-            topL_opr  = uicontrol( 'Parent', topLT );
-            topLT.TabTitles = {'Project', 'Eruption', 'Particle', 'Position', 'Velocity','Option'};
+                
+                    topL_proj = uix.Grid( 'Parent', topL_PROJ, 'Padding', 15, 'Spacing', 8, 'BackgroundColor', BGC );
+                        topL_proj_nameL     = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Run name', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
+                        topL_proj_latL      = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Vent latitude', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
+                        topL_proj_lonL      = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Vent longitude', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
+                        topL_proj_altL      = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Vent altitude', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
+                        topL_proj_dateL     = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Eruption date', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
+                        uix.Empty( 'Parent', topL_proj );
+                        topL_proj_atmL     = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Atmospheric data', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
+                        topL_proj_demL     = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'DEM', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
+
+                        topL_proj_name      = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Run name', 'Tag', 'name', 'callback', @check_var);
+                        topL_proj_lat       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Vent latitude (negative in southern hemisphere)', 'Tag', 'vent_lat', 'callback', @check_var);
+                        topL_proj_lon       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Vent longitude (negative in western hemisphere)', 'Tag', 'vent_lon', 'callback', @check_var);
+                        topL_proj_alt       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Vent elevation (m asl)', 'Tag', 'vent_alt', 'callback', @check_var);
+                        topL_proj_date      = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', datestr(now), 'Tooltip', 'Eruption date (hours in UTC)', 'Tag', 'date', 'callback', @check_var);
+                        uix.Empty( 'Parent', topL_proj );
+                        topL_proj_atm       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Path to .nc file of atmospheric data', 'Tag', 'atm', 'callback', @check_var);
+                        topL_proj_dem       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Path to DEM file', 'Tag', 'dem', 'callback', @check_var);
+
+                        uix.Empty( 'Parent', topL_proj );
+                        uix.Empty( 'Parent', topL_proj );
+                        uix.Empty( 'Parent', topL_proj );
+                        uix.Empty( 'Parent', topL_proj );
+                        uix.Empty( 'Parent', topL_proj );
+                        uix.Empty( 'Parent', topL_proj );
+                        topL_proj_atmP      = uicontrol( 'Parent', topL_proj, 'Style', 'Pushbutton', 'String', '...', 'callback', {@set_path, topL_proj_atm, '*.nc', 'input/wind/', 'Load .nc file'});
+                        topL_proj_demP      = uicontrol( 'Parent', topL_proj, 'Style', 'Pushbutton', 'String', '...', 'callback', {@set_path, topL_proj_dem, '*.mat', 'input/dem/', 'Load .mat file'});
+
+                        set( topL_proj,  'Heights', [35 35 35 35 35 0 35 35], 'Widths', [120, -1 40] );
+                    
+                    topLT.Selection = 2;
+                    topL_part = uix.Grid( 'Parent', topL_PART, 'Padding', 15, 'Spacing', 8, 'BackgroundColor', BGC );
+                        topL_part_nameL     = uicontrol( 'Parent', topL_part, 'Style', 'Edit', 'String', 'Particle name', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
+                        uix.Empty( 'Parent', topL_part );
+                        topL_part_diamL     = uicontrol( 'Parent', topL_part, 'Style', 'Edit', 'String', 'Diameter (mm)', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
+                        topL_part_densL     = uicontrol( 'Parent', topL_part, 'Style', 'Edit', 'String', 'Density (kg/m^3)', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
+                        topL_part_flatL     = uicontrol( 'Parent', topL_part, 'Style', 'Edit', 'String', 'Flatness', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
+                        topL_part_elonL     = uicontrol( 'Parent', topL_part, 'Style', 'Edit', 'String', 'Elongation', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
+
+                        topL_part_name      = uicontrol( 'Parent', topL_part, 'Style', 'Edit', 'Tooltip', 'Particle name', 'Tag', 'name', 'callback', @check_var);
+                        uix.Empty( 'Parent', topL_part );
+                        topL_part_diam      = uicontrol( 'Parent', topL_part, 'Style', 'Edit', 'Tooltip', 'Particle diameter (mm)', 'Tag', 'name', 'callback', @check_var);
+                        topL_part_dens      = uicontrol( 'Parent', topL_part, 'Style', 'Edit', 'Tooltip', 'Density (kg/m^3)', 'Tag', 'name', 'callback', @check_var);
+                        topL_part_flat      = uicontrol( 'Parent', topL_part, 'Style', 'Edit', 'Tooltip', 'Flatness (i.e. ratio of small and intermediate axes)', 'Tag', 'name', 'callback', @check_var);
+                        topL_part_elon      = uicontrol( 'Parent', topL_part, 'Style', 'Edit', 'Tooltip', 'Elongation (i.e. ration of intermediate and large axes)', 'Tag', 'name', 'callback', @check_var);
+                        
+                        set( topL_part,  'Heights', [35 0 35 35 35 35], 'Widths', [120, -1
+                            
+                        ] );
+                        
+                        
+                
+                
+                    topL_pos = uix.Grid( 'Parent', topL_POS, 'Padding', 15, 'Spacing', 8, 'BackgroundColor', BGC );
+                
+                
+                    topL_vel = uix.Grid( 'Parent', topL_VEL, 'Padding', 15, 'Spacing', 8, 'BackgroundColor', BGC );
+                
+                
+                    topL_opt = uix.Grid( 'Parent', topL_OPT, 'Padding', 15, 'Spacing', 8, 'BackgroundColor', BGC );
+                
+                
+                
+
+                
             
-            topLB = uix.HButtonBox( 'Parent', topL2, 'Padding', 5 , 'BackgroundColor', BGC   );
-            uicontrol( 'Parent', topLB, 'String', 'Run' );
-            set( topLB, 'ButtonSize', [100 45], 'Spacing', 5 );
+                
+                
+            
+            topLB = uix.HBox('Parent', topL2, 'Padding', 5 , 'BackgroundColor', BGC);
+            %uix.HButtonBox( 'Parent', topL2, 'Padding', 5 , 'BackgroundColor', BGC   );
+            errorE = uicontrol( 'Parent', topLB, 'Style', 'Edit', 'String', '  ', 'HorizontalAlign', 'left', 'Tag','Errmsg');
+            uicontrol( 'Parent', topLB, 'Style', 'Pushbutton', 'String', 'Run' );
+            set( topLB, 'Widths', [-1 120], 'Spacing', 5 );
+            %set( topLB, 'ButtonSize', [100 45], 'Spacing', 5 );
         
         set(topL2, 'Heights', [-1 45]);
         
