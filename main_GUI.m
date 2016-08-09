@@ -7,7 +7,8 @@ ypos = ceil((screensize(4)-sz(1))/2); % center the figure on the
 
 
 
-f = figure( 'Name', 'LagTrack', 'position',[xpos, ypos, sz(2), sz(1)], 'Toolbar','none', 'Menubar', 'none', 'NumberTitle', 'off' );
+f = figure( 'Name', 'LagTrack', 'position',[xpos, ypos, sz(2), sz(1)], 'Toolbar','none', 'Menubar', 'none', 'NumberTitle', 'off', 'Visible', 'off' );
+display('Preparing the interface, please wait...')
 
 % Main container
 MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
@@ -29,7 +30,7 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
                 %topL_VEL  = uix.Panel( 'Parent', topLT );
                 topL_ADV  = uix.Panel( 'Parent', topLT );
                 topLT.TabTitles = {'Project', 'Particle', 'Release', 'Advanced'};
-                
+                topLT.TabWidth  = 65;
                     
                     % Project
                     topL_proj = uix.Grid( 'Parent', topL_PROJ, 'Padding', 15, 'Spacing', 8, 'BackgroundColor', BGC );
@@ -143,7 +144,7 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
             
             topLB = uix.HBox('Parent', topL, 'Padding', 5 , 'BackgroundColor', BGC);
             errorE = uicontrol( 'Parent', topLB, 'Style', 'Edit', 'String', '  ', 'HorizontalAlign', 'left', 'Tag','Errmsg');
-            uicontrol( 'Parent', topLB, 'Style', 'Pushbutton', 'String', 'Run' );
+            uicontrol( 'Parent', topLB, 'Style', 'Pushbutton', 'String', 'Run', 'Enable', 'off', 'Tag', 'run_btn' );
             set( topLB, 'Widths', [-1 120], 'Spacing', 5 );
         
         set(topL, 'Heights', [-1 45]);
@@ -161,10 +162,39 @@ set(MAIN, 'Heights', [-1 200], 'Spacing', 5 );
 
 
 
+%% Setup GUI data
+part.run_name       = -9999;
+part.vent.lat       = -9999;
+part.vent.lon       = -9999;
+part.vent.alt       = -9999;
+part.date           = now;
+part.path.nc        = -9999;
+part.path.dem       = -9999;
+part.part.name      = -9999;
+part.part.diam      = 0.5;
+part.part.dens      = 1000;
+part.part.flat      = 0.7;
+part.part.elon      = 0.7;
+part.rel.x          = 0;
+part.rel.y          = 0;
+part.rel.z          = 0;
+part.rel.t          = 0;
+part.rel.vx         = 0;
+part.rel.vy         = 0;
+part.rel.vz         = 1e-4;
+part.adv.solution   = 'euler';
+part.adv.dt         = 0.1;
+part.adv.drag       = 0;
+part.adv.interp     = 'subset';
+part.adv.method     = 'linear';
+part.adv.range      = 1;
+part.adv.skip       = 0;
 
+guidata(f, part)
 
-
-
+%% Display interface
+set(f, 'Visible', 'on');
+display('Done!');
 
 
 % jEditbox = findjobj(a);
