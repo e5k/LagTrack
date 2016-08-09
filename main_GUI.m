@@ -144,7 +144,7 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
             
             topLB = uix.HBox('Parent', topL, 'Padding', 5 , 'BackgroundColor', BGC);
             errorE = uicontrol( 'Parent', topLB, 'Style', 'Edit', 'String', '  ', 'HorizontalAlign', 'left', 'Tag','Errmsg');
-            uicontrol( 'Parent', topLB, 'Style', 'Pushbutton', 'String', 'Run', 'Enable', 'off', 'Tag', 'run_btn' );
+            uicontrol( 'Parent', topLB, 'Style', 'Pushbutton', 'String', 'Run', 'Enable', 'off', 'Tag', 'run_btn', 'callback', @runIt );
             set( topLB, 'Widths', [-1 120], 'Spacing', 5 );
         
         set(topL, 'Heights', [-1 45]);
