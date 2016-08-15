@@ -1,0 +1,33 @@
+Run name:	Etna_test
+Particle name:	part2
+
+Atmpspheric data:	/Users/Seb/Documents/WORK/Codes/LagTrack/input/wind/Etna_Nov_2013/Etna_Nov_2013.mat
+DEM:	/Users/Seb/Documents/WORK/Codes/LagTrack/input/dem/Etna/Etna.mat
+
+Vent latitude:	37.74
+Vent longitude:	15.00
+Vent altitude:	3000.00
+Eruption date:	23-Nov-2013 11:55:00
+
+Diameter (mm):	0.0500
+Density (kg/m3):	1000.00
+Flatness:	0.70
+Elongation:	0.70
+
+X offset (m):	   0
+Y offset (m):	   0
+Z offset (m):	   0
+Time offset (s):	   0
+Initial U velocity (m/s):	0.00
+Initial V velocity (m/s):	0.00
+Initial Z velocity (m/s):	0.00
+
+Solution:	euler
+Time step:	0.10
+
+Radius of reduced drag:	0.00
+
+Interpolation scheme:	subset
+Interpolation method:	linear
+Interpolation range:	1
+Interpolation skip:	0

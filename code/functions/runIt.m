@@ -19,7 +19,19 @@ if exist(['projects', filesep, part.run_name, filesep, part.part.name, '.mat'], 
         case 'Cancel'
             return
         case 'Replace'
-            rm(['projects', filesep, part.run_name, filesep, part.part.name, '.mat']);
+            delete(['projects', filesep, part.run_name, filesep, part.part.name, '.mat']);
     end
 end
 
+%% RUN
+set(findobj(ancestor(src, 'figure'), 'Tag', 'run_btn'), 'Enable', 'off');   
+display('Run started...');
+part.traj = get_trajectory(part);
+set(findobj(ancestor(src, 'figure'), 'Tag', 'run_btn'), 'Enable', 'on');   
+display('Done!');
+
+%% Update
+update_table(src, part);
+
+
+save(['projects', filesep, part.run_name, filesep, part.part.name, '.mat'], 'part');

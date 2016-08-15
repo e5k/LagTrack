@@ -37,3 +37,5 @@ fclose(fid);
 !python download_ECMWF.py
 
 delete('download_ECMWF.py');
+
+preprocess_ECMWF(filename)

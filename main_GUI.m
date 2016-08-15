@@ -1,3 +1,5 @@
+clear
+
 BGC = get(0,'DefaultUicontrolBackgroundColor');
 PC  = [.9 .9 .9];
 sz = [700 1000]; % figure size
@@ -9,6 +11,10 @@ ypos = ceil((screensize(4)-sz(1))/2); % center the figure on the
 
 f = figure( 'Name', 'LagTrack', 'position',[xpos, ypos, sz(2), sz(1)], 'Toolbar','none', 'Menubar', 'none', 'NumberTitle', 'off', 'Visible', 'off' );
 display('Preparing the interface, please wait...')
+
+% Menu
+m = uimenu('Label', 'File');
+uimenu(m, 'Label', 'Load particle', 'Accelerator', 'O', 'Callback', @load_part);
 
 % Main container
 MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
@@ -58,7 +64,7 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
                         uix.Empty( 'Parent', topL_proj );
                         uix.Empty( 'Parent', topL_proj );
                         uix.Empty( 'Parent', topL_proj );
-                        topL_proj_atmP      = uicontrol( 'Parent', topL_proj, 'Style', 'Pushbutton', 'String', '...', 'callback', {@set_path, topL_proj_atm, '*.nc', 'input/wind/', 'Load .nc file'});
+                        topL_proj_atmP      = uicontrol( 'Parent', topL_proj, 'Style', 'Pushbutton', 'String', '...', 'callback', {@set_path, topL_proj_atm, '*.mat', 'input/wind/', 'Load .nc file'});
                         topL_proj_demP      = uicontrol( 'Parent', topL_proj, 'Style', 'Pushbutton', 'String', '...', 'callback', {@set_path, topL_proj_dem, '*.mat', 'input/dem/', 'Load .mat file'});
 
                         set( topL_proj,  'Heights', [35 35 35 35 35 0 35 35], 'Widths', [120, -1 40] );
@@ -154,14 +160,77 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
 
     set( TOP, 'Widths', [-1 -1], 'Spacing', 5 );
 
-    % Bottom container
-    bottom  = uix.BoxPanel( 'Parent', MAIN, 'Title', 'Input', 'FontWeight', 'Bold', 'TitleColor', [.2 .2 .2], 'BackgroundColor', BGC,  'Padding', 5 );
-
+%% Bottom container
+    bottom  = uix.BoxPanel( 'Parent', MAIN, 'Title', 'Particles', 'FontWeight', 'Bold', 'TitleColor', [.2 .2 .2], 'BackgroundColor', BGC,  'Padding', 5 );
+    
+    BOT = uix.HBox( 'Parent', bottom);
+    TB  = uitable( 'Parent', BOT, 'Tag', 'DataTable');
+    GRD = uix.Grid( 'Parent', BOT, 'Spacing', 5 );
+        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Plot' )
+        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Clear' )
+        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Export' )
+        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Display'  )
+        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Details' )
+        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Save' )
+    set(GRD, 'Heights', [-1 -1 -1], 'Widths', [-1 -1] );
+    set(BOT, 'Widths', [-1 200], 'Spacing', 5 );
+    
 set(MAIN, 'Heights', [-1 200], 'Spacing', 5 );
 
 
+CName = {'Name', 'Plot',...
+    '<html><center>Diameter<br />(mm)</center></html>',...
+    '<html><center>Density<br />(kg/m<sup>2</sup>)</center></html>',...
+    'Flatness', 'Elongation',...
+    '<html><center>X offset<br />(m)</center></html>',...
+    '<html><center>Y offset<br />(m)</center></html>',...
+    '<html><center>Altitude<br />(m asl)</center></html>',...
+    'Time', ...
+    '<html><center>Fall time<br />(s)</center></html>',...
+    '<html><center>Landing altitude<br />(m asl)</center></html>',...
+    '<html><center>Terminal velocity<br />(m/s)</center></html>'};
+CForm = {'char', 'logical','bank', 'bank', 'bank', 'bank', 'bank', 'bank', 'bank', 'char', 'bank', 'bank', 'bank'};
+CEdit = [false, true, false, false, false, false ,false ,false ,false ,false ,false ,false ,false ];
+%CEdit = logical([0 1 0 0 0 0 0 0 0 0 0 0 0]);
+set(TB, 'ColumnName', CName, 'ColumnFormat', CForm, 'ColumnEditable', CEdit, 'RowName', [], 'ColumnWidth', 'auto');
 
 
+
+%% DISPLAY
+
+varList     =     {'Time (s)',...
+    'X distance (m)',...
+    'Y distance (m)',...
+    'Altitude (m asl)',...
+    'Distance (m)',...
+    'Latitude',...
+    'Longitude',...
+    'U velocity (m/s)',...
+    'V velocity (m/s)',...
+    'Z velocity (m/s)',...
+    'U wind (m/s)',...
+    'V wind (m/s)',...
+    'Re',...
+    'Ganser Re',...
+    'Drag coefficient', ...
+    'Relaxation time (s)'};
+
+
+topRT       = uix.TabPanel( 'Parent', TOPR, 'Padding', 5 , 'BackgroundColor', BGC );
+topR_MAP    = uix.Panel( 'Parent', topRT);
+topR_PLOT   = uix.Panel( 'Parent', topRT );
+topRT.TabTitles = {'Map', 'Profiles'};
+topRT.TabWidth  = 65;
+
+topR_plot   = uix.VBox('Parent', topR_PLOT, 'BackgroundColor', BGC, 'Padding', 5);
+    topR_plotA  = uix.Empty( 'Parent', topR_plot ); % Axis goes here
+
+    topR_plotB  = uix.HBox( 'Parent', topR_plot );
+        topR_varA   = uicontrol('Parent', topR_plotB, 'Style', 'popupmenu', 'String', varList, 'Tag', 'varA');
+        topR_varB   = uicontrol('Parent', topR_plotB, 'Style', 'popupmenu', 'String', varList, 'Tag', 'varB');
+        set(topR_plotB, 'Widths', [-1 -1]);
+        
+    set(topR_plot, 'Heights', [-1 25]);
 %% Setup GUI data
 part.run_name       = -9999;
 part.vent.lat       = -9999;
