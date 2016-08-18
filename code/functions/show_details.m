@@ -1,5 +1,31 @@
-function show_details(part)
+function show_details(varargin)
 
+if nargin == 0  % If calling the function independently
+    [fl, pth] = uigetfile('*.mat');
+    if isempty(fl)
+        return
+    end
+    
+    load(fullfile(pth, fl));
+    if ~isfield(part, 'traj')
+        errordlg('The selected file is not a valid run')
+        return
+    end
+    
+    
+else % If the function is called through the GUI
+    src     = varargin{1};
+    tmpS    = get(findobj(ancestor(src, 'figure'), 'Tag', 'DataList'), 'String');
+    tmpV    = get(findobj(ancestor(src, 'figure'), 'Tag', 'DataList'), 'Value');
+    APDTA   = getappdata(ancestor(src, 'figure'));  
+    
+    if length(tmpV) > 1
+        errordlg('Please select only one particle')
+        return
+    else
+        part = APDTA.pltData.(char(tmpS(tmpV)));
+    end
+end
 
 header = {'<html><center> Time <br/> (s) </center></html>',...
     '<html><center> X distance <br/> (m) </center></html>',...

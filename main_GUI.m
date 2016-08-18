@@ -143,11 +143,7 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
                         
                         
                     topLT.Selection = 1;
-                    
-            
-                
-                
-            
+       
             topLB = uix.HBox('Parent', topL, 'Padding', 5 , 'BackgroundColor', BGC);
             errorE = uicontrol( 'Parent', topLB, 'Style', 'Edit', 'String', '  ', 'HorizontalAlign', 'left', 'Tag','Errmsg');
             uicontrol( 'Parent', topLB, 'Style', 'Pushbutton', 'String', 'Run', 'Enable', 'off', 'Tag', 'run_btn', 'callback', @runIt );
@@ -165,20 +161,21 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
     
     BOT = uix.HBox( 'Parent', bottom);
     TB  = uitable( 'Parent', BOT, 'Tag', 'DataTable');
+    LST = uicontrol('Parent', BOT', 'Style', 'listbox', 'Tag', 'DataList', 'Max', 4, 'Min',1);
     GRD = uix.Grid( 'Parent', BOT, 'Spacing', 5 );
-        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Plot' )
+        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Plot', 'Callback', @update_plots )
         uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Clear' )
         uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Export' )
         uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Display'  )
-        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Details' )
+        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Details', 'Callback', @show_details )
         uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Save' )
     set(GRD, 'Heights', [-1 -1 -1], 'Widths', [-1 -1] );
-    set(BOT, 'Widths', [-1 200], 'Spacing', 5 );
+    set(BOT, 'Widths', [-4 -1 200], 'Spacing', 5 );
     
 set(MAIN, 'Heights', [-1 200], 'Spacing', 5 );
 
 
-CName = {'Name', 'Plot',...
+CName = {'Name',...
     '<html><center>Diameter<br />(mm)</center></html>',...
     '<html><center>Density<br />(kg/m<sup>2</sup>)</center></html>',...
     'Flatness', 'Elongation',...
@@ -189,8 +186,8 @@ CName = {'Name', 'Plot',...
     '<html><center>Fall time<br />(s)</center></html>',...
     '<html><center>Landing altitude<br />(m asl)</center></html>',...
     '<html><center>Terminal velocity<br />(m/s)</center></html>'};
-CForm = {'char', 'logical','bank', 'bank', 'bank', 'bank', 'bank', 'bank', 'bank', 'char', 'bank', 'bank', 'bank'};
-CEdit = [false, true, false, false, false, false ,false ,false ,false ,false ,false ,false ,false ];
+CForm = {'char','bank', 'bank', 'bank', 'bank', 'bank', 'bank', 'bank', 'char', 'bank', 'bank', 'bank'};
+CEdit = [false,false, false, false, false ,false ,false ,false ,false ,false ,false ,false ];
 %CEdit = logical([0 1 0 0 0 0 0 0 0 0 0 0 0]);
 set(TB, 'ColumnName', CName, 'ColumnFormat', CForm, 'ColumnEditable', CEdit, 'RowName', [], 'ColumnWidth', 'auto');
 
@@ -215,22 +212,46 @@ varList     =     {'Time (s)',...
     'Drag coefficient', ...
     'Relaxation time (s)'};
 
-
+% Setup tabs of map/plt
 topRT       = uix.TabPanel( 'Parent', TOPR, 'Padding', 5 , 'BackgroundColor', BGC );
-topR_MAP    = uix.Panel( 'Parent', topRT);
+topR_MAP    = uix.Panel( 'Parent', topRT);  
 topR_PLOT   = uix.Panel( 'Parent', topRT );
 topRT.TabTitles = {'Map', 'Profiles'};
 topRT.TabWidth  = 65;
 
+% Map tab
+topR_map    = uix.VBox('Parent', topR_MAP, 'BackgroundColor', BGC, 'Padding', 5);
+    ax_map  = axes('Parent', topR_map, 'Tag', 'MapAx', 'Box', 'on'); % Map axis
+
+    topR_mapB  = uix.HBox( 'Parent', topR_map );
+        uix.Empty('Parent', topR_mapB);
+        uicontrol('Parent', topR_mapB, 'Style', 'togglebutton', 'String', '3D rotate', 'Tag', 'Map3D', 'Callback', @set_map_mode);
+        uicontrol('Parent', topR_mapB, 'Style', 'togglebutton', 'String', 'Pan', 'Tag', 'MapPan', 'Callback', @set_map_mode);
+        uicontrol('Parent', topR_mapB, 'Style', 'togglebutton', 'String', 'Zoom', 'Tag', 'MapZoom', 'Callback', @set_map_mode);
+        uicontrol('Parent', topR_mapB, 'Style', 'togglebutton', 'String', 'Legend', 'Tag', 'MapLegend', 'Callback', @set_map_mode);
+        uix.Empty('Parent', topR_mapB);
+        set(topR_mapB, 'Widths', [-1 90 90 90 90 -1]);
+        
+    set(topR_map, 'Heights', [-1 40]);
+    
+% Plot tab    
 topR_plot   = uix.VBox('Parent', topR_PLOT, 'BackgroundColor', BGC, 'Padding', 5);
-    topR_plotA  = uix.Empty( 'Parent', topR_plot ); % Axis goes here
+    ax_plot = axes('Parent', topR_plot, 'Tag', 'PlotAx', 'Box', 'on'); % Plot axis
 
     topR_plotB  = uix.HBox( 'Parent', topR_plot );
-        topR_varA   = uicontrol('Parent', topR_plotB, 'Style', 'popupmenu', 'String', varList, 'Tag', 'varA');
-        topR_varB   = uicontrol('Parent', topR_plotB, 'Style', 'popupmenu', 'String', varList, 'Tag', 'varB');
+        topR_varA   = uicontrol('Parent', topR_plotB, 'Style', 'popupmenu', 'String', varList, 'Tag', 'varA', 'Enable', 'off');
+        topR_varB   = uicontrol('Parent', topR_plotB, 'Style', 'popupmenu', 'String', varList, 'Tag', 'varB', 'Enable', 'off');
         set(topR_plotB, 'Widths', [-1 -1]);
         
     set(topR_plot, 'Heights', [-1 25]);
+    
+    
+    
+    
+    
+    
+    
+    
 %% Setup GUI data
 part.run_name       = -9999;
 part.vent.lat       = -9999;

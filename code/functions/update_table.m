@@ -2,9 +2,9 @@ function update_table(src, part)
 
 %f = ancestor(src, 'figure');
 Tdata = get(findobj(ancestor(src, 'figure'), 'Tag', 'DataTable'), 'Data');
+Ldata = get(findobj(ancestor(src, 'figure'), 'Tag', 'DataList'), 'String');
 
 data = {part.part.name, ...
-    'true',...
     part.part.diam*1e2,...
     part.part.dens,...
     part.part.flat,...
@@ -18,13 +18,14 @@ data = {part.part.name, ...
     part.traj.uf(end)
     };
 
-CName = {'Name', 'Plot', 'Diameter (mm)', 'Density', 'Flatness', 'Elongation', 'X offset (m)', 'Y offset (m)', 'Altitude (m)', 'Release', 'Flight Time (s)', 'Landing altitude', 'Terminal velocity'};
 
 if isempty(Tdata)
     Tdata = data;
+    Ldata = {part.part.name};
 else
     Tdata(size(Tdata,1)+1,:) = data;
+    Ldata{size(Ldata,1)+1,1} = part.part.name;
 end
 
 set(findobj(ancestor(src, 'figure'), 'Tag', 'DataTable'), 'Data', Tdata);
-
+set(findobj(ancestor(src, 'figure'), 'Tag', 'DataList'), 'String', Ldata);
