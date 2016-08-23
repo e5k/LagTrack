@@ -134,7 +134,7 @@ while test_run == 0
 
 
     % Update particle state
-    velr         = sqrt((part.u(i-1)-part.uf(i-1))^2+(part.v(i-1)-part.vf(i-1))^2+part.w(i-1)^2);	% Particle relative velocity
+    velr            = sqrt((part.u(i-1)-part.uf(i-1))^2+(part.v(i-1)-part.vf(i-1))^2+part.w(i-1)^2);	% Particle relative velocity
     
     if sqrt((part.u(i-1)-part.uf(i-1))^2+(part.v(i-1)-part.vf(i-1))^2)==0
         theta       = 90;
@@ -146,7 +146,7 @@ while test_run == 0
     else
         Beta        = atand(part.w(i-1)/sqrt((part.u(i-1)-part.uf(i-1))^2+(part.v(i-1)-part.vf(i-1))^2)); % direction of particle in the vertical plane (x-z or y-z)
     end
-    part.Re(i)      = denf * velr * P.part.diam / visf;                       % Reynolds
+    part.Re(i)      = denf * velr * P.part.diam / visf;                     % Reynolds
     part.Re_S(i)    = part.Re(i) * part.Kn / part.Ks;                       % Ganser Re
     
     if part.Re_S(i) > 3e10^5
@@ -175,7 +175,7 @@ while test_run == 0
         part.z(i)   = part.z(i-1) + G_w * (1/Fd) * P.adv.dt + (1/Fd)* (1-exp(-P.adv.dt*Fd)) * (part.w(i) - G_w/Fd);
 
     elseif strcmp(P.adv.solution, 'euler')
-        % Euler semi-implicit 
+    % Euler semi-implicit 
         part.u(i)   = ((G_u + Fd_u * part.uf(i-1))* P.adv.dt + part.u(i-1)) / (1+Fd_u * P.adv.dt);
         part.x(i)   = part.x(i-1) + .5 * P.adv.dt * (part.u(i) + part.u(i-1));
 

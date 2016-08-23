@@ -161,14 +161,14 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
     
     BOT = uix.HBox( 'Parent', bottom);
     TB  = uitable( 'Parent', BOT, 'Tag', 'DataTable');
-    LST = uicontrol('Parent', BOT', 'Style', 'listbox', 'Tag', 'DataList', 'Max', 4, 'Min',1);
-    GRD = uix.Grid( 'Parent', BOT, 'Spacing', 5 );
-        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Plot', 'Callback', @update_plots )
-        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Clear' )
-        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Export' )
-        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Display'  )
-        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Details', 'Callback', @show_details )
-        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Save' )
+    LST = uicontrol('Parent', BOT', 'Style', 'listbox', 'Tag', 'DataList', 'Max', 100, 'Min',0);
+    GRD = uix.Grid( 'Parent', BOT, 'Spacing', 5);
+        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Plot', 'Enable', 'off', 'Tag', 'Bplot', 'Tooltip', 'Update plot in the GUI', 'Callback', @update_plots )
+        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Clear', 'Enable', 'off', 'Tag', 'Bclear', 'Tooltip', 'Clear selected particles', 'Callback', @clear_part )
+        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Export', 'Enable', 'off', 'Tag', 'B' )
+        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Export', 'Enable', 'off', 'Tag', 'Bexport', 'Tooltip', 'Export figure to new axes', 'Callback', @update_plots )
+        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Details', 'Enable', 'off', 'Tag', 'Bdetail', 'Callback', @show_details )
+        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Save', 'Enable', 'off', 'Tag', 'Bsave' )
     set(GRD, 'Heights', [-1 -1 -1], 'Widths', [-1 -1] );
     set(BOT, 'Widths', [-4 -1 200], 'Spacing', 5 );
     
@@ -220,15 +220,15 @@ topRT.TabTitles = {'Map', 'Profiles'};
 topRT.TabWidth  = 65;
 
 % Map tab
-topR_map    = uix.VBox('Parent', topR_MAP, 'BackgroundColor', BGC, 'Padding', 5);
-    ax_map  = axes('Parent', topR_map, 'Tag', 'MapAx', 'Box', 'on'); % Map axis
+topR_map    = uix.VBox('Parent', topR_MAP, 'BackgroundColor', BGC, 'Padding', 5, 'Tag', 'MapTab');
+    ax_map  = axes('Parent', uicontainer('Parent',topR_map), 'Tag', 'MapAx', 'Box', 'on'); % Map axis
 
     topR_mapB  = uix.HBox( 'Parent', topR_map );
         uix.Empty('Parent', topR_mapB);
-        uicontrol('Parent', topR_mapB, 'Style', 'togglebutton', 'String', '3D rotate', 'Tag', 'Map3D', 'Callback', @set_map_mode);
-        uicontrol('Parent', topR_mapB, 'Style', 'togglebutton', 'String', 'Pan', 'Tag', 'MapPan', 'Callback', @set_map_mode);
-        uicontrol('Parent', topR_mapB, 'Style', 'togglebutton', 'String', 'Zoom', 'Tag', 'MapZoom', 'Callback', @set_map_mode);
-        uicontrol('Parent', topR_mapB, 'Style', 'togglebutton', 'String', 'Legend', 'Tag', 'MapLegend', 'Callback', @set_map_mode);
+        uicontrol('Parent', topR_mapB, 'Style', 'togglebutton', 'String', '3D rotate', 'Tag', 'Map3D', 'Enable', 'off', 'Callback', {@set_map_mode, ax_map.Position});
+        uicontrol('Parent', topR_mapB, 'Style', 'togglebutton', 'String', 'Pan', 'Tag', 'MapPan', 'Enable', 'off', 'Callback', {@set_map_mode, ax_map.Position});
+        uicontrol('Parent', topR_mapB, 'Style', 'togglebutton', 'String', 'Zoom', 'Tag', 'MapZoom', 'Enable', 'off', 'Callback', {@set_map_mode, ax_map.Position});
+        uicontrol('Parent', topR_mapB, 'Style', 'togglebutton', 'String', 'Legend', 'Tag', 'MapLegend', 'Enable', 'off', 'Callback', {@set_map_mode, ax_map.Position});
         uix.Empty('Parent', topR_mapB);
         set(topR_mapB, 'Widths', [-1 90 90 90 90 -1]);
         
@@ -236,11 +236,11 @@ topR_map    = uix.VBox('Parent', topR_MAP, 'BackgroundColor', BGC, 'Padding', 5)
     
 % Plot tab    
 topR_plot   = uix.VBox('Parent', topR_PLOT, 'BackgroundColor', BGC, 'Padding', 5);
-    ax_plot = axes('Parent', topR_plot, 'Tag', 'PlotAx', 'Box', 'on'); % Plot axis
+    ax_plot = axes('Parent', uicontainer('Parent',topR_plot), 'Tag','PlotAx', 'Box', 'on'); % Plot axis
 
     topR_plotB  = uix.HBox( 'Parent', topR_plot );
-        topR_varA   = uicontrol('Parent', topR_plotB, 'Style', 'popupmenu', 'String', varList, 'Tag', 'varA', 'Enable', 'off');
-        topR_varB   = uicontrol('Parent', topR_plotB, 'Style', 'popupmenu', 'String', varList, 'Tag', 'varB', 'Enable', 'off');
+        topR_varX   = uicontrol('Parent', topR_plotB, 'Style', 'popupmenu', 'String', varList, 'Tag', 'varX', 'Enable', 'off');
+        topR_varY   = uicontrol('Parent', topR_plotB, 'Style', 'popupmenu', 'String', varList, 'Tag', 'varY', 'Enable', 'off');
         set(topR_plotB, 'Widths', [-1 -1]);
         
     set(topR_plot, 'Heights', [-1 25]);

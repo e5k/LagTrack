@@ -2,9 +2,7 @@ function map_part(varargin)
 
 if nargin == 0  % If calling the function independently
     [fl, pth] = uigetfile('projects/*.mat', 'Multiselect', 'on');
-    if isempty(fl)
-        return
-    end
+    if fl == 0; return; end
 
     pltData = struct;
     
@@ -32,10 +30,17 @@ if nargin == 0  % If calling the function independently
 else % If the function is called through the GUI
     src     = varargin{1};
     pltData = varargin{2};
-    AX      = findobj(ancestor(src, 'figure'), 'Tag', 'MapAx');     % Set plotting target - i.e. GUI axis
     fld     = fieldnames(pltData);                                  % Retrieve fieldnames
     
+     if nargin == 2
+        AX      = findobj(ancestor(src, 'figure'), 'Tag', 'MapAx');    % Set plotting target - i.e. GUI axis
+    elseif nargin == 3
+        FG      = figure;
+        AX      = axes('Parent', FG);                                   % Set plotting target - i.e. new figure
+    end
 end
+
+POS = AX.Position;
 
 % Retrieve the dem for plotting
 load(pltData.(fld{1}).path.dem); 
@@ -59,7 +64,8 @@ delete(f_tmp);
 surface( dem.X, dem.Y, dem.Z./1000, prepare_google_map(dem, lonVec, latVec, imag), 'Parent', AX); % Map the background to the topography
 % h=rotate3d;
 % set(h,'Enable','on');
-shading(AX, 'flat'); hold(AX, 'on');   grid(AX, 'on'); axis(AX, 'tight');
+shading(AX, 'flat'); hold(AX, 'on');   grid(AX, 'on'); 
+axis(AX, 'tight');
 
 %delete(tmpA);                                                               % Delete temporary line
 
@@ -88,10 +94,14 @@ for i = 1:length(fld)
     
     leg{i} = pltData.(fld{i}).part.name;
 end
+box(AX, 'on')
 
 xlabel('Longitude');
 ylabel('Latitude');
 zlabel('Altitude (km asl)');
 
-legend(legH, leg, 'Location', 'NorthEastOutside', 'Visible', 'off');
+legend(AX, legH, leg, 'Location', 'Best', 'Tag', 'Legend');
+AX.Position = POS;
 
+
+%legend('Hide')

@@ -13,10 +13,7 @@ else
     if isfield(APDTA, 'pltData') && ~isempty(find(strcmp(fieldnames(APDTA.pltData), part.part.name)==1,1))
         errordlg('This particle is already loaded');
         return
-    %elseif length(unique(strcmp(Tdata(:,1), part.part.name))) > 1
-    
     end
-   
 end
 
 %load([pth, filesep, fl])
@@ -59,7 +56,8 @@ update_table(src, part);
 guidata(src, part);
 
 % Set data to plot
-
-
 APDTA.pltData.(part.part.name) = part;
 setappdata(ancestor(src, 'figure'), 'pltData',APDTA.pltData);
+
+% Enable buttons
+enableUI(src, 'on');
