@@ -2,7 +2,7 @@ function map_part(varargin)
 
 if nargin == 0  % If calling the function independently
     [fl, pth] = uigetfile('projects/*.mat', 'Multiselect', 'on');
-    if fl == 0; return; end
+    if isnumeric(fl(1)); return; end
 
     pltData = struct;
     
@@ -34,6 +34,8 @@ else % If the function is called through the GUI
     
      if nargin == 2
         AX      = findobj(ancestor(src, 'figure'), 'Tag', 'MapAx');    % Set plotting target - i.e. GUI axis
+        cla(AX);
+        delete(findobj(ancestor(src, 'figure'), 'Tag', 'LegMap'));
     elseif nargin == 3
         FG      = figure;
         AX      = axes('Parent', FG);                                   % Set plotting target - i.e. new figure
@@ -45,13 +47,8 @@ POS = AX.Position;
 % Retrieve the dem for plotting
 load(pltData.(fld{1}).path.dem); 
 
-%
-if nargin > 0
-    cla(AX);
-    delete(findobj(ancestor(src, 'figure'), 'Tag', 'LegMap'));
-end
 
-cmap    = jet(length(fld));     % Setup colormap
+cmap    = lines(length(fld));     % Setup colormap
 leg     = cell(length(fld),1);  % Setup legend
 legH    = zeros(length(fld),1); % Legend handles
 

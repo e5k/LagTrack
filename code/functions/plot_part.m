@@ -19,7 +19,7 @@ varList     =     {'Time (s)',...
 
 if nargin == 0  % If calling the function independently
     [fl, pth] = uigetfile('projects/*.mat', 'Multiselect', 'on');
-    if fl == 0; return; end
+    if isnumeric(fl(1)); return; end
 
     pltData = struct;
     
@@ -59,13 +59,15 @@ if nargin == 0  % If calling the function independently
 else % If the function is called through the GUI
     src     = varargin{1};
     pltData = varargin{2};
-    fld     = fieldnames(pltData);                                  % Name of particles
+    fld     = fieldnames(pltData);                                          % Name of particles
     
     if nargin == 2
-        AX      = findobj(ancestor(src, 'figure'), 'Tag', 'PlotAx');    % Set plotting target - i.e. GUI axis
+        AX      = findobj(ancestor(src, 'figure'), 'Tag', 'PlotAx');        % Set plotting target - i.e. GUI axis       
+        cla(AX);                                                            % Clear axes
+        delete(findobj(ancestor(src, 'figure'), 'Tag', 'LegPlot'));         % Delete legend
     elseif nargin == 3
         FG      = figure;
-        AX      = axes('Parent', FG);                                   % Set plotting target - i.e. new figure
+        AX      = axes('Parent', FG);                                       % Set plotting target - i.e. new figure
     end
     
     vX      = get(findobj(ancestor(src, 'figure'), 'Tag', 'varX'), 'Value');
@@ -73,11 +75,7 @@ else % If the function is called through the GUI
         
 end
 
-% Delete axes that already exist 
-if nargin > 0
-    cla(AX);
-    delete(findobj(ancestor(src, 'figure'), 'Tag', 'LegPlot'));
-end
+
 
 % Retrieve field names
 varX    = get_field(varList{vX});
@@ -86,6 +84,7 @@ varY    = get_field(varList{vY});
 % Plot
 hold(AX, 'on');   grid(AX, 'on');
 for i = 1:length(fld)
+    
     plot(AX, pltData.(fld{i}).traj.(varX), pltData.(fld{i}).traj.(varY), '-');
     hold on
 end
@@ -94,8 +93,8 @@ grid(AX, 'on')
 box(AX, 'on')
 
 legend(AX, fld, 'Tag', 'LegPlot')
-xlabel(varList{vX});
-ylabel(varList{vY});
+xlabel(AX, varList{vX});
+ylabel(AX, varList{vY});
 
 
 function fldOut = get_field(fldIn)
