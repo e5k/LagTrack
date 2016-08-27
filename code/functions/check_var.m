@@ -17,8 +17,8 @@ elseif strcmp(src.Tag, 'vent_lat')
 elseif strcmp(src.Tag, 'vent_lon')  
     tmp = str2double(src.String);
     err = 'Check the vent longitude';
-    if isnan(tmp) || tmp>180 || tmp<-180 ; change_frame(jEdit,src,0,err);  part.vent.lon = -9999; else change_frame(jEdit,src,1,' '); part.vent.lon = tmp; end
-    
+    if isnan(tmp) ; change_frame(jEdit,src,0,err);  part.vent.lon = -9999; else change_frame(jEdit,src,1,' '); part.vent.lon = tmp; end
+    %|| tmp>180 || tmp<-180 
 elseif strcmp(src.Tag, 'vent_alt')
     tmp = str2double(src.String);
     err = 'Check the vent altitude';
@@ -106,7 +106,7 @@ elseif strcmp(src.Tag, 'rel_vz')
     
 %% Advanced pannel
 elseif strcmp(src.Tag, 'adv_sol')
-    tmp = lower(src.String);
+    tmp = lower(src.String{src.Value});
     err = 'Solution is Euler, Analytical or RungeKutta';
     if isempty(regexp(tmp, '(euler|analytical|rungekutta)', 'once')); change_frame(jEdit,src,0,err); part.adv.solution = -9999; else change_frame(jEdit,src,1,' '); part.adv.solution = tmp; end 
     
@@ -121,12 +121,12 @@ elseif strcmp(src.Tag, 'adv_drag')
     if isnan(tmp) || tmp<0 ; change_frame(jEdit,src,0,err); part.adv.drag = -9999; else change_frame(jEdit,src,1,' '); part.adv.drag = tmp; end    
     
 elseif strcmp(src.Tag, 'adv_int')
-    tmp = lower(src.String);
+    tmp = lower(src.String{src.Value});
     err = 'Interpolation is None, Subset or Complete';
     if isempty(regexp(tmp, '(none|subset|complete)', 'once')); change_frame(jEdit,src,0,err); part.adv.interp = -9999; else change_frame(jEdit,src,1,' '); part.adv.interp = tmp; end 
 
 elseif strcmp(src.Tag, 'adv_meth')
-    tmp = lower(src.String);
+    tmp = lower(src.String{src.Value});
     err = 'Check interpolation method (interpn)';
     if isempty(regexp(tmp, '(linear|nearest|pchip|cubic|spline)', 'once')); change_frame(jEdit,src,0,err); part.adm.method = -9999; else change_frame(jEdit,src,1,' '); part.adv.method = tmp; end 
     
@@ -157,9 +157,11 @@ if ischar(part.run_name) && ...
         ischar(part.adv.solution) && ischar(part.adv.interp) && ischar(part.adv.method) && ...
         part.adv.dt ~= -9999 && part.adv.drag ~= -9999 && part.adv.range ~= -9999 && part.adv.skip ~= -9999
     
-    set(findobj(ancestor(src, 'figure'), 'Tag', 'run_btn'), 'Enable', 'on');   
+    %set(findobj(ancestor(src, 'figure'), 'Tag', 'run_btn'), 'Enable', 'on');
+    part.run_check = 1;
 else
-    set(findobj(ancestor(src, 'figure'), 'Tag', 'run_btn'), 'Enable', 'off');
+    %set(findobj(ancestor(src, 'figure'), 'Tag', 'run_btn'), 'Enable', 'off');
+    part.run_check = 0;
 end
 
 % Update GUI data

@@ -22,6 +22,9 @@ else % If the function is called through the GUI
     if length(tmpV) > 1
         errordlg('Please select only one particle')
         return
+    elseif isempty(tmpV)
+        errordlg('Please select one particle');
+        return
     else
         part = APDTA.pltData.(char(tmpS(tmpV)));
     end

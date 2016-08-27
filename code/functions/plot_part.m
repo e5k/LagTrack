@@ -75,7 +75,8 @@ end
 
 % Delete axes that already exist 
 if nargin > 0
-    delete(AX.Children);
+    cla(AX);
+    delete(findobj(ancestor(src, 'figure'), 'Tag', 'LegPlot'));
 end
 
 % Retrieve field names
@@ -92,7 +93,7 @@ hold(AX, 'off')
 grid(AX, 'on')
 box(AX, 'on')
 
-legend(AX, fld)
+legend(AX, fld, 'Tag', 'LegPlot')
 xlabel(varList{vX});
 ylabel(varList{vY});
 

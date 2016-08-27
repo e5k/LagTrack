@@ -3,9 +3,8 @@ function load_part(src, ~)
 
 [fl,pth] = uigetfile('projects/*.mat');
 
-if isempty(fl)
-    return
-    
+if fl == 0
+    return  
 else
     load([pth, filesep, fl])
     APDTA = getappdata(ancestor(src, 'figure'));    
@@ -41,11 +40,14 @@ set(findobj(ancestor(src, 'figure'), 'Tag', 'rel_vx'), 'String', num2str(part.re
 set(findobj(ancestor(src, 'figure'), 'Tag', 'rel_vy'), 'String', num2str(part.rel.vy));
 set(findobj(ancestor(src, 'figure'), 'Tag', 'rel_vz'), 'String', num2str(part.rel.vz));
 
-set(findobj(ancestor(src, 'figure'), 'Tag', 'adv_sol'), 'String', part.adv.solution);
+if strcmp(part.adv.solution, 'analytical'); V = 1; elseif strcmp(part.adv.solution, 'euler'); V = 2; end
+set(findobj(ancestor(src, 'figure'), 'Tag', 'adv_sol'), 'Value', V);
 set(findobj(ancestor(src, 'figure'), 'Tag', 'adv_dt'), 'String', num2str(part.adv.dt));
 set(findobj(ancestor(src, 'figure'), 'Tag', 'adv_drag'), 'String', num2str(part.adv.drag));
-set(findobj(ancestor(src, 'figure'), 'Tag', 'adv_int'), 'String', part.adv.interp);
-set(findobj(ancestor(src, 'figure'), 'Tag', 'adv_meth'), 'String', part.adv.method);
+if strcmp(part.adv.solution, 'none'); V = 1; elseif strcmp(part.adv.solution, 'subset'); V = 2; elseif strcmp(part.adv.solution, 'complete'); V = 3; end
+set(findobj(ancestor(src, 'figure'), 'Tag', 'adv_int'), 'Value', V);
+if strcmp(part.adv.solution, 'linear'); V = 1; elseif strcmp(part.adv.solution, 'nearest'); V = 2; elseif strcmp(part.adv.solution, 'pchip'); V = 3; elseif strcmp(part.adv.solution, 'cubic'); V = 4; elseif strcmp(part.adv.solution, 'spline'); V = 5; end
+set(findobj(ancestor(src, 'figure'), 'Tag', 'adv_meth'), 'Value', V);
 set(findobj(ancestor(src, 'figure'), 'Tag', 'adv_range'), 'String', num2str(part.adv.range));
 set(findobj(ancestor(src, 'figure'), 'Tag', 'adv_skip'), 'String', num2str(part.adv.skip));
 

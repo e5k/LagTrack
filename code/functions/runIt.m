@@ -2,7 +2,14 @@
 function runIt(src, ~)
 
 % Retrieve data
-part = guidata(ancestor(src, 'Figure'));
+part  = guidata(ancestor(src, 'Figure'));
+APDTA = getappdata(ancestor(src, 'figure'));  
+
+% Check if input parameters are ok
+if part.run_check == 0
+    errordlg('There are problems with input parameters, double check.');
+    return
+end
 
 % If project folder does not exist, then create it
 if ~exist(['projects', filesep, part.run_name], 'dir')
@@ -20,18 +27,24 @@ if exist(['projects', filesep, part.run_name, filesep, part.part.name, '.mat'], 
             return
         case 'Replace'
             delete(['projects', filesep, part.run_name, filesep, part.part.name, '.mat']);
+            clear_part(src,1,part.part.name);
     end
 end
 
-%% RUN
-set(findobj(ancestor(src, 'figure'), 'Tag', 'run_btn'), 'Enable', 'off');   
+%% RUN 
 display('Run started...');
+set(findobj(ancestor(src, 'figure'), 'Tag', 'Errmsg'), 'String', 'Run started, please wait...');
 part.traj = get_trajectory(part);
-set(findobj(ancestor(src, 'figure'), 'Tag', 'run_btn'), 'Enable', 'on');   
+display(part.traj.out_msg); 
+set(findobj(ancestor(src, 'figure'), 'Tag', 'Errmsg'), 'String', '');
 display('Done!');
 
 %% Update
 update_table(src, part);
+APDTA.pltData.(part.part.name) = part;
+setappdata(ancestor(src, 'figure'), 'pltData',APDTA.pltData);
 
+% Enable buttons
+enableUI(src, 'on');
 
 save(['projects', filesep, part.run_name, filesep, part.part.name, '.mat'], 'part');

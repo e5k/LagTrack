@@ -47,7 +47,8 @@ load(pltData.(fld{1}).path.dem);
 
 %
 if nargin > 0
-    delete(AX.Children);
+    cla(AX);
+    delete(findobj(ancestor(src, 'figure'), 'Tag', 'LegMap'));
 end
 
 cmap    = jet(length(fld));     % Setup colormap
@@ -100,7 +101,7 @@ xlabel('Longitude');
 ylabel('Latitude');
 zlabel('Altitude (km asl)');
 
-legend(AX, legH, leg, 'Location', 'Best', 'Tag', 'Legend');
+legend(AX, legH, leg, 'Location', 'Best', 'Tag', 'LegMap');
 AX.Position = POS;
 
 

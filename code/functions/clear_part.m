@@ -1,16 +1,25 @@
 % Clear particles
 
-function clear_part(src,~)
+function clear_part(src,~,varargin)
 
 % Load GUI data
 APDTA = getappdata(ancestor(src, 'figure'));   
-fld   = fieldnames(APDTA.pltData)
+fld   = fieldnames(APDTA.pltData);
 
 % Get table data from GUI
 List    = get(findobj(ancestor(src, 'figure'), 'Tag', 'DataList'), 'String');
-ListV   = get(findobj(ancestor(src, 'figure'), 'Tag', 'DataList'), 'Value');
 Tab     = get(findobj(ancestor(src, 'figure'), 'Tag', 'DataTable'), 'Data');
 
+if nargin == 2    % If this function is called from the main GUI
+    % Get table data from GUI
+    ListV   = get(findobj(ancestor(src, 'figure'), 'Tag', 'DataList'), 'Value');
+
+else % Function called when starting the run
+    for i = 1:length(List)
+        if strcmp(varargin{1}, List{i}); ListV = i; end           
+    end
+end
+    
 % Setup logical vector
 partCheck = zeros(length(List),1);
 partCheck(ListV) = true;

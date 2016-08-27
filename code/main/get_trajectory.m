@@ -1,16 +1,5 @@
 function part = get_trajectory(P)
 
-% UPDATES
-% 2016/02/02 (Seb): Added bearing
-
-% TO DO:
-% - RungeKutta
-
-% Release point, relative to the vent, in metres
-% x0: Positive when E, negative when W
-% y0: Positive when N, negative when S
-% z0: Above sea level
-
 %% ________________________________________________________________________
 %% Input parameters
 %% ________________________________________________________________________
@@ -19,7 +8,7 @@ function part = get_trajectory(P)
 atm             = load(P.path.nc); atm = atm.atm;
 %% DEM      -> Check whether symetry should be on WIND instead
 dem             = load(P.path.dem); dem = dem.dem;                                      % Load DEM
-dem.X(dem.X<0)  = 360+(dem.X(dem.X<0));                                     % Symetry latitude
+%dem.X(dem.X<0)  = 360+(dem.X(dem.X<0));                                     % Symetry latitude
 
 % Set domain extent based on the union of DEM and wind data
 lat_min         = min([min(atm.lat), min(dem.Y(:,1))]);
@@ -61,6 +50,7 @@ part.Ks         = .5 * (part.Fs^(1/3) + part.Fs^(-1/3));                    % St
 part.Kn         = 10^(.45 * (-log10(part.Fn))^.99);                         % Newton's drag correction     
 
 % Initial parameters
+part.out_msg    = ' ';
 
 % If no initial x or y velocity is given, assume the particle is carried by
 % the wind
@@ -105,8 +95,8 @@ while test_run == 0
     elseif strcmp(P.adv.interp, 'complete')
     % Complete interpolation method (Slow)
         alt_sub = squeeze(atm.alt(part.yI(i-1), part.xI(i-1), :, part.tI(i-1)));
-        denf    = interpn(atm.lat, atm.lon, alt_sub, atm.time, atm.rhoair, part.lat(i-1), part.lon(i-1), part.z(i-1), P.date+part.t(i-1)/3600/24, P.adv.method);
-        visf    = interpn(atm.lat, atm.lon, alt_sub, atm.time, atm.muair,  part.lat(i-1), part.lon(i-1), part.z(i-1), P.date+part.t(i-1)/3600/24, P.adv.method);
+        denf    = interpn(double(atm.lat), double(atm.lon), alt_sub, atm.time, atm.rhoair, part.lat(i-1), part.lon(i-1), part.z(i-1), P.date+part.t(i-1)/3600/24, P.adv.method);
+        visf    = interpn(double(atm.lat), double(atm.lon), alt_sub, atm.time, atm.muair,  part.lat(i-1), part.lon(i-1), part.z(i-1), P.date+part.t(i-1)/3600/24, P.adv.method);
 
     elseif strcmp(P.adv.interp, 'subset')
     % Interpolation by subsetting method
@@ -249,8 +239,8 @@ while test_run == 0
         elseif strcmp(P.adv.interp, 'complete')
             %complete interpolation method (Slow)
             alt_sub      = squeeze(atm.alt(part.yI(i), part.xI(i), :, part.tI(i)));
-            part.uf(i)   = interpn(atm.lat, atm.lon, alt_sub, atm.time, atm.u, part.lat(i), part.lon(i), part.z(i), P.date+part.t(i)/3600/24, P.adv.method);
-            part.vf(i)   = interpn(atm.lat, atm.lon, alt_sub, atm.time, atm.v, part.lat(i), part.lon(i), part.z(i), P.date+part.t(i)/3600/24, P.adv.method);
+            part.uf(i)   = interpn(double(atm.lat), double(atm.lon), alt_sub, atm.time, atm.u, part.lat(i), part.lon(i), part.z(i), P.date+part.t(i)/3600/24, P.adv.method);
+            part.vf(i)   = interpn(double(atm.lat), double(atm.lon), alt_sub, atm.time, atm.v, part.lat(i), part.lon(i), part.z(i), P.date+part.t(i)/3600/24, P.adv.method);
             
         elseif strcmp(P.adv.interp, 'subset')
             %interpolation by subsetting method
@@ -279,46 +269,6 @@ while test_run == 0
         end
     end    
 end
-
-% 
-% %% Plotting
-% figure;
-% if strcmp(vent.geo, 'West')
-%     plot(-360+[lon_min, lon_max], [lat_min, lat_max], '.k');                    % Plot frame
-%     plot_google_map('Maptype', 'terrain'); hold on;                             % Plot google background
-%     surf(-360+dem.X, dem.Y, dem.Z./1000); shading flat; alpha 0.5               % Plot topography
-%     colormap(landcolor);
-%     c = colorbar;
-%     ylabel(c, 'Topography altitude (km asl)');
-%     freezeColors;
-%     [C,h] = contour(-360+dem.X, dem.Y, ll2dist(P.vent.lat, P.vent.lon, dem.Y, dem.X));
-%     set(h, 'LineColor', 'k', 'Linewidth', 1.5);
-%     clabel(C,h);
-%     plot3(-360+part.lon, part.lat, part.z/1000, '.r');                          % Plot trajectory
-%     plot3([-360+P.vent.lon,-360+P.vent.lon], [P.vent.lat,P.vent.lat], [P.vent.ht/1000, erup.ht], '--k')
-%     plot3(-360+P.vent.lon, P.vent.lat, P.vent.ht/1000, '^k', 'MarkerSize', 12, 'MarkerFaceColor', 'r');
-% 
-% else
-%     
-%     plot([min(dem.X(1,:)), max(dem.X(1,:))], [min(dem.Y(:,1)), max(dem.Y(:,1))], '.k');                    % Plot frame
-%     plot_google_map('Maptype', 'terrain'); hold on;                             % Plot google background
-%     surf(dem.X, dem.Y, dem.Z./1000); shading flat; alpha 0.5               % Plot topography
-%     colormap(landcolor);
-%     c = colorbar;
-%     ylabel(c, 'Topography altitude (km asl)');
-%     freezeColors;
-%     [C,h] = contour(dem.X, dem.Y, ll2dist(P.vent.lat, P.vent.lon, dem.Y, dem.X));
-%     set(h, 'LineColor', 'k', 'Linewidth', 1.5);
-%     clabel(C,h);
-%     plot3(part.lon, part.lat, part.z/1000, '.r');                          % Plot trajectory
-%     plot3([P.vent.lon,P.vent.lon], [P.vent.lat,P.vent.lat], [P.vent.ht/1000, erup.ht], '--k')
-%     plot3(P.vent.lon, P.vent.lat, P.vent.ht/1000, '^k', 'MarkerSize', 12, 'MarkerFaceColor', 'r');
-% 
-% end
-% title(sprintf('%4.4f mm, %4.f kg/m^3, fl = %2.1f, el = %2.1f', part.diam*1000, part.dens, part.fl, part.el));
-
-
-
 
 
 

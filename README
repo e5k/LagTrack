@@ -1,0 +1,10 @@
+Requirements:
+- Matlab 2014b
+- GUI Layout toolbox: https://uk.mathworks.com/matlabcentral/fileexchange/47982-gui-layout-toolbox
+
+Main script:
+LagTrack
+
+To do:
+- Check extent of DEM and atmospheric data
+- Implement Mohssen's changes
