@@ -12,11 +12,11 @@ addpath(genpath('code/'));
 
 % Check if GUI toolbox is installed
 if ~exist('layoutRoot', 'file')==2
-    error('The GUI Toolbox App is not installed. Please visit: <a href="https://uk.mathworks.com/matlabcentral/fileexchange/47982-gui-layout-toolbox">https://uk.mathworks.com/matlabcentral/fileexchange/47982-gui-layout-toolbox</a>')
+    error('The GUI Toolbox App is not installed. Please visit: <a href="https://www.mathworks.com/matlabcentral/fileexchange/47982-gui-layout-toolbox">https://www.mathworks.com/matlabcentral/fileexchange/47982-gui-layout-toolbox</a>')
 end
 
 % Check Matlab version
-if verLessThan('matlab','8.5')
+if verLessThan('matlab','8.4')
     error('You need at least Matlab R2014b to run the GUI, but you can still use separate functions.')
 end    
 % GUI
