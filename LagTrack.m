@@ -179,7 +179,7 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
     GRD = uix.Grid( 'Parent', BOT, 'Spacing', 5);
         uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Plot', 'Enable', 'off', 'Tag', 'Bplot', 'Tooltip', 'Update plot in the GUI', 'Callback', @update_plots )
         uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Clear', 'Enable', 'off', 'Tag', 'Bclear', 'Tooltip', 'Clear selected particles', 'Callback', @clear_part )
-        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Export', 'Enable', 'off', 'Tag', 'B' )
+        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Delete', 'Enable', 'off', 'Tag', 'Bdelete', 'Tooltip', 'Delete selected particles', 'Callback', @delete_part )
         uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Export', 'Enable', 'off', 'Tag', 'Bexport', 'Tooltip', 'Export figure to new axes', 'Callback', @update_plots )
         uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Details', 'Enable', 'off', 'Tag', 'Bdetail', 'Callback', @show_details )
         uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Save', 'Enable', 'off', 'Tag', 'Bsave' )
@@ -242,9 +242,9 @@ topR_map    = uix.VBox('Parent', topR_MAP, 'BackgroundColor', BGC, 'Padding', 5,
         uicontrol('Parent', topR_mapB, 'Style', 'togglebutton', 'String', '3D rotate', 'Tag', 'Map3D', 'Enable', 'off', 'Callback', {@set_map_mode, ax_map.Position});
         uicontrol('Parent', topR_mapB, 'Style', 'togglebutton', 'String', 'Pan', 'Tag', 'MapPan', 'Enable', 'off', 'Callback', {@set_map_mode, ax_map.Position});
         uicontrol('Parent', topR_mapB, 'Style', 'togglebutton', 'String', 'Zoom', 'Tag', 'MapZoom', 'Enable', 'off', 'Callback', {@set_map_mode, ax_map.Position});
-        uicontrol('Parent', topR_mapB, 'Style', 'togglebutton', 'String', 'Legend', 'Tag', 'MapLegend', 'Enable', 'off', 'Callback', {@set_map_mode, ax_map.Position});
+        %uicontrol('Parent', topR_mapB, 'Style', 'togglebutton', 'String', 'Legend', 'Tag', 'MapLegend', 'Enable', 'off', 'Callback', {@set_map_mode, ax_map.Position});
         uix.Empty('Parent', topR_mapB);
-        set(topR_mapB, 'Widths', [-1 90 90 90 90 -1]);
+        set(topR_mapB, 'Widths', [-1 90 90 90 -1]);
         
     set(topR_map, 'Heights', [-1 40]);
     

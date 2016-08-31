@@ -3,7 +3,7 @@ function set_map_mode(src, ~, position)
 
 if src.Value == 1 && strcmp(src.Tag, 'Map3D')
     set(findobj(ancestor(src, 'figure'), 'Tag', 'MapZoom'), 'Value',0);
-   % rotate3d(get(findobj(ancestor(gcf, 'figure'), 'Tag', 'MapAx')), 'on', 'ButtonDownFilter', @btn);
+    set(findobj(ancestor(src, 'figure'), 'Tag', 'MapPan'), 'Value',0);
     rotate3d on
 elseif src.Value == 0 && strcmp(src.Tag, 'Map3D')
     rotate3d off
@@ -19,10 +19,9 @@ elseif src.Value == 1 && strcmp(src.Tag, 'MapZoom')
     zoom on
 elseif src.Value == 0 && strcmp(src.Tag, 'MapZoom')   
     zoom off        
-elseif src.Value == 1 && strcmp(src.Tag, 'MapLegend')
-    %legend('toggle')
-elseif src.Value == 0 && strcmp(src.Tag, 'MapLegend')   
-    %legend('toggle') 
+elseif strcmp(src.Tag, 'MapLegend')
+    AX      = findobj(ancestor(src, 'figure'), 'Tag', 'MapAx'); 
+    legend(AX, 'toggle')
 end
 
 function btn(src,~)

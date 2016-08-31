@@ -40,7 +40,7 @@ set(findobj(ancestor(src, 'figure'), 'Tag', 'rel_vx'), 'String', num2str(part.re
 set(findobj(ancestor(src, 'figure'), 'Tag', 'rel_vy'), 'String', num2str(part.rel.vy));
 set(findobj(ancestor(src, 'figure'), 'Tag', 'rel_vz'), 'String', num2str(part.rel.vz));
 
-if strcmp(part.adv.solution, 'analytical'); V = 1; elseif strcmp(part.adv.solution, 'euler'); V = 2; end
+if strcmp(part.adv.solution, 'analytical'); V = 2; elseif strcmp(part.adv.solution, 'euler'); V = 1; end
 set(findobj(ancestor(src, 'figure'), 'Tag', 'adv_sol'), 'Value', V);
 set(findobj(ancestor(src, 'figure'), 'Tag', 'adv_dt'), 'String', num2str(part.adv.dt));
 set(findobj(ancestor(src, 'figure'), 'Tag', 'adv_drag'), 'String', num2str(part.adv.drag));

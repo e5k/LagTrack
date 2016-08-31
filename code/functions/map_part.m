@@ -47,7 +47,6 @@ POS = AX.Position;
 % Retrieve the dem for plotting
 load(pltData.(fld{1}).path.dem); 
 
-
 cmap    = lines(length(fld));     % Setup colormap
 leg     = cell(length(fld),1);  % Setup legend
 legH    = zeros(length(fld),1); % Legend handles
@@ -100,6 +99,3 @@ zlabel('Altitude (km asl)');
 
 legend(AX, legH, leg, 'Location', 'Best', 'Tag', 'LegMap');
 AX.Position = POS;
-
-
-%legend('Hide')
