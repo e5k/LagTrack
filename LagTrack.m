@@ -26,7 +26,11 @@ display('Preparing the interface, please wait...')
 % Menu
 m = uimenu('Label', 'File');
 uimenu(m, 'Label', 'Load particle', 'Accelerator', 'O', 'Callback', @load_part);
-uimenu(m, 'Label', 'Download input parameters', 'Accelerator', 'I', 'Callback', 'GUI_input');
+
+m2 = uimenu('Label', 'Tools');
+uimenu(m2, 'Label', 'Download input parameters', 'Accelerator', 'I', 'Callback', 'GUI_input');
+uimenu(m2, 'Label', 'Get u,v,w velocities', 'Callback', @sphere2cart, 'Separator', 'on');
+
 % Main container
 MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
 
@@ -40,7 +44,7 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
         % Top left box
         topL = uix.VBox( 'Parent', TOPL); 
             %Pannels
-            topLT = uix.TabPanel( 'Parent', topL, 'Padding', 5 , 'BackgroundColor', BGC );
+            topLT = uix.TabPanel( 'Parent', topL, 'Padding', 5 , 'BackgroundColor', BGC, 'Tag', 'TopPanel' );
                 topL_PROJ = uix.Panel( 'Parent', topLT );
                 topL_PART = uix.Panel( 'Parent', topLT );
                 topL_REL  = uix.Panel( 'Parent', topLT );
