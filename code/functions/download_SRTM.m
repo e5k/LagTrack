@@ -1,4 +1,4 @@
-function dem = downloadSRTM(lat_min, lat_max, lon_min, lon_max, res, filename)
+function dem = download_SRTM(lat_min, lat_max, lon_min, lon_max, res, filename)
 
 % Check if folder already exist
 if exist(['input/dem/', filename], 'dir') == 7
@@ -134,16 +134,3 @@ dem.res = res;
 
 % Save
 save(['input/dem/', filename, filesep, filename, '.dem'], 'dem');
-
-% Plot
-figure;
-plot([min(dem.X(1,:)), max(dem.X(1,:))], [min(dem.Y(:,1)), max(dem.Y(:,1))], '.k'); 
-[lonVec, latVec, imag] = plot_google_map('Maptype', 'terrain'); hold on;                           % Plot google background
-surface(dem.X, dem.Y, dem.Z./1000, prepare_google_map(dem, lonVec, latVec, imag)); 
-daspect([1,1,10]);
-shading flat
-axis tight
-xlabel('Longitude');
-ylabel('Latitude');
-zlabel('Altitude (km)');
-

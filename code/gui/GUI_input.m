@@ -224,10 +224,10 @@ t.menu0 = uimenu(t.fig, 'Label', 'ECMWF');
     function download(source,~)
     global t    
     
-    if strcmp(get(source, 'Tag'), 'SRTM')
-        downloadSRTM(str2double(get(t.extentS, 'String')), str2double(get(t.extentN, 'String')), str2double(get(t.extentW, 'String')), str2double(get(t.extentE, 'String')), str2double(get(t.demR, 'String')), get(t.nameE, 'String'));
-    elseif strcmp(get(source, 'Tag'), 'Interim')
-        dwind_ECMWF(str2double(get(t.extentS, 'String')), str2double(get(t.extentN, 'String')), str2double(get(t.extentW, 'String')), str2double(get(t.extentE, 'String')), str2double(get(t.windYS, 'String')), str2double(get(t.windYE, 'String')), str2double(get(t.windMS, 'String')), str2double(get(t.windME, 'String')), get(t.nameE, 'String'), 'Interim')       
-    elseif strcmp(get(source, 'Tag'), 'NOAA')
-        dwind_ECMWF(str2double(get(t.extentS, 'String')), str2double(get(t.extentN, 'String')), str2double(get(t.extentW, 'String')), str2double(get(t.extentE, 'String')), str2double(get(t.windYS, 'String')), str2double(get(t.windYE, 'String')), str2double(get(t.windMS, 'String')), str2double(get(t.windME, 'String')), get(t.nameE, 'String'), 'Interim')
+    if strcmp(get(source, 'String'), 'SRTM')
+        download_SRTM(str2double(get(t.extentS, 'String')), str2double(get(t.extentN, 'String')), str2double(get(t.extentW, 'String')), str2double(get(t.extentE, 'String')), str2double(get(t.demR, 'String')), get(t.nameE, 'String'));
+    elseif strcmp(get(source, 'String'), 'Interim')
+        download_ATM(str2double(get(t.extentS, 'String')), str2double(get(t.extentN, 'String')), str2double(get(t.extentW, 'String')), str2double(get(t.extentE, 'String')), str2double(get(t.windYS, 'String')), str2double(get(t.windYE, 'String')), str2double(get(t.windMS, 'String')), str2double(get(t.windME, 'String')), get(t.nameE, 'String'), 'Interim')       
+    elseif strcmp(get(source, 'String'), 'NOAA')
+        download_ATM(str2double(get(t.extentS, 'String')), str2double(get(t.extentN, 'String')), str2double(get(t.extentW, 'String')), str2double(get(t.extentE, 'String')), str2double(get(t.windYS, 'String')), str2double(get(t.windYE, 'String')), str2double(get(t.windMS, 'String')), str2double(get(t.windME, 'String')), get(t.nameE, 'String'), 'Reanalysis2')
     end

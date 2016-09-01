@@ -54,11 +54,11 @@ else
     
     month_list  = {'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'};
     
-    
+    % Reanalysis 1, not used anymore
     if strcmp(dataset, 'Reanalysis1')
         display('Connecting to NOAA NCEP/NCAR Reanalysis 1')
         % Find tid variable
-        pge = urlread('http://www.esrl.noaa.gov/psd/cgi-bin/db_search/DBSearch.pl?Dataset=NCEP+Reanalysis+Pressure+Level&Variable=Geopotential+height&group=0&submit=Search');
+        pge = webread('http://www.esrl.noaa.gov/psd/cgi-bin/db_search/DBSearch.pl?Dataset=NCEP+Reanalysis+Pressure+Level&Variable=Geopotential+height&group=0&submit=Search');
         fnd = strfind(pge, 'tid=');
         tid = pge(fnd(1)+4:fnd(1)+8);
         
@@ -66,7 +66,7 @@ else
         str2 = '&DB_did=2&DB_vid=14';
         
         % Find nc variable
-        pge = urlread(strcat(str1, tid, str2));
+        pge = webread(strcat(str1, tid, str2));
         fnd = strfind(pge, 'y4.nc');
         nc  = pge(fnd(1)+6:fnd(1)+10);
         
@@ -103,29 +103,7 @@ else
             end
             
             for k=1:1*10^9
-                
-                %                             http://www.esrl.noaa.gov/psd/cgi-bin/GrADS.pl?dataset=NCEP%2FDOE+AMIP-II+Reanalysis+%28Reanalysis-2%29&DB_did=61&file=%2FDatasets%2Fncep.reanalysis2%2Fpressure%2F...
-                %                             .1979.nc+
-                %                             .%25y4.nc+
-                %                             &variable=
-                %                             &DB_vid=
-                %                             &DB_tid=
-                %                             &units=
-                %                             &longstat=Individual+Obs&DB_statistic=Individual+Obs&stat=&lat-begin=
-                %                             &lat-end=
-                %                             &lon-begin=
-                %                             &lon-end=
-                %                             &dim0=level&level+units=millibar&level=1000.00&level=925.00&level=850.00&level=700.00&level=600.00&level=500.00&level=400.00&level=300.00&level=250.00&level=200.00&level=150.00&level=100.00&level=70.00&level=50.00&level=30.00&level=20.00&level=10.00
-                %                             &dim1=time&year_begin=
-                %                             &mon_begin=
-                %                             &day_begin=
-                %                             &hour_begin=
-                %                             +Z&year_end=
-                %                             &mon_end=
-                %                             &day_end=
-                %                             &hour_end=
-                %                             +Z&X=lon&Y=lat&output=file&bckgrnd=black&use_color=on&fill=lines&cint=&range1=&range2=&scale=100&maskf=%2FDatasets%2Fncep.reanalysis2%2Fgaussian_grid%2Fland.sfc.gauss.nc&maskv=Land-sea+mask&submit=Create+Plot+or+Subset+of+Data
-                
+
                 page = ['http://www.esrl.noaa.gov/psd/cgi-bin/GrADS.pl?dataset=NCEP+Reanalysis+Pressure+Level&DB_did=2&file=%2FDatasets%2Fncep.reanalysis%2Fpressure%2F',...
                     name,...
                     '.1948.nc+', name,...
@@ -149,7 +127,7 @@ else
                     '&hour_end=18+Z',...
                     '&X=lon&Y=lat&output=file&bckgrnd=black&use_color=on&cint=&range1=&range2=&scale=100&submit=Create+Plot+or+Subset+of+Data'];
                 
-                [content, statut] = urlread(page);
+                [content, statut] = webread(page);
                 if statut == 0
                     break
                 else
@@ -179,45 +157,12 @@ else
             end
         end
                 
-       
-        
-        
-    elseif strcmp(dataset, 'Reanalysis2')
-        
-   % 'http://www.esrl.noaa.gov/psd/cgi-bin/DataAccess.pl?DB_dataset=NCEP/DOE+AMIP-II+Reanalysis+(Reanalysis-2)&DB_variable=Geopotential+height&DB_statistic=Individual+Obs&DB_tid=53754DB_did=61&DB_vid=1454'
-   % 'http://www.esrl.noaa.gov/psd/cgi-bin/DataAccess.pl?DB_dataset=NCEP/DOE+AMIP-II+Reanalysis+(Reanalysis-2)&DB_variable=Geopotential+height&DB_statistic=Individual+Obs&DB_tid=53754&DB_did=61&DB_vid=1454'
-        
-        
-        
-    display('Connecting to NOAA NCEP/NCAR Reanalysis 2')
-        % Find tid variable
-        pge = urlread('http://www.esrl.noaa.gov/psd/cgi-bin/db_search/DBSearch.pl?&Dataset=NCEP/DOE+AMIP-II+Reanalysis+(Reanalysis-2)+&Variable=Geopotential+Height');
-        
-        fnd = strfind(pge, 'tid=');
-        tid = pge(fnd(1)+4:fnd(1)+8);
-
-        str1 = 'http://www.esrl.noaa.gov/psd/cgi-bin/DataAccess.pl?DB_dataset=NCEP/DOE+AMIP-II+Reanalysis+(Reanalysis-2)&DB_variable=Geopotential+height&DB_statistic=Individual+Obs&DB_tid=';
-        str2 = '&DB_did=61&DB_vid=1454';
-        
-        % Find nc variable
-        pge = urlread(strcat(str1, tid, str2));
-        fnd = strfind(pge, 'y4.nc ');
-        nc  = pge(fnd(1)+6:fnd(1)+10);
+   % Reanalysis 2    
+   elseif strcmp(dataset, 'Reanalysis2')
+       display('Connecting to NOAA NCEP/NCAR Reanalysis 2')
         
         % Waitbar
         wtb = waitbar(0, '', 'Name', 'Downloading wind...');
-        
-%         http://www.esrl.noaa.gov/psd/cgi-bin/db_search/DBSearch.pl?&Dataset=NCEP/DOE+AMIP-II+Reanalysis+(Reanalysis-2)+&Variable=Air+Temperature
-%         http://www.esrl.noaa.gov/psd/cgi-bin/DataAccess.pl?DB_dataset=NCEP/DOE+AMIP-II+Reanalysis+(Reanalysis-2)&DB_variable=Air+temperature&DB_statistic=Individual+Obs&DB_tid=53752&DB_did=61&DB_vid=1447
-%         
-%         http://www.esrl.noaa.gov/psd/cgi-bin/db_search/DBSearch.pl?&Dataset=NCEP/DOE+AMIP-II+Reanalysis+(Reanalysis-2)+&Variable=Relative+Humidity
-%         http://www.esrl.noaa.gov/psd/cgi-bin/DataAccess.pl?DB_dataset=NCEP/DOE+AMIP-II+Reanalysis+(Reanalysis-2)&DB_variable=Relative+humidity&DB_statistic=Individual+Obs&DB_tid=53754&DB_did=61&DB_vid=4271
-%         
-%         http://www.esrl.noaa.gov/psd/cgi-bin/db_search/DBSearch.pl?&Dataset=NCEP/DOE+AMIP-II+Reanalysis+(Reanalysis-2)+&Variable=U-wind
-%         http://www.esrl.noaa.gov/psd/cgi-bin/DataAccess.pl?DB_dataset=NCEP/DOE+AMIP-II+Reanalysis+(Reanalysis-2)&DB_variable=u-wind&DB_statistic=Individual+Obs&DB_tid=53754&DB_did=61&DB_vid=4300
-%         
-%         http://www.esrl.noaa.gov/psd/cgi-bin/db_search/DBSearch.pl?&Dataset=NCEP/DOE+AMIP-II+Reanalysis+(Reanalysis-2)+&Variable=V-wind
-%         http://www.esrl.noaa.gov/psd/cgi-bin/DataAccess.pl?DB_dataset=NCEP/DOE+AMIP-II+Reanalysis+(Reanalysis-2)&DB_variable=v-wind&DB_statistic=Individual+Obs&DB_tid=53754&DB_did=61&DB_vid=4306
         
         %count = 1;
         for i = 1:5
@@ -279,12 +224,7 @@ else
                     '&day_end=', num2str(eomday(year_max, month_max)),...
                     '&hour_end=18+Z',...
                     '&X=lon&Y=lat&output=file&bckgrnd=black&use_color=on&fill=lines&cint=&range1=&range2=&scale=100&maskf=%2FDatasets%2Fncep.reanalysis2%2Fgaussian_grid%2Fland.sfc.gauss.nc&maskv=Land-sea+mask&submit=Create+Plot+or+Subset+of+Data'];
-
-                
-                
-%                 'http://www.esrl.noaa.gov/psd/cgi-bin/GrADS.pl?dataset=NCEP%2FDOE+AMIP-II+Reanalysis+%28Reanalysis-2%29&DB_did=61&file=%2FDatasets%2Fncep.reanalysis2%2Fpressure%2Fair.1979.nc+air.%25y4.nc+54784&variable=air&DB_vid=1447&DB_tid=53754&units=degK&longstat=Individual+Obs&DB_statistic=Individual+Obs&stat=&lat-begin=35.5N&lat-end=40.5N&lon-begin=12.5&lon-end=17.5&dim0=level&level+units=millibar&level=1000.00&level=925.00&level=850.00&level=700.00&level=600.00&level=500.00&level=400.00&level=300.00&level=250.00&level=200.00&level=150.00&level=100.00&level=70.00&level=50.00&level=30.00&level=20.00&level=10.00&dim1=time&year_begin=2013&mon_begin=Nov&day_begin=1&hour_begin=00+Z&year_end=2013&mon_end=Nov&day_end=30&hour_end=18+Z&X=lon&Y=lat&output=file&bckgrnd=black&use_color=on&fill=lines&cint=&range1=&range2=&scale=100&maskf=%2FDatasets%2Fncep.reanalysis2%2Fgaussian_grid%2Fland.sfc.gauss.nc&maskv=Land-sea+mask&submit=Create+Plot+or+Subset+of+Data'
-%                 'http://www.esrl.noaa.gov/psd/cgi-bin/GrADS.pl?dataset=NCEP%2FDOE+AMIP-II+Reanalysis+%28Reanalysis-2%29&DB_did=61&file=%2FDatasets%2Fncep.reanalysis2%2Fpressure%2Fair.1979.nc+air.%25y4.nc+54784&variable=air&DB_vid=1447&DB_tid=53752&units=degK&longstat=Individual+Obs&DB_statistic=Individual+Obs&stat=&lat-begin=37N&lat-end=39N&lon-begin=14E&lon-end=16E&dim0=level&level+units=millibar&level=1000.00&level=925.00&level=850.00&level=700.00&level=600.00&level=500.00&level=400.00&level=300.00&level=250.00&level=200.00&level=150.00&level=100.00&level=70.00&level=50.00&level=30.00&level=20.00&level=10.00&dim1=time&year_begin=1979&mon_begin=Jan&day_begin=1&hour_begin=00+Z&year_end=1979&mon_end=Jan&day_end=31&hour_end=18+Z&X=lon&Y=lat&output=file&bckgrnd=black&use_color=on&fill=lines&cint=&range1=&range2=&scale=100&maskf=%2FDatasets%2Fncep.reanalysis2%2Fgaussian_grid%2Fland.sfc.gauss.nc&maskv=Land-sea+mask&submit=Create+Plot+or+Subset+of+Data'
-                
+          
                 [content, statut] = urlread(page);
                 if statut == 0
                     break
@@ -313,15 +253,11 @@ else
                     break
                 end
             end
-        end   
-        
-        
-        
-    end
-    
+        end       
+    end    
 end
 
-preprocess_ECMWF(filename, dataset)
+preprocess_ATM(filename, dataset)
 
 
 function [tid, nc] = get_tid(var, vid)
@@ -331,9 +267,9 @@ pge = urlread(['http://www.esrl.noaa.gov/psd/cgi-bin/db_search/DBSearch.pl?&Data
 fnd = strfind(pge, 'tid=');
 tid = pge(fnd(1)+4:fnd(1)+8);
 
-pge = urlread(['http://www.esrl.noaa.gov/psd/cgi-bin/DataAccess.pl?DB_dataset=NCEP/DOE+AMIP-II+Reanalysis+(Reanalysis-2)&DB_variable=', var,...
+pge2 = webread(['http://www.esrl.noaa.gov/psd/cgi-bin/DataAccess.pl?DB_dataset=NCEP/DOE+AMIP-II+Reanalysis+(Reanalysis-2)&DB_variable=', var,...
     '&DB_statistic=Individual+Obs&DB_tid=', tid,...
     '&DB_did=61&DB_vid=', num2str(vid)]);
-fnd = strfind(pge, 'y4.nc ');
-nc  = pge(fnd(1)+6:fnd(1)+10);
+fnd = strfind(pge2, 'y4.nc ');
+nc  = pge2(fnd(1)+6:fnd(1)+10);
         
