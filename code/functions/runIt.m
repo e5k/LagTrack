@@ -11,6 +11,15 @@ if part.run_check == 0
     return
 end
 
+% Check spatial and temporal extents of DEM and atmospheric data
+atm = load(get(findobj(ancestor(src, 'figure'), 'Tag', 'atm'), 'String')); atm = atm.atm;
+%dem = load(get(findobj(ancestor(src, 'figure'), 'Tag', 'dem'), 'String')); dem = dem.dem;
+
+if part.date < min(atm.time) || part.date > max(atm.time)
+    errordlg('The specified eruption date is outside of the range of atmospheric data');
+    return
+end
+
 % If project folder does not exist, then create it
 if ~exist(['projects', filesep, part.run_name], 'dir')
     mkdir(['projects', filesep, part.run_name]);

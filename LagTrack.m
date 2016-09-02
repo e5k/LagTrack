@@ -29,6 +29,7 @@ uimenu(m, 'Label', 'Load particle', 'Accelerator', 'O', 'Callback', @load_part);
 
 m2 = uimenu('Label', 'Tools');
 uimenu(m2, 'Label', 'Download input parameters', 'Accelerator', 'I', 'Callback', 'GUI_input');
+uimenu(m2, 'Label', 'Display atmospheric data', 'Accelerator', 'I', 'Callback', @ViewAtm, 'Separator', 'on');
 uimenu(m2, 'Label', 'Get u,v,w velocities', 'Callback', @sphere2cart, 'Separator', 'on');
 
 % Main container
