@@ -262,3 +262,8 @@ while test_run == 0
         end
     end    
 end
+
+% Trick to make the uf and vf vectors the same size as everything else
+part.uf(i) = part.uf(i-1); 
+part.vf(i) = part.vf(i-1);
+part.wf(i) = part.wf(i-1);
