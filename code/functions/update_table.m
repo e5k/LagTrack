@@ -1,6 +1,5 @@
 function update_table(src, part)
 
-%f = ancestor(src, 'figure');
 Tdata = get(findobj(ancestor(src, 'figure'), 'Tag', 'DataTable'), 'Data');
 Ldata = get(findobj(ancestor(src, 'figure'), 'Tag', 'DataList'), 'String');
 
@@ -15,7 +14,7 @@ data = {part.part.name, ...
     datestr(part.date+part.rel.t/3600/24),...
     part.traj.t(end),...
     part.traj.z(end),...
-    part.traj.uf(end)
+    part.traj.w(end)
     };
 
 

@@ -89,7 +89,7 @@ main        = uix.VBox('Parent', f, 'Padding', 15, 'Spacing', 5);
         
         uix.Empty( 'Parent', BOT );
         uicontrol( 'Parent', BOT, 'Style', 'Pushbutton', 'String', 'Export', 'callback', {@export_part, part, data});
-        uicontrol( 'Parent', BOT, 'Style', 'Pushbutton', 'String', 'Close'); %, 'callback', {@set_path, topL_proj_atm, '*.mat', 'input/wind/', 'Load .nc file'});
+        uicontrol( 'Parent', BOT, 'Style', 'Pushbutton', 'String', 'Close', 'callback', 'delete(gcf)'); %, 'callback', {@set_path, topL_proj_atm, '*.mat', 'input/wind/', 'Load .nc file'});
 
     set(BOT, 'Widths', [-1 100 100]);
 set(main, 'Heights', [-1 50]);

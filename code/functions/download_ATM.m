@@ -24,6 +24,11 @@ mkdir(['input/wind/', filename])
 
 %% ERA-INTERIM
 if strcmp(dataset, 'Interim')
+    
+    % Work on input coordinates
+    if lon_min < 0; lon_min = 360+lon_min; end
+    if lon_max < 0; lon_max = 360+lon_max; end
+
     txt     = fileread('download_ECMWF_tmp.py');
     txt_new = strrep(txt, 'var_date_start', [num2str(year_min), num2str(month_min, '%02d'), '01']);
     txt_new = strrep(txt_new, 'var_date_end', [num2str(year_max), num2str(month_max, '%02d'), num2str(eomday(year_max, month_max),'%02d')]);
@@ -48,7 +53,7 @@ if strcmp(dataset, 'Interim')
 else
     % Work on input coordinates
     if lon_min < 0; lon_min = [num2str(360+lon_min),'E']; end
-    if lon_max < 0; lon_min = [num2str(360+lon_max),'E']; end
+    if lon_max < 0; lon_max = [num2str(360+lon_max),'E']; end
     if lat_min < 0; lat_min = [num2str(abs(lat_min)), 'S']; else lat_min = [num2str(lat_min), 'N']; end
     if lat_max < 0; lat_max = [num2str(abs(lat_max)), 'S']; else lat_max = [num2str(lat_max), 'N']; end 
     

@@ -156,13 +156,13 @@ while test_run == 0
     if strcmp(P.adv.solution, 'analytical')
     % Analytical solution
         part.u(i)   = part.uf(i-1) + exp(-Fd * P.adv.dt) *(part.u(i-1)-part.uf(i-1)) - G_u * (1/Fd) * (exp(-P.adv.dt*Fd)-1);
-        part.x(i)   = part.x(i-1) + (G_u * (1/Fd)+part.uf(i-1) )* P.adv.dt + (1/Fd)* (1-exp(-P.adv.dt*Fd)) * (part.u(i)-part.uf(i-1)- G_u/Fd);
+        part.x(i)   = part.x(i-1) + (G_u * (1/Fd)+part.uf(i-1)) * P.adv.dt + (1/Fd)* (1-exp(-P.adv.dt*Fd)) * (part.u(i)-part.uf(i-1)- G_u/Fd);
 
         part.v(i)   = part.vf(i-1) + exp(-Fd * P.adv.dt) *(part.v(i-1)-part.vf(i-1)) - G_v * (1/Fd) * (exp(-P.adv.dt*Fd)-1);
-        part.y(i)   = part.y(i-1) + (G_v * (1/Fd)+part.vf(i-1)) * P.adv.dt + (1/Fd)* (1-exp(-P.adv.dt*Fd)) * (part.v(i)-part.vf(i-1) - G_v/Fd);
+        part.y(i)   = part.y(i-1) + (G_v * (1/Fd)+part.vf(i-1)) * P.adv.dt + (1/Fd)* (1-exp(-P.adv.dt*Fd)) * (part.v(i)-part.vf(i-1)- G_v/Fd);
         
         part.w(i)   = part.wf(i-1) + exp(-Fd * P.adv.dt) *(part.w(i-1)-part.wf(i-1)) - G_w * (1/Fd) * (exp(-P.adv.dt*Fd)-1);
-        part.z(i)   = part.z(i-1) + (G_w * (1/Fd)+part.wf(i-1)) * P.adv.dt + (1/Fd)* (1-exp(-P.adv.dt*Fd)) * (part.w(i)-part.wf(i-1) - G_w/Fd);
+        part.z(i)   = part.z(i-1) + (G_w * (1/Fd)+part.wf(i-1)) * P.adv.dt + (1/Fd)* (1-exp(-P.adv.dt*Fd)) * (part.w(i)-part.wf(i-1)- G_w/Fd);
                       
     elseif strcmp(P.adv.solution, 'euler')
     % Euler semi-implicit 

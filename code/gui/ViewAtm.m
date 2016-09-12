@@ -1,18 +1,24 @@
 function ViewAtm(varargin)
 
 % Retrieve path to atmospheric file
+% If called independently
 if nargin == 0
-    [fl, pth] = uigetfile('*.mat', 'Select atmospheric file');
-    PTH = fullfile(pth,fl);
+    [fl, pth]   = uigetfile('*.mat', 'Select atmospheric file');
+    PTH         = fullfile(pth,fl);
+    part        = []; % Empty particle
     if fl == 0; return; end
+    
+% If called from GUI
 else
-    src = varargin{1};
-    if isempty(get(findobj(ancestor(src, 'figure'), 'Tag', 'atm'), 'String'))        
-        [fl, pth] = uigetfile('*.mat', 'Select atmospheric file');
-        PTH = fullfile(pth,fl);
+    src     = varargin{1};
+    part    = guidata(ancestor(src, 'Figure'));
+    
+    if part.path.nc == -9999 %isempty(get(findobj(ancestor(src, 'figure'), 'Tag', 'atm'), 'String'))        
+        [fl, pth]   = uigetfile('*.mat', 'Select atmospheric file');
+        PTH         = fullfile(pth,fl);
         if fl == 0; return; end
     else
-        PTH = get(findobj(ancestor(src, 'figure'), 'Tag', 'atm'), 'String');
+        PTH = part.path.nc;
     end
 end
 
@@ -76,6 +82,7 @@ main = uix.VBox( 'Parent', f , 'Padding', 10, 'BackgroundColor', BGC);
         set(bot, 'Heights', [-1 -1.5 -1.5] );        
 set( main, 'Heights', [-1 130 ], 'Spacing', 5 );
 
+guidata(f,part);
 PlotAtm(f,'',atm);
 
 

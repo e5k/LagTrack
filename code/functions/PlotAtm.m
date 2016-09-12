@@ -1,10 +1,10 @@
 function PlotAtm(src, ~, atm)
 
-AX = findobj(ancestor(src, 'figure'), 'Type', 'axes');
+AX      = findobj(ancestor(src, 'figure'), 'Type', 'axes'); % Retrieve axes
+part    = guidata(src);                                     % Retrieve stored particle
+cla(AX);    % Clear axes
 
-cla(AX);
-
-% Variable
+% Variable to plot
 varL = get(findobj(ancestor(src, 'figure'), 'Tag', 'varList'), 'String');
 varS = get(findobj(ancestor(src, 'figure'), 'Tag', 'varList'), 'Value');
 varT = varL{varS};
@@ -44,10 +44,22 @@ else
     
     pcolor(AX, atm.lon, atm.lat, squeeze(tmp(:,:,levS,timS)));
     c = colorbar;
-    ylabel(c, lab)
-    xlabel(AX, 'Longitude');
-    ylabel(AX, 'Latitude');
+    ylabel(c, lab)    
 end
 
+% Plot options
+xlabel(AX, 'Longitude');
+ylabel(AX, 'Latitude');
+axis(AX, 'equal'); axis(AX, 'tight');
+
+% If the vent is defined in the GUI, plot it
+if ~isempty(part) 
+    if part.vent.lon > -9999
+        hold(AX, 'on');
+        plot(AX, part.vent.lon, part.vent.lat, '^', 'MarkerSize', 10, 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'k');
+    end
+end
+
+% Update info
 set(findobj(ancestor(src, 'figure'), 'Tag', 'info'), 'String', ['Altitude: ', num2str(round(mean(mean(squeeze(atm.alt(:,:,levS,timS)))))), ' m asl']);
 set(findobj(ancestor(src, 'figure'), 'Tag', 'DateInfo'), 'String', timL{timS});

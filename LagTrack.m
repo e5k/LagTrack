@@ -1,11 +1,11 @@
 function LagTrack
 
 % Setup figure
-BGC = get(0,'DefaultUicontrolBackgroundColor');
-sz = [700 1000]; % figure size
-screensize = get(0,'ScreenSize');
-xpos = ceil((screensize(3)-sz(2))/2); % center the figure on the
-ypos = ceil((screensize(4)-sz(1))/2); % center the figure on the
+BGC     = get(0,'DefaultUicontrolBackgroundColor');
+sz      = [700 1000]; % figure size
+screenS = get(0,'ScreenSize');
+xpos    = ceil((screenS(3)-sz(2))/2); % center the figure on the
+ypos    = ceil((screenS(4)-sz(1))/2); % center the figure on the
 
 % Add folders to search path
 addpath(genpath('code/'));
@@ -29,7 +29,7 @@ uimenu(m, 'Label', 'Load particle', 'Accelerator', 'O', 'Callback', @load_part);
 
 m2 = uimenu('Label', 'Tools');
 uimenu(m2, 'Label', 'Download input parameters', 'Accelerator', 'I', 'Callback', 'GUI_input');
-uimenu(m2, 'Label', 'Display atmospheric data', 'Accelerator', 'I', 'Callback', @ViewAtm, 'Separator', 'on');
+uimenu(m2, 'Label', 'Display atmospheric data', 'Accelerator', 'A', 'Callback', @ViewAtm, 'Separator', 'on');
 uimenu(m2, 'Label', 'Get u,v,w velocities', 'Callback', @sphere2cart, 'Separator', 'on');
 
 % Main container
@@ -187,13 +187,13 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
         uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Delete', 'Enable', 'off', 'Tag', 'Bdelete', 'Tooltip', 'Delete selected particles', 'Callback', @delete_part )
         uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Export', 'Enable', 'off', 'Tag', 'Bexport', 'Tooltip', 'Export figure to new axes', 'Callback', @update_plots )
         uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Details', 'Enable', 'off', 'Tag', 'Bdetail', 'Callback', @show_details )
-        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Save', 'Enable', 'off', 'Tag', 'Bsave' )
+        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Close', 'Enable', 'on', 'Tag', 'Bclose', 'Callback', 'delete(gcf)' )
     set(GRD, 'Heights', [-1 -1 -1], 'Widths', [-1 -1] );
     set(BOT, 'Widths', [-4 -1 200], 'Spacing', 5 );
     
 set(MAIN, 'Heights', [-1 200], 'Spacing', 5 );
 
-
+% Table data
 CName = {'Name',...
     '<html><center>Diameter<br />(mm)</center></html>',...
     '<html><center>Density<br />(kg/m<sup>2</sup>)</center></html>',...
@@ -207,13 +207,10 @@ CName = {'Name',...
     '<html><center>Terminal velocity<br />(m/s)</center></html>'};
 CForm = {'char','bank', 'bank', 'bank', 'bank', 'bank', 'bank', 'bank', 'char', 'bank', 'bank', 'bank'};
 CEdit = [false,false, false, false, false ,false ,false ,false ,false ,false ,false ,false ];
-%CEdit = logical([0 1 0 0 0 0 0 0 0 0 0 0 0]);
-set(TB, 'ColumnName', CName, 'ColumnFormat', CForm, 'ColumnEditable', CEdit, 'RowName', [], 'ColumnWidth', 'auto');
 
-
+set(TB, 'ColumnName', CName, 'ColumnFormat', CForm, 'ColumnEditable', CEdit, 'RowName', [], 'ColumnWidth', 'auto', 'RowName', {});
 
 %% DISPLAY
-
 varList     =     {'Time (s)',...
     'X distance (m)',...
     'Y distance (m)',...
@@ -263,14 +260,7 @@ topR_plot   = uix.VBox('Parent', topR_PLOT, 'BackgroundColor', BGC, 'Padding', 5
         set(topR_plotB, 'Widths', [-1 -1]);
         
     set(topR_plot, 'Heights', [-1 25]);
-    
-    
-    
-    
-    
-    
-    
-    
+
 %% Setup GUI data
 part.run_name       = -9999;
 part.vent.lat       = -9999;
@@ -306,19 +296,3 @@ guidata(f, part)
 set(f, 'Visible', 'on');
 display('Done!');
 
-
-% jEditbox = findjobj(a);
-% jEditbox.setBorder([]); % or: set(jEditbox,'Border',[])
-% 
-
-
-
-
-%topL = uix.TabPanel( 'Parent', top, 'Padding', 5 , 'BackgroundColor', BGC  );
-% topL_proj = uicontrol( 'Parent', topL );
-% topL_erup = uicontrol( 'Parent', topL );
-% topL_part = uicontrol( 'Parent', topL );
-% topL.TabTitles = {'Project', 'Blue', 'Green'};
-
-%uicontrol( 'Parent', top, 'Background', 'r' )
-%uicontrol( 'Parent', top, 'Background', 'b' )
