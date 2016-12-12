@@ -1,5 +1,7 @@
 function process_SRTM(lat_min, lat_max, lon_min, lon_max, res, filename)
 
+disp('Processing SRTM tiles, please wait...')
+
 % Retrieves the indices of the files in the folder
 maindir = ['input/dem/', filename];
 files   = dir([maindir, filesep, 'srtm*']);
@@ -37,7 +39,7 @@ for yy = lat_maxI:lat_minI
         % Open the file and save data
         % Here, first flipud so the highest latitude is on index 1 in y
         % axis
-        display(['Reading tile ', tile, '...'])
+        disp(['   Reading tile ', tile, '...'])
         [tmpX, tmpY, tmpZ] = readDEM([pwd, filesep, outdir, filesep, tile, '.asc']);
         XX(idxY:idxY+nrows-1, idxX:idxX+ncols-1) = tmpX;
         YY(idxY:idxY+nrows-1, idxX:idxX+ncols-1) = flipud(tmpY);
@@ -64,6 +66,8 @@ ZZ      = flipud(ZZ);
 [~, lat_maxI]   = min(abs(YY(:,1)-lat_max));
 [~, lon_minI]   = min(abs(XX(1,:)-lon_min));
 [~, lon_maxI]   = min(abs(XX(1,:)-lon_max));
+
+disp('Done!');
 
 XX              = XX(lat_minI:lat_maxI, lon_minI:lon_maxI);
 YY              = YY(lat_minI:lat_maxI, lon_minI:lon_maxI);

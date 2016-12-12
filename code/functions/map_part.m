@@ -97,5 +97,5 @@ xlabel('Longitude');
 ylabel('Latitude');
 zlabel('Altitude (km asl)');
 
-legend(AX, legH, leg, 'Location', 'Best', 'Tag', 'LegMap');
+legend(AX, legH, leg, 'Location', 'Best', 'Tag', 'LegMap', 'Interpreter', 'none');
 AX.Position = POS;

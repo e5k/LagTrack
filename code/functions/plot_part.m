@@ -92,7 +92,7 @@ hold(AX, 'off')
 grid(AX, 'on')
 box(AX, 'on')
 
-legend(AX, fld, 'Tag', 'LegPlot')
+legend(AX, fld, 'Tag', 'LegPlot', 'interpreter', 'none')
 xlabel(AX, varList{vX});
 ylabel(AX, varList{vY});
 

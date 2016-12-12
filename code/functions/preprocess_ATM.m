@@ -69,7 +69,7 @@ t0R             = 524.07;                                                   % Re
 C               = 120;                                                      % Sutherland's constant
 a               = .555*t0R+C;
 b               = .555.*tempR+C;
-atm.muair       = mu0.*(a./b).*(tempR./t0R).^(3/2)./10^3;
+atm.muair       = mu0.*(a./b).*(tempR./t0R).^(3/2)./10^3;                   % Dynamic viscosity (Pa S)
 
 
 % %% Interpolation

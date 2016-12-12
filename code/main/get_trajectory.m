@@ -207,13 +207,11 @@ while test_run == 0
     % Test altitude
     if part.z(i) <= dem.Z(part.yD(i), part.xD(i))
         part.out_msg = sprintf('Particle landed on the domain');
-        test_run     = 1;
-        
+        test_run     = 1;       
     % Test domain
     elseif part.lon(i) <= lon_min || part.lon(i) >= lon_max || part.lat(i) <= lat_min || part.lat(i) >= lat_max
         part.out_msg = sprintf('Particle reached the domain border');
-        test_run     = 1;
-        
+        test_run     = 1;        
     % Test time
     elseif (P.date + i*P.adv.dt/3600/24) > max(atm.time)+0.25
         part.out_msg = sprintf('Particle residence time longer than atmospheric data');

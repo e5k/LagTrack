@@ -21,15 +21,17 @@ mkdir(['input/dem/', filename])
 [lat_minI, lat_maxI, lon_minI, lon_maxI] = get_SRTM_coordinates(lat_min, lat_max, lon_min, lon_max);
 
 % Main 2 loops
+disp('Accessing SRTM server, please wait...')
+cnt = 0; % Counter
 for yy = lat_maxI:lat_minI
     for xx = lon_minI:lon_maxI
         maindir = ['input/dem/', filename];
         tile    = ['srtm_', num2str(xx, '%02d'), '_', num2str(yy, '%02d')];
         outdir  = [maindir, filesep, tile];    % Tmp directory
-        
+        cnt     = cnt+1;                       % Update counter
         mkdir(outdir);
         
-        display(sprintf('Downloading SRTM tile %d of %d... ', count, length(lat_maxI:lat_minI)*length(lon_minI:lon_maxI)))
+        fprintf('   Downloading SRTM tile %d of %d... \n', cnt, length(lat_maxI:lat_minI)*length(lon_minI:lon_maxI))
         
         % Download
         DL_check = 0;
