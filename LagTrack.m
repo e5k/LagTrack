@@ -4,8 +4,8 @@ function LagTrack
 BGC     = get(0,'DefaultUicontrolBackgroundColor');
 sz      = [700 1000]; % figure size
 screenS = get(0,'ScreenSize');
-xpos    = ceil((screenS(3)-sz(2))/2); % center the figure on the
-ypos    = ceil((screenS(4)-sz(1))/2); % center the figure on the
+xpos    = ceil((screenS(3)-sz(2))/2);
+ypos    = ceil((screenS(4)-sz(1))/2);
 
 % Add folders to search path
 addpath(genpath('code/'));

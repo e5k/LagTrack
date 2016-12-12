@@ -1,5 +1,15 @@
+function download_ATM(lat_min, lat_max, lon_min, lon_max, year_min, year_max, month_min, month_max, filename, dataset)
+% DOWNLOAD_ATM Download atmospheric data from Reanalysis datasets.
+%   DOWNLOAD_ATM(lat_min, lat_max, lon_min, lon_max, year_min, year_max, month_min, month_max, filename, dataset)
+%       Download data for the specified spatial and temporal extent with
+%       the output name filename. The dataset is either 'Interim' for ECMWF
+%       Era-Interim or 'Reanalysis2' for NOAA Reanalysis 2 database.
+%
+%   See also writeECMWFAPIKey, preprocess_ATM.
 
-function download_ATM(lat_min, lat_max, lon_min, lon_max, year_min, year_max, month_min, month_max, filename, dataset )
+% This function is part of LagTrack.
+% Written by Sebastien Biass & Gholamhossein Bagheri
+% GPLv3
 
 % Extend the range
 if abs(lat_max - lat_min) < 2.5; lat_min = lat_min-1.5; lat_max = lat_max+1.5; end

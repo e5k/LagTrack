@@ -1,6 +1,15 @@
-% Extract ECMWF data into a Matlab matrix
-
 function preprocess_ATM(filename, dataset, varargin)
+% PREPROCESS_ATM Converts NetCDF data into a Matlab matrix.
+%   PREPROCESS_ATM(filename, dataset) Loads NetCDF files located in
+%       input/filename/ and save a .mat file in the same folder.
+%       The dataset is either 'Interim' for ECMWF Era-Interim or 
+%       'Reanalysis2' for NOAA Reanalysis 2 database.
+%
+%   See also writeECMWFAPIKey, download_ATM.
+
+% This function is part of LagTrack.
+% Written by Sebastien Biass & Gholamhossein Bagheri
+% GPLv3
 
 % This is setup in case we ever figure out how to interpolate a 4D matrix
 % if isempty(varargin)
