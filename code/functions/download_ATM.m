@@ -64,7 +64,7 @@ else
     % Work on input coordinates
     if lon_min < 0; lon_min = [num2str(360+lon_min),'E']; end
     if lon_max < 0; lon_max = [num2str(360+lon_max),'E']; end
-    if lat_min < 0; lat_min = [num2str(abs(lat_min)), 'S']; else lat_min = [num2str(lat_min), 'N']; end
+    if lat_min < 0; lat_min = [num2str(abs(lat_min)), 'S']; else lat_min = [num2str(lat_min), 'N']; end 
     if lat_max < 0; lat_max = [num2str(abs(lat_max)), 'S']; else lat_max = [num2str(lat_max), 'N']; end 
     
     month_list  = {'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'};
@@ -146,7 +146,7 @@ else
                 if statut == 0
                     break
                 else
-                    display(['Downloading ', group, '...'])
+                    display(['Downloading ', group, '...']) 
                     % Setup  ftp access
                     folder  = 'Public/www/';
                     firs    = strfind(content,'ftp.cdc.noaa.gov/Public/www/');
@@ -166,7 +166,7 @@ else
                     waitbar(i/5, wtb);
                 end
                 
-                if statut == 1;
+                if statut == 1
                     break
                 end
             end
@@ -174,7 +174,7 @@ else
                 
    % Reanalysis 2    
    elseif strcmp(dataset, 'Reanalysis2')
-       display('Connecting to NOAA NCEP/NCAR Reanalysis 2')
+       disp('Connecting to NOAA NCEP/NCAR Reanalysis 2')
         
         % Waitbar
         wtb = waitbar(0, '', 'Name', 'Downloading wind...');
@@ -215,7 +215,7 @@ else
             
             [tid, nc] = get_tid(var, vid);
             
-            for k=1:1*10^9
+          %  for k=1:1*10^9
                 
                 page = ['http://www.esrl.noaa.gov/psd/cgi-bin/GrADS.pl?dataset=NCEP%2FDOE+AMIP-II+Reanalysis+%28Reanalysis-2%29&DB_did=61&file=%2FDatasets%2Fncep.reanalysis2%2Fpressure%2F',...
                     name,...
@@ -240,11 +240,13 @@ else
                     '&hour_end=18+Z',...
                     '&X=lon&Y=lat&output=file&bckgrnd=black&use_color=on&fill=lines&cint=&range1=&range2=&scale=100&maskf=%2FDatasets%2Fncep.reanalysis2%2Fgaussian_grid%2Fland.sfc.gauss.nc&maskv=Land-sea+mask&submit=Create+Plot+or+Subset+of+Data'];
           
-                [content, statut] = urlread(page);
-                if statut == 0
-                    break
-                else
-                    display(['Downloading ', group, '...'])
+%                 [content, statut] = urlread(page);
+%                 if statut == 0
+%                     break
+%                 else
+
+                    content = webread(page, 'timeout', inf);
+                    disp(['Downloading ', group, '...'])
                     % Setup  ftp access
                     folder  = 'Public/www/';
                     firs    = strfind(content,'ftp.cdc.noaa.gov/Public/www/');
@@ -262,12 +264,12 @@ else
                     
                     % Updates Waitbar
                     waitbar(i/5, wtb);
-                end
+%                end
                 
-                if statut == 1;
-                    break
-                end
-            end
+%                 if statut == 1
+%                     break
+%                 end
+%            end
         end       
     end    
 end
@@ -277,7 +279,8 @@ preprocess_ATM(filename, dataset)
 
 function [tid, nc] = get_tid(var, vid)
 
-pge = urlread(['http://www.esrl.noaa.gov/psd/cgi-bin/db_search/DBSearch.pl?&Dataset=NCEP/DOE+AMIP-II+Reanalysis+(Reanalysis-2)+&Variable=', var]);
+%pge = urlread(['http://www.esrl.noaa.gov/psd/cgi-bin/db_search/DBSearch.pl?&Dataset=NCEP/DOE+AMIP-II+Reanalysis+(Reanalysis-2)+&Variable=', var]);
+pge = webread(['http://www.esrl.noaa.gov/psd/cgi-bin/db_search/DBSearch.pl?&Dataset=NCEP/DOE+AMIP-II+Reanalysis+(Reanalysis-2)+&Variable=', var]);
 
 fnd = strfind(pge, 'tid=');
 tid = pge(fnd(1)+4:fnd(1)+8);

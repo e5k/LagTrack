@@ -19,11 +19,6 @@ end
 nrows  = 6001;
 ncols  = 6001;
 
-% Define a storage matrix for the data of all tiles
-XX = zeros(length(lat_maxI:lat_minI)*nrows, length(lon_minI:lon_maxI)*ncols); 
-YY = zeros(size(XX));
-ZZ = zeros(size(XX));
-
 % Initialize counters
 count  = 1;
 county = 1;
@@ -34,6 +29,7 @@ for yy = lat_maxI:lat_minI
     idxX    = 1;
     countx  = 1;
     for xx = lon_minI:lon_maxI
+        
         tile    = ['srtm_', num2str(xx, '%02d'), '_', num2str(yy, '%02d')];
         outdir  = [maindir, filesep, tile];    % Tmp directory
         % Open the file and save data
@@ -41,15 +37,28 @@ for yy = lat_maxI:lat_minI
         % axis
         disp(['   Reading tile ', tile, '...'])
         [tmpX, tmpY, tmpZ] = readDEM([pwd, filesep, outdir, filesep, tile, '.asc']);
-        XX(idxY:idxY+nrows-1, idxX:idxX+ncols-1) = tmpX;
-        YY(idxY:idxY+nrows-1, idxX:idxX+ncols-1) = flipud(tmpY);
-        ZZ(idxY:idxY+nrows-1, idxX:idxX+ncols-1) = tmpZ;
+        cellsize        = tmpX(1,2) - tmpX(1,1);            
+        [xq,yq]         = meshgrid(tmpX(1,1):res*cellsize/90:tmpX(1,end),tmpY(1,1):res*cellsize/90:tmpY(end,1));
+        zq              = interp2(tmpX,tmpY,tmpZ,xq,yq);
+            
+        % If first tile
+        if idxX == 1 && idxY == 1
+            % Define a storage matrix for the data of all tiles
+            XX = zeros(length(lat_maxI:lat_minI)*size(xq,1), length(lon_minI:lon_maxI)*size(xq,1));
+            YY = zeros(size(XX));
+            ZZ = zeros(size(XX));
+        end
+
+        XX(idxY:idxY+size(xq,1)-1, idxX:idxX+size(xq,2)-1) = xq;
+        YY(idxY:idxY+size(xq,1)-1, idxX:idxX+size(xq,2)-1) = flipud(yq);
+        ZZ(idxY:idxY+size(xq,1)-1, idxX:idxX+size(xq,2)-1) = zq;
 
         count = count+ 1;
         
         % Update counters
-        idxX   = countx*ncols+1;
+        idxX   = countx*size(xq,2)+1;
         countx = countx + 1;
+        clear tmpX tmpY tmpZ
     end
     idxY    = county*nrows+1;
     county  = county + 1;    
@@ -78,14 +87,20 @@ ZZ(isnan(ZZ))   = 0;
 % YY = YY(lat_maxI:lat_minI, lon_minI:lon_maxI);
 % ZZ = ZZ(lat_maxI:lat_minI, lon_minI:lon_maxI);
 
-% Interpolate
-cellsize        = XX(1,2) - XX(1,1);
-[xq,yq]         = meshgrid(XX(1,1):res*cellsize/90:XX(1,end),YY(1,1):res*cellsize/90:YY(end,1));
-zq              = interp2(XX,YY,ZZ,xq,yq);
+% % Interpolate
+% cellsize        = XX(1,2) - XX(1,1);
+% [xq,yq]         = meshgrid(XX(1,1):res*cellsize/90:XX(1,end),YY(1,1):res*cellsize/90:YY(end,1));
+% zq              = interp2(XX,YY,ZZ,xq,yq);
+% 
+% dem.X   = xq; 
+% dem.Y   = yq; 
+% dem.Z   = zq;
+% dem.res = res;
 
-dem.X   = xq; 
-dem.Y   = yq; 
-dem.Z   = zq;
+
+dem.X   = XX; 
+dem.Y   = YY; 
+dem.Z   = ZZ;
 dem.res = res;
 
 % Save
