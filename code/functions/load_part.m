@@ -27,7 +27,7 @@ set(findobj(ancestor(src, 'figure'), 'Tag', 'atm'), 'String', part.path.nc);
 set(findobj(ancestor(src, 'figure'), 'Tag', 'dem'), 'String', part.path.dem);
 
 set(findobj(ancestor(src, 'figure'), 'Tag', 'part_name'), 'String', part.part.name);
-set(findobj(ancestor(src, 'figure'), 'Tag', 'part_diam'), 'String', num2str(part.part.diam*1e2));
+set(findobj(ancestor(src, 'figure'), 'Tag', 'part_diam'), 'String', num2str(part.part.diam*1e3));
 set(findobj(ancestor(src, 'figure'), 'Tag', 'part_dens'), 'String', num2str(part.part.dens));
 set(findobj(ancestor(src, 'figure'), 'Tag', 'part_flat'), 'String', num2str(part.part.flat));
 set(findobj(ancestor(src, 'figure'), 'Tag', 'part_elon'), 'String', num2str(part.part.elon));

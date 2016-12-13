@@ -49,7 +49,7 @@ elseif strcmp(src.Tag, 'part_name')
 elseif strcmp(src.Tag, 'part_diam')
     tmp = str2double(src.String);
     err = 'Check the particle diameter';
-    if isnan(tmp) || tmp<0 ; change_frame(jEdit,src,0,err); part.part.diam = -9999; else change_frame(jEdit,src,1,' '); part.part.diam = tmp/1e2; end % Convert diameter to m
+    if isnan(tmp) || tmp<0 ; change_frame(jEdit,src,0,err); part.part.diam = -9999; else change_frame(jEdit,src,1,' '); part.part.diam = tmp/1e3; end % Convert diameter to m
 
 elseif strcmp(src.Tag, 'part_dens')
     tmp = str2double(src.String);

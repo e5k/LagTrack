@@ -122,7 +122,7 @@ fprintf(fid1, 'Vent longitude:\t%2.2f\n', part.vent.lon);
 fprintf(fid1, 'Vent altitude:\t%2.2f\n', part.vent.alt);
 fprintf(fid1, 'Eruption date:\t%s\n\n', datestr(part.date));
 
-fprintf(fid1, 'Diameter (mm):\t%2.4f\n', part.part.diam*1e2);
+fprintf(fid1, 'Diameter (mm):\t%2.4f\n', part.part.diam*1e3);
 fprintf(fid1, 'Density (kg/m3):\t%.2f\n', part.part.dens);
 fprintf(fid1, 'Flatness:\t%.2f\n', part.part.flat);
 fprintf(fid1, 'Elongation:\t%.2f\n\n', part.part.elon);
