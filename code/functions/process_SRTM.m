@@ -60,7 +60,7 @@ for yy = lat_maxI:lat_minI
         countx = countx + 1;
         clear tmpX tmpY tmpZ
     end
-    idxY    = county*nrows+1;
+    idxY    = county*size(xq,1)+1;
     county  = county + 1;    
 end
 

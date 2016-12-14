@@ -58,13 +58,11 @@ plot(a_tmp, [dem.X(1), dem.X(end)], [dem.Y(1), dem.Y(end)], '.');
 [lonVec, latVec, imag] = plot_google_map('Axis', a_tmp, 'Maptype', 'terrain');
 delete(f_tmp);
 
+% Set topography and corrects ratio
 surface( dem.X, dem.Y, dem.Z./1000, prepare_google_map(dem, lonVec, latVec, imag), 'Parent', AX); % Map the background to the topography
-% h=rotate3d;
-% set(h,'Enable','on');
 shading(AX, 'flat'); hold(AX, 'on');   grid(AX, 'on'); 
-axis(AX, 'tight');
-
-%delete(tmpA);                                                               % Delete temporary line
+lat_lon_proportions(AX)
+axis tight
 
 for i = 1:length(fld)
     % Plot vent

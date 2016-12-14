@@ -3,10 +3,28 @@ function part = get_trajectory(P)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+disp('Run started...');
 % Input parameters
-atm             = load(P.path.nc); atm = atm.atm;                           % Atmospheric data
-dem             = load(P.path.dem); dem = dem.dem;                          % DEM
+if isstruct(P)  % In case one particle is input
+    atm  = load(P.path.nc); atm = atm.atm;                           % Atmospheric data
+    dem  = load(P.path.dem); dem = dem.dem;                          % DEM
+    part = run_trajectory(P, atm, dem);
+    
+elseif iscell(P) % In case multiple particles are input    
+    atm  = load(P{1}.path.nc); atm = atm.atm;                        % Atmospheric data
+    dem  = load(P{1}.path.dem); dem = dem.dem;                       % DEM
+    if license('checkout', 'Distrib_Computing_Toolbox') == 1    % If parallel toolbox available
+        gcp;
+        parfor iP = 1:length(P)
+            run_trajectory(P{iP}, atm, dem);
+        end
+    else
+        
+    end
+end
+disp('Done!');
+
+function part = run_trajectory(P, atm, dem)
 
 % Set domain extent based on the union of DEM and wind data
 lat_min         = min([min(atm.lat), min(dem.Y(:,1))]);
@@ -267,3 +285,11 @@ end
 part.uf(i) = part.uf(i-1); 
 part.vf(i) = part.vf(i-1);
 part.wf(i) = part.wf(i-1);
+
+% Clean output
+P.traj = part;
+part   = P;
+
+% Display message
+disp(part.traj.out_msg); 
+save(['projects', filesep, part.run_name, filesep, part.part.name, '.mat'], 'part');

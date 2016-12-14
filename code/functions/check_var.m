@@ -44,7 +44,8 @@ elseif strcmp(src.Tag, 'dem')
 elseif strcmp(src.Tag, 'part_name')
     tmp = src.String;
     err = 'Enter a particle name';
-    if isempty(tmp) ; change_frame(jEdit,src,0,err); part.part.name = -9999; else change_frame(jEdit,src,1,' '); part.part.name = tmp; end
+    err1 = 'Invalid particle name';
+    if isempty(tmp) ; change_frame(jEdit,src,0,err); part.part.name = -9999; elseif isnumeric(str2double(tmp(1))) && ~isnan(str2double(tmp(1))); change_frame(jEdit,src,0,err1); part.part.name = -9999;  else change_frame(jEdit,src,1,' '); part.part.name = tmp; end
 
 elseif strcmp(src.Tag, 'part_diam')
     tmp = str2double(src.String);

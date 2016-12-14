@@ -41,12 +41,14 @@ if exist(['projects', filesep, part.run_name, filesep, part.part.name, '.mat'], 
 end
 
 %% RUN 
-display('Run started...');
+%disp('Run started...');
 set(findobj(ancestor(src, 'figure'), 'Tag', 'Errmsg'), 'String', 'Run started, please wait...');
-part.traj = get_trajectory(part);
-display(part.traj.out_msg); 
+% part.traj = get_trajectory(part);
+%display(part.traj.out_msg); 
+get_trajectory(part);
+load(['projects', filesep, part.run_name, filesep, part.part.name, '.mat']); % Load particle saved in the get_trajectory function
 set(findobj(ancestor(src, 'figure'), 'Tag', 'Errmsg'), 'String', '');
-display('Done!');
+%disp('Done!');
 
 %% Update
 update_table(src, part);
@@ -56,4 +58,4 @@ setappdata(ancestor(src, 'figure'), 'pltData',APDTA.pltData);
 % Enable buttons
 enableUI(src, 'on');
 
-save(['projects', filesep, part.run_name, filesep, part.part.name, '.mat'], 'part');
+%save(['projects', filesep, part.run_name, filesep, part.part.name, '.mat'], 'part');

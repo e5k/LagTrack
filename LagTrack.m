@@ -294,5 +294,6 @@ guidata(f, part)
 
 %% Display interface
 set(f, 'Visible', 'on');
-display('Done!');
+
+disp('Done!');
 
