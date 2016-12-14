@@ -1,22 +1,25 @@
-% Pre-process and run
+% Load particle to the GUI
+
 function load_part(src, ~)
 
-[fl,pth] = uigetfile('projects/*.mat');
+[fl,pth] = uigetfile('projects/*.mat', 'Multiselect', 'on');
 
-if fl == 0
-    return  
-else
-    load([pth, filesep, fl])
-    APDTA = getappdata(ancestor(src, 'figure'));    
-
-    if isfield(APDTA, 'pltData') && ~isempty(find(strcmp(fieldnames(APDTA.pltData), part.part.name)==1,1))
-        errordlg('This particle is already loaded');
-        return
+if iscell(fl)                                       % If multiple particles were selected
+    for i = 1:length(fl)
+        load([pth, filesep, fl{i}]);
+        APDTA = getappdata(ancestor(src, 'figure'));
+        preprocess_part(part, APDTA, src);
     end
+elseif ~iscell(fl) && fl>0                          % If one single particle was selected
+    load([pth, filesep, fl]);
+    APDTA = getappdata(ancestor(src, 'figure'));
+    preprocess_part(part, APDTA, src);
+else                                                % If the user cancelled
+    return
 end
 
-%load([pth, filesep, fl])
 
+function preprocess_part(part, APDTA, src)
 % Fill up GUI
 set(findobj(ancestor(src, 'figure'), 'Tag', 'name'), 'String', part.run_name);
 set(findobj(ancestor(src, 'figure'), 'Tag', 'vent_lat'), 'String', num2str(part.vent.lat));

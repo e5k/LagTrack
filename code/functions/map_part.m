@@ -61,8 +61,8 @@ delete(f_tmp);
 % Set topography and corrects ratio
 surface( dem.X, dem.Y, dem.Z./1000, prepare_google_map(dem, lonVec, latVec, imag), 'Parent', AX); % Map the background to the topography
 shading(AX, 'flat'); hold(AX, 'on');   grid(AX, 'on'); 
-lat_lon_proportions(AX)
-axis tight
+axis(AX, 'tight')
+lat_lon_proportions(AX);
 
 for i = 1:length(fld)
     % Plot vent
