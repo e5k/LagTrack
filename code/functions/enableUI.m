@@ -15,3 +15,5 @@ set(findobj(ancestor(src, 'figure'), 'Tag', 'Map3D'), 'Enable', state);
 set(findobj(ancestor(src, 'figure'), 'Tag', 'MapPan'), 'Enable', state);
 set(findobj(ancestor(src, 'figure'), 'Tag', 'MapZoom'), 'Enable', state);
 set(findobj(ancestor(src, 'figure'), 'Tag', 'MapLegend'), 'Enable', state);
+
+set(findobj(ancestor(src, 'figure'), 'Tag', 'variable'), 'Enable', state);
