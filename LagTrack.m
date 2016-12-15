@@ -31,6 +31,7 @@ m2 = uimenu('Label', 'Tools');
 uimenu(m2, 'Label', 'Download input parameters', 'Accelerator', 'I', 'Callback', 'GUI_input');
 uimenu(m2, 'Label', 'Display atmospheric data', 'Accelerator', 'A', 'Callback', @ViewAtm, 'Separator', 'on');
 uimenu(m2, 'Label', 'Get u,v,w velocities', 'Callback', @sphere2cart, 'Separator', 'on');
+uimenu(m2, 'Label', 'Variable parameters', 'Callback', @vary_param, 'Separator', 'on');
 
 % Main container
 MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );

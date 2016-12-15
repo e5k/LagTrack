@@ -1,5 +1,7 @@
 function map_part(varargin)
 
+nSteps = 100;   % Number of steps to plot
+
 if nargin == 0  % If calling the function independently
     [fl, pth] = uigetfile('projects/*.mat', 'Multiselect', 'on');
     if isnumeric(fl(1)); return; end
@@ -52,8 +54,8 @@ leg     = cell(length(fld),1);  % Setup legend
 legH    = zeros(length(fld),1); % Legend handles
 
 % Create a temporary figure to retrieve Google background
-f_tmp = figure('visible', 'off'); 
-a_tmp = axes('Parent', f_tmp);
+f_tmp   = figure('visible', 'off'); 
+a_tmp   = axes('Parent', f_tmp);
 plot(a_tmp, [dem.X(1), dem.X(end)], [dem.Y(1), dem.Y(end)], '.'); 
 [lonVec, latVec, imag] = plot_google_map('Axis', a_tmp, 'Maptype', 'terrain');
 delete(f_tmp);
@@ -76,7 +78,8 @@ for i = 1:length(fld)
         'Tag', ['alt',pltData.(fld{i}).part.name]);
     
     % Plot trajectory
-    legH(i) = plot3(AX, pltData.(fld{i}).traj.lon, pltData.(fld{i}).traj.lat, pltData.(fld{i}).traj.z./1000,...
+    idx = ceil(linspace(1, length(pltData.(fld{i}).traj.lon), nSteps));
+    legH(i) = plot3(AX, pltData.(fld{i}).traj.lon(idx), pltData.(fld{i}).traj.lat(idx), pltData.(fld{i}).traj.z(idx)./1000,...
         '-', 'Color', cmap(i,:), 'linewidth',3,...
         'Tag', ['traj',pltData.(fld{i}).part.name]);
     

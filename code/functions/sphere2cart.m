@@ -46,9 +46,9 @@ elevation = deg2rad(90-inclination);
 [a(1),a(2),a(3)] = sph2cart(azimuth, elevation, velocity);
 
 if nargin == 0
-    display(sprintf('U velocity: %.2f m/s', a(1)));
-    display(sprintf('V velocity: %.2f m/s', a(2)));
-    display(sprintf('W velocity: %.2f m/s', a(3)));
+    fprintf('U velocity: %.2f m/s\n', a(1));
+    fprintf('V velocity: %.2f m/s\n', a(2));
+    fprintf('W velocity: %.2f m/s\n', a(3));
     
 elseif nargin == 2
     src = varargin{1};

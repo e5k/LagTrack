@@ -10,7 +10,7 @@ if iscell(fl)                                       % If multiple particles were
         APDTA = getappdata(ancestor(src, 'figure'));
         preprocess_part(part, APDTA, src);
     end
-elseif ~iscell(fl) && fl>0                          % If one single particle was selected
+elseif ~iscell(fl) & fl>0                          % If one single particle was selected
     load([pth, filesep, fl]);
     APDTA = getappdata(ancestor(src, 'figure'));
     preprocess_part(part, APDTA, src);

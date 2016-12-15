@@ -13,13 +13,15 @@ if isstruct(P)  % In case one particle is input
 elseif iscell(P) % In case multiple particles are input    
     atm  = load(P{1}.path.nc); atm = atm.atm;                        % Atmospheric data
     dem  = load(P{1}.path.dem); dem = dem.dem;                       % DEM
-    if license('checkout', 'Distrib_Computing_Toolbox') == 1    % If parallel toolbox available
+    if license('checkout', 'Distrib_Computing_Toolbox') == 1 && length(P)>1 % If parallel toolbox available
         gcp;
         parfor iP = 1:length(P)
             run_trajectory(P{iP}, atm, dem);
         end
     else
-        
+        for iP = 1:length(P)
+            run_trajectory(P{iP}, atm, dem);
+        end    
     end
 end
 disp('Done!');
@@ -33,15 +35,15 @@ lon_min         = min([min(atm.lon), min(dem.X(1,:))]);
 lon_max         = max([max(atm.lon), max(dem.X(1,:))]);
 
 % Initialize particle release position/time
-part.x(1)       = P.rel.x;                                                  % X (m, Positive in E, negative in W)
-part.y(1)       = P.rel.y;                                                  % Y (m, Positive in N, negative in S)
-part.t(1)       = P.rel.t;                                                  % Time of eruption
+part.x(1)       = 0;%P.rel.x;                                                  % X (m, Positive in E, negative in W)
+part.y(1)       = 0;%P.rel.y;                                                  % Y (m, Positive in N, negative in S)
+part.t(1)       = 0;%P.rel.t;                                                  % Time of eruption
 part.z(1)       = P.vent.alt+P.rel.z;                                       % Z (m asl)
-part.dis(1)     = sqrt(P.rel.x^2 + P.rel.y^2);                              % Initial Euclidian distance from the vent in the x-y plane
+part.dis(1)     = 0; %sqrt(P.rel.x^2 + P.rel.y^2);                              % Initial Euclidian distance from the vent in the x-y plane
 part.bear(1)    = 0;                                                        % Particle bearing (Degree from north)
 
 % Calculate lat and lon of particle release
-[part.lat(1),part.lon(1)] = dist2ll(P.vent.lat, P.vent.lon, part.x, part.y);
+[part.lat(1),part.lon(1)] = dist2ll(P.vent.lat, P.vent.lon, part.x+P.rel.x, part.y+P.rel.y);
 
 % Find particle indices relative to atmospheric conditions
 [~, part.xI(1)] = min(abs(atm.lon - part.lon(1)));
@@ -94,7 +96,7 @@ int_count2      = 0;                                                        % Co
 i               = 1;                                                        % Main iteration counter
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Calculation of particle trajector
+% Calculation of particle trajectory
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 while test_run == 0
