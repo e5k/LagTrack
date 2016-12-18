@@ -1,15 +1,47 @@
-function download_ATM(lat_min, lat_max, lon_min, lon_max, year_min, year_max, month_min, month_max, filename, dataset)
+function download_ATM(varargin)%(lat_min, lat_max, lon_min, lon_max, year_min, year_max, month_min, month_max, filename, dataset)
 % DOWNLOAD_ATM Download atmospheric data from Reanalysis datasets.
 %   DOWNLOAD_ATM(lat_min, lat_max, lon_min, lon_max, year_min, year_max, month_min, month_max, filename, dataset)
 %       Download data for the specified spatial and temporal extent with
 %       the output name filename. The dataset is either 'Interim' for ECMWF
 %       Era-Interim or 'Reanalysis2' for NOAA Reanalysis 2 database.
 %
-%   See also writeECMWFAPIKey, preprocess_ATM.
+%   See also writeECMWFAPIKey, process_ATM.
 
 % This function is part of LagTrack.
 % Written by Sebastien Biass & Gholamhossein Bagheri
 % GPLv3
+
+% check number of input parameters
+if nargin == 0 || nargin == 2
+    answer      = inputdlg({'Minimum latitude (decimal degree, negative in S hemisphere)', 'Maximum latitude (decimal degree, negative in S hemisphere)', 'Minimum longitude (decimal degree, negative in W hemisphere)', 'Maximum longitude (decimal degree, negative in W hemisphere)', 'Start year (yyyy)', 'End year (yyyy)', 'Start month (mm)', 'End month (mm)', 'Name', 'Dataset (Interim or Reanalysis2)'}, 'Download atmospheric data', 1);
+    if isempty(answer)
+        return
+    end
+    lat_min     = str2double(answer{1});
+    lat_max     = str2double(answer{2});
+    lon_min     = str2double(answer{3});   
+    lon_max     = str2double(answer{4});
+    year_min    = str2double(answer{5});
+    year_max    = str2double(answer{6});
+    month_min   = str2double(answer{7});
+    month_max   = str2double(answer{8});
+    filename    = answer{9};
+    dataset     = answer{10};
+elseif nargin == 10   
+    lat_min     = varargin{1};
+    lat_max     = varargin{2};
+    lon_min     = varargin{3};   
+    lon_max     = varargin{4};
+    year_min    = varargin{5};
+    year_max    = varargin{6};
+    month_min   = varargin{7};
+    month_max   = varargin{8};
+    filename    = varargin{9};
+    dataset     = varargin{10};
+else
+    error('Wrong number of input arguments, should be either 0 or 10');
+end
+
 
 % Extend the range
 if abs(lat_max - lat_min) < 2.5; lat_min = lat_min-1.5; lat_max = lat_max+1.5; end
@@ -274,7 +306,7 @@ else
     end    
 end
 
-preprocess_ATM(filename, dataset)
+process_ATM(filename, dataset)
 
 
 function [tid, nc] = get_tid(var, vid)

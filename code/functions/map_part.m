@@ -52,20 +52,7 @@ load(pltData.(fld{1}).path.dem);
 cmap    = lines(length(fld));     % Setup colormap
 leg     = cell(length(fld),1);  % Setup legend
 legH    = zeros(length(fld),1); % Legend handles
-
-% Create a temporary figure to retrieve Google background
-f_tmp   = figure('visible', 'off'); 
-a_tmp   = axes('Parent', f_tmp);
-plot(a_tmp, [dem.X(1), dem.X(end)], [dem.Y(1), dem.Y(end)], '.'); 
-[lonVec, latVec, imag] = plot_google_map('Axis', a_tmp, 'Maptype', 'terrain');
-delete(f_tmp);
-
-% Set topography and corrects ratio
-surface( dem.X, dem.Y, dem.Z./1000, prepare_google_map(dem, lonVec, latVec, imag), 'Parent', AX); % Map the background to the topography
-shading(AX, 'flat'); hold(AX, 'on');   grid(AX, 'on'); 
-axis(AX, 'tight')
-lat_lon_proportions(AX);
-
+hold(AX, 'on')
 for i = 1:length(fld)
     % Plot vent
     plot3(AX, pltData.(fld{i}).vent.lon, pltData.(fld{i}).vent.lat, pltData.(fld{i}).vent.alt./1000,...
@@ -92,6 +79,46 @@ for i = 1:length(fld)
     
     leg{i} = pltData.(fld{i}).part.name;
 end
+axis tight
+% Retrieve the extent of plotted particles
+fact = .1; % Factor to extend the map extent
+XMin = AX.XLim(1) - fact*abs(AX.XLim(2)-AX.XLim(1));
+XMax = AX.XLim(2) + fact*abs(AX.XLim(2)-AX.XLim(1));
+YMin = AX.YLim(1) - fact*abs(AX.YLim(2)-AX.YLim(1));
+YMax = AX.YLim(2) + fact*abs(AX.YLim(2)-AX.YLim(1));
+
+% Indices of the new extent on the dem
+[~, XiMin] = min(abs(dem.X(1,:)-XMin));
+[~, XiMax] = min(abs(dem.X(1,:)-XMax));
+[~, YiMin] = min(abs(dem.Y(:,1)-YMin));
+[~, YiMax] = min(abs(dem.Y(:,1)-YMax));
+
+% If extent covers only one pixel, extend it to at least 3 pixels
+if XiMin-XiMax<3 && XiMin>2 && XiMax<size(dem.X,2)-1
+    XiMin = XiMin-2; XiMax = XiMax+2;
+    XMin  = dem.X(1,XiMin); XMax  = dem.X(1,XiMax); 
+end
+if YiMin-YiMax<3 && YiMin>2 && YiMax<size(dem.Y,1)-1
+    YiMin = YiMin-2; YiMax = YiMax+2;
+    YMin  = dem.Y(YiMin,1); YMax  = dem.Y(YiMax,1); 
+end
+
+% Create a temporary figure to retrieve Google background
+f_tmp   = figure('visible', 'off'); 
+a_tmp   = axes('Parent', f_tmp);
+plot(a_tmp, [dem.X(1,XiMin), dem.X(1,XiMax)], [dem.Y(YiMin,1), dem.Y(YiMax,1)], '.'); 
+[lonVec, latVec, imag] = plot_google_map('Axis', a_tmp, 'Maptype', 'terrain');
+delete(f_tmp);
+
+% Set topography and corrects ratio
+surface( dem.X(YiMin:YiMax, XiMin:XiMax),...
+    dem.Y(YiMin:YiMax, XiMin:XiMax),...
+    dem.Z(YiMin:YiMax, XiMin:XiMax)./1000,...
+    prepare_google_map(dem.X(YiMin:YiMax, XiMin:XiMax), dem.Y(YiMin:YiMax, XiMin:XiMax), lonVec, latVec, imag), 'Parent', AX); % Map the background to the topography
+shading(AX, 'flat'); grid(AX, 'on'); 
+
+axis(AX, [XMin, XMax, YMin, YMax])
+lat_lon_proportions(AX);
 box(AX, 'on')
 
 xlabel('Longitude');

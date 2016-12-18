@@ -1,4 +1,4 @@
-function PlotAtm(src, ~, atm)
+function plot_ATM(src, ~, atm)
 
 AX      = findobj(ancestor(src, 'figure'), 'Type', 'axes'); % Retrieve axes
 part    = guidata(src);                                     % Retrieve stored particle
@@ -19,6 +19,8 @@ levS = get(findobj(ancestor(src, 'figure'), 'Tag', 'levList'), 'Value');
 % Plot
 if strcmp(varT, 'Wind velocity')
     quiver(AX, atm.lon, atm.lat, squeeze(atm.u(:,:,levS,timS)), squeeze(atm.v(:,:,levS,timS)));
+    axis equal
+    axis([min(atm.lon), max(atm.lon), min(atm.lat), max(atm.lat)]);
 else
     if strcmp(varT, 'U wind')
         var = 'u';
@@ -44,13 +46,14 @@ else
     
     pcolor(AX, atm.lon, atm.lat, squeeze(tmp(:,:,levS,timS)));
     c = colorbar;
-    ylabel(c, lab)    
+    ylabel(c, lab)   
+    axis(AX, 'equal'); axis(AX, 'tight');
 end
 
 % Plot options
 xlabel(AX, 'Longitude');
 ylabel(AX, 'Latitude');
-axis(AX, 'equal'); axis(AX, 'tight');
+
 
 % If the vent is defined in the GUI, plot it
 if ~isempty(part) 

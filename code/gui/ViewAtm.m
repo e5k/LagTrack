@@ -24,6 +24,12 @@ end
 
 % Load atmospheric file
 atm     = load(PTH); atm = atm.atm;
+% In case a standard atmosphere
+if ~isfield(atm, 'humid')
+    errordlg('Only Reanalysis data can be displayed')
+    return
+end
+
 varList = {'Wind velocity', 'U wind', 'V wind', 'Temperature', 'Relative humidity', 'Air density', 'Air viscosity'};
 levList = cellstr(num2str(atm.level));
 timList = cellstr(datestr(atm.time));
@@ -59,9 +65,9 @@ main = uix.VBox( 'Parent', f , 'Padding', 10, 'BackgroundColor', BGC);
         bot = uix.VBox( 'Parent', main, 'Padding', 5, 'BackgroundColor', BGC );
             % Top/bottom
             botT = uix.HBox( 'Parent', bot, 'Padding', 5, 'BackgroundColor', BGC );
-                uicontrol('Parent', botT, 'Style', 'popupmenu', 'String', varList, 'Tag', 'varList', 'Tooltip', 'Parameter to plot', 'Callback', {@PlotAtm, atm});
-                uicontrol('Parent', botT, 'Style', 'popupmenu', 'String', levList, 'Tag', 'levList', 'Tooltip', 'Geopotential height (mb)', 'Callback', {@PlotAtm, atm}); 
-                uicontrol('Parent', botT, 'Style', 'popupmenu', 'String', timList, 'Tag', 'timList', 'Value', tIstart, 'Tooltip', 'Time', 'Callback', {@PlotAtm, atm});
+                uicontrol('Parent', botT, 'Style', 'popupmenu', 'String', varList, 'Tag', 'varList', 'Tooltip', 'Parameter to plot', 'Callback', {@plot_ATM, atm});
+                uicontrol('Parent', botT, 'Style', 'popupmenu', 'String', levList, 'Tag', 'levList', 'Tooltip', 'Geopotential height (mb)', 'Callback', {@plot_ATM, atm}); 
+                uicontrol('Parent', botT, 'Style', 'popupmenu', 'String', timList, 'Tag', 'timList', 'Value', tIstart, 'Tooltip', 'Time', 'Callback', {@plot_ATM, atm});
             set(botT, 'Widths', [-1 -1 -1],'Spacing', 5 );
             
             % Midle/bottom
@@ -83,7 +89,7 @@ main = uix.VBox( 'Parent', f , 'Padding', 10, 'BackgroundColor', BGC);
 set( main, 'Heights', [-1 130 ], 'Spacing', 5 );
 
 guidata(f,part);
-PlotAtm(f,'',atm);
+plot_ATM(f,'',atm);
 
 
 function changeT(src, ~, atm)
@@ -111,4 +117,4 @@ else
 end
 
 set(findobj(ancestor(src, 'figure'), 'Tag', 'timList'), 'Value', idx);
-PlotAtm(src,'',atm);
+plot_ATM(src,'',atm);

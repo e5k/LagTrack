@@ -17,11 +17,12 @@ else
 end
 
 %Calculate the distances along the axis
-x_dist = diff(ax(1:2));
-y_dist = diff(ax(3:4));
+y_dist = ll2dist(ax(3), ax(1), ax(4), ax(1)); %diff(ax(1:2));
+x_dist = ll2dist(ax(3), ax(1), ax(3), ax(2)); %diff(ax(3:4));
+z_dist = h.ZLim(2)*1000;
 
 %Adjust the aspect ratio
 c_adj = cosd(mean(ax(3:4)));
-dar = [1 c_adj 1];
-pbar = [x_dist*c_adj/y_dist 1 1 ];
+dar = [1 c_adj z_dist/mean([x_dist y_dist])/10];
+pbar = [x_dist*c_adj/y_dist 1 1];
 set(gca, 'DataAspectRatio',dar,'PlotBoxAspectRatio',pbar);

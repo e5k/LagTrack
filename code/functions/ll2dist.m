@@ -1,9 +1,9 @@
-function D = ll2dist(lat1, lon1,lat2, lon2)
+function D = ll2dist(lat1, lon1,lat2, lon2, radius)
 % lat1 = latitude of point 1
 % lon1 = longitude of point 1
 
 
-radius=6371;
+%radius=6371*1e3;
 
 lat1 = lat1*pi/180;
 lat2 = lat2*pi/180;

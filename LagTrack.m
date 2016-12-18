@@ -27,11 +27,19 @@ display('Preparing the interface, please wait...')
 m = uimenu('Label', 'File');
 uimenu(m, 'Label', 'Load particle', 'Accelerator', 'O', 'Callback', @load_part);
 
-m2 = uimenu('Label', 'Tools');
-uimenu(m2, 'Label', 'Download input parameters', 'Accelerator', 'I', 'Callback', 'GUI_input');
-uimenu(m2, 'Label', 'Display atmospheric data', 'Accelerator', 'A', 'Callback', @ViewAtm, 'Separator', 'on');
-uimenu(m2, 'Label', 'Get u,v,w velocities', 'Callback', @sphere2cart, 'Separator', 'on');
-uimenu(m2, 'Label', 'Variable parameters', 'Callback', @vary_param, 'Separator', 'on', 'enable', 'off', 'tag', 'variable');
+m2 = uimenu('Label', 'Input parameters');
+uimenu(m2, 'Label', 'Download amospheric data', 'Callback', @download_ATM);
+uimenu(m2, 'Label', 'Process amospheric data', 'Callback', @process_ATM);
+uimenu(m2, 'Label', 'ECMWF - Set API key', 'callback', @writeECMWFAPIKey);
+uimenu(m2, 'Label', 'ECMWF - Install library', 'callback', @installECMWFAPI);
+uimenu(m2, 'Label', 'Create standard atmosphere', 'Callback', @makeStandardAtm);
+uimenu(m2, 'Label', 'Display atmospheric data', 'Callback', @ViewAtm);
+uimenu(m2, 'Label', 'Download SRTM DEM', 'Separator', 'on', 'Callback', @download_SRTM);
+uimenu(m2, 'Label', 'Process SRTM DEM', 'Separator', 'on', 'Callback', @process_SRTM);
+
+m3 = uimenu('Label', 'Tools');
+uimenu(m3, 'Label', 'Get u,v,w velocities', 'Callback', @sphere2cart);
+uimenu(m3, 'Label', 'Variable parameters', 'Callback', @vary_param, 'Separator', 'on', 'enable', 'off', 'tag', 'variable');
 
 % Main container
 MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
@@ -124,13 +132,11 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
                         uix.Empty( 'Parent', topL_rel );
                         topL_rel_t          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Time offset relative to the eruption date (sec)\nPositive in future, negative in past'), 'Tag', 'rel_t', 'String', '0', 'callback', @check_var);
                         uix.Empty( 'Parent', topL_rel );                        
-                        topL_rel_vx         = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Initial velocity in X direction (m/s)\nPositive towards E, negative towards W'), 'Tag', 'rel_vx', 'String', '0', 'callback', @check_var);                     
-                        topL_rel_vy         = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Initial velocity in Y direction (m/s)\nPositive towards N, negative towards S'), 'Tag', 'rel_vy', 'String', '0', 'callback', @check_var);                        
+                        topL_rel_vx         = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Initial velocity in X direction (m/s)\nPositive towards E, negative towards W\nEnter -1 to initialize the particle velocity with the u wind component'), 'Tag', 'rel_vx', 'String', '-1', 'callback', @check_var);                     
+                        topL_rel_vy         = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Initial velocity in Y direction (m/s)\nPositive towards N, negative towards S\nEnter -1 to initialize the particle velocity with the v wind component'), 'Tag', 'rel_vy', 'String', '-1', 'callback', @check_var);                        
                         topL_rel_vz         = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Initial velocity in Z direction (m/s)\nPositive upwards, negative downwards'), 'Tag', 'rel_vz', 'String', '0', 'callback', @check_var);
                        
                         set( topL_rel,  'Heights', [35 35 35 0 35 0 35 35 35], 'Widths', [120, -1] );
-                
-                    %topL_vel = uix.Grid( 'Parent', topL_VEL, 'Padding', 15, 'Spacing', 8, 'BackgroundColor', BGC );
                 
                     % Advanced 
                     topLT.Selection = 4;
@@ -171,9 +177,6 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
         
         set(topL, 'Heights', [-1 45]);
         
-        % Top right box
-        %topR = uix.BoxPanel( 'Parent', TOPL, 'Title', 'Display', 'FontWeight', 'Bold', 'TitleColor', [.2 .2 .2], 'BackgroundColor', BGC,  'Padding', 5 );
-
     set( TOP, 'Widths', [-1 -1], 'Spacing', 5 );
 
 %% Bottom container
@@ -212,11 +215,12 @@ CEdit = [false,false, false, false, false ,false ,false ,false ,false ,false ,fa
 set(TB, 'ColumnName', CName, 'ColumnFormat', CForm, 'ColumnEditable', CEdit, 'RowName', [], 'ColumnWidth', 'auto', 'RowName', {});
 
 %% DISPLAY
-varList     =     {'Time (s)',...
+varList     =     {'Time (s)',...    
+    'Altitude (m asl)',...
+    'Projected distance (m)',...
     'X distance (m)',...
     'Y distance (m)',...
-    'Altitude (m asl)',...
-    'Distance (m)',...
+    'Flight distance (m)',...
     'Latitude',...
     'Longitude',...
     'U velocity (m/s)',...
@@ -256,8 +260,8 @@ topR_plot   = uix.VBox('Parent', topR_PLOT, 'BackgroundColor', BGC, 'Padding', 5
     ax_plot = axes('Parent', uicontainer('Parent',topR_plot), 'Tag','PlotAx', 'Box', 'on'); % Plot axis
 
     topR_plotB  = uix.HBox( 'Parent', topR_plot );
-        topR_varX   = uicontrol('Parent', topR_plotB, 'Style', 'popupmenu', 'String', varList, 'Tag', 'varX', 'Enable', 'off');
-        topR_varY   = uicontrol('Parent', topR_plotB, 'Style', 'popupmenu', 'String', varList, 'Tag', 'varY', 'Enable', 'off');
+        topR_varX   = uicontrol('Parent', topR_plotB, 'Style', 'popupmenu', 'String', varList, 'Tag', 'varX', 'Enable', 'off', 'value', 3);
+        topR_varY   = uicontrol('Parent', topR_plotB, 'Style', 'popupmenu', 'String', varList, 'Tag', 'varY', 'Enable', 'off', 'value', 2);
         set(topR_plotB, 'Widths', [-1 -1]);
         
     set(topR_plot, 'Heights', [-1 25]);

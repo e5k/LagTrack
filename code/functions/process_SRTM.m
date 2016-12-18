@@ -1,23 +1,71 @@
-function process_SRTM(lat_min, lat_max, lon_min, lon_max, res, filename)
+function process_SRTM(varargin)
+% Function PROCESS_SRTM - extract the region of interests from a set of
+% 90-m SRTM tiles and interpolates to the desired resolution. If no
+% argument is passed to the function, select the folder containing the
+% unzipped SRTM tiles (i.e. each tile is a separate folder). Tiles must be
+% downloaded from http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp in
+% ArcInfo ASCII format. Else, 6 arguments must be provided:
+% lat_min:  Minimum latitude (decimal degree, negative in S hemisphere)
+% lat_max:  Maximum latitude (decimal degree, negative in S hemisphere)
+% lon_min:  Minimum longitude (decimal degree, negative in W hemisphere)
+% lon_max:  Maximum longitude (decimal degree, negative in W hemisphere)
+% res    :  Resolution (m) (Leave 90 m for no interpolation)
+% name   :  File name as saved in input/dem/
+
+% check number of input parameters
+if nargin == 0 || nargin == 2
+    answer      = inputdlg({'Minimum latitude (decimal degree, negative in S hemisphere)', 'Maximum latitude (decimal degree, negative in S hemisphere)', 'Minimum longitude (decimal degree, negative in W hemisphere)', 'Maximum longitude (decimal degree, negative in W hemisphere)', 'Resolution (m)'}, 'Process SRTM DEM', 1, {'','','','','90'});
+    if isempty(answer)
+        return
+    end
+    lat_min     = str2double(answer{1});
+    lat_max     = str2double(answer{2});
+    lon_min     = str2double(answer{3});   
+    lon_max     = str2double(answer{4});
+    res         = str2double(answer{5});
+    
+    % Select the folder
+    folder = uigetdir('input/dem/', 'Select the folder containig the tiles');
+    if isempty(folder)
+        return
+    end
+    
+    % Retrieve the file name
+    tmp      = regexp(folder, filesep);
+    filename = folder(tmp(end)+1:end);
+    % If the .mat file is already present then load it, else create it
+    if exist([folder, filesep, folder, '.mat'], 'file')
+        load([folder, filesep, folder, '.mat']);
+    else
+        dem.lat_min = lat_min;
+        dem.lat_max = lat_max;
+        dem.lon_min = lon_min;
+        dem.lon_max = lon_max;
+        dem.res     = res;
+        dem.tiles   = get_SRTM_coordinates(lat_min, lat_max, lon_min, lon_max);
+        dem.type    = 'DEM';
+    end
+    
+elseif nargin == 6   
+    lat_min     = varargin{1};
+    lat_max     = varargin{2};
+    lon_min     = varargin{3};   
+    lon_max     = varargin{4};
+    res         = varargin{5};
+    filename    = varargin{6};
+    load(['input/dem/', filename, filesep, filename, '.mat']);
+else
+    error('Wrong number of input arguments, should be either 0 or 6');
+end
+
 
 disp('Processing SRTM tiles, please wait...')
 
 % Retrieves the indices of the files in the folder
 maindir = ['input/dem/', filename];
-files   = dir([maindir, filesep, 'srtm*']);
-storI   = zeros(length(files),2);
-
-for i = 1:length(files)
-    storI(i,1) = str2double(files(i).name(6:7));
-    storI(i,2) = str2double(files(i).name(9:10));
-end
 
 % Retrieve indices of SRTM files
-[lat_minI, lat_maxI, lon_minI, lon_maxI] = get_SRTM_coordinates(lat_min, lat_max, lon_min, lon_max);
-
-% Size of each SRTM tile
-nrows  = 6001;
-ncols  = 6001;
+[~, lat_minI, lat_maxI, lon_minI, lon_maxI] = get_SRTM_coordinates(lat_min, lat_max, lon_min, lon_max);
 
 % Initialize counters
 count  = 1;
@@ -28,8 +76,7 @@ idxY   = 1;
 for yy = lat_maxI:lat_minI
     idxX    = 1;
     countx  = 1;
-    for xx = lon_minI:lon_maxI
-        
+    for xx = lon_minI:lon_maxI        
         tile    = ['srtm_', num2str(xx, '%02d'), '_', num2str(yy, '%02d')];
         outdir  = [maindir, filesep, tile];    % Tmp directory
         % Open the file and save data
@@ -82,21 +129,6 @@ XX              = XX(lat_minI:lat_maxI, lon_minI:lon_maxI);
 YY              = YY(lat_minI:lat_maxI, lon_minI:lon_maxI);
 ZZ              = ZZ(lat_minI:lat_maxI, lon_minI:lon_maxI);
 ZZ(isnan(ZZ))   = 0;
-
-% XX = XX(lat_maxI:lat_minI, lon_minI:lon_maxI);
-% YY = YY(lat_maxI:lat_minI, lon_minI:lon_maxI);
-% ZZ = ZZ(lat_maxI:lat_minI, lon_minI:lon_maxI);
-
-% % Interpolate
-% cellsize        = XX(1,2) - XX(1,1);
-% [xq,yq]         = meshgrid(XX(1,1):res*cellsize/90:XX(1,end),YY(1,1):res*cellsize/90:YY(end,1));
-% zq              = interp2(XX,YY,ZZ,xq,yq);
-% 
-% dem.X   = xq; 
-% dem.Y   = yq; 
-% dem.Z   = zq;
-% dem.res = res;
-
 
 dem.X   = XX; 
 dem.Y   = YY; 

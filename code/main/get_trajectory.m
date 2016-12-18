@@ -35,15 +35,18 @@ lon_min         = min([min(atm.lon), min(dem.X(1,:))]);
 lon_max         = max([max(atm.lon), max(dem.X(1,:))]);
 
 % Initialize particle release position/time
-part.x(1)       = 0;%P.rel.x;                                                  % X (m, Positive in E, negative in W)
-part.y(1)       = 0;%P.rel.y;                                                  % Y (m, Positive in N, negative in S)
-part.t(1)       = 0;%P.rel.t;                                                  % Time of eruption
+part.x(1)       = 0;                                                        % X (m, Positive in E, negative in W)
+part.y(1)       = 0;                                                        % Y (m, Positive in N, negative in S)
+part.t(1)       = 0;                                                        % Time of eruption
 part.z(1)       = P.vent.alt+P.rel.z;                                       % Z (m asl)
-part.dis(1)     = 0; %sqrt(P.rel.x^2 + P.rel.y^2);                              % Initial Euclidian distance from the vent in the x-y plane
+part.dis(1)     = 0;                                                        % Distance along the flight path
+part.disP(1)    = 0;                                                        % Distance projected on the Earth surface using the Haversine formula
 part.bear(1)    = 0;                                                        % Particle bearing (Degree from north)
 
 % Calculate lat and lon of particle release
 [part.lat(1),part.lon(1)] = dist2ll(P.vent.lat, P.vent.lon, part.x+P.rel.x, part.y+P.rel.y);
+% Distance from release point to the vent
+part.dis0       = ll2dist(P.vent.lat, P.vent.lon, part.lat(1), part.lon(1), part.z(1)); 
 
 % Find particle indices relative to atmospheric conditions
 [~, part.xI(1)] = min(abs(atm.lon - part.lon(1)));
@@ -71,12 +74,12 @@ part.tau(1)     = P.part.dens * P.part.diam^2 / (18 * atm.muair(part.yI(1), part
 
 % Initial particle velocities
 % If no initial x or y velocity is given, assume the particle is carried by the wind
-if P.rel.vx == 0
+if P.rel.vx == -1
     part.u(1)   = part.uf(1);
 else
     part.u(1)   = P.rel.vx;
 end
-if P.rel.vy == 0
+if P.rel.vy == -1
     part.v(1)   = part.vf(1);
 else
     part.v(1)   = P.rel.vy;
@@ -89,6 +92,7 @@ test_run        = 0;                                                        % Co
 
 % Constant
 g               = 9.806;                                                    % Gravity m/s2  
+earth_radius    = 6371*1e3;                                                 % Earth radius
 
 % Initialize counters
 int_count1      = 0;                                                        % Counter for skip check for density and viscosity
@@ -215,6 +219,7 @@ while test_run == 0
     [~, part.tI(i)] = min(abs(atm.time-(P.date + part.t(i)/3600/24)));
     [~, part.zI(i)] = min(abs(atm.alt(part.yI(i), part.xI(i), :, part.tI(i)) - part.z(i)));
     part.dis(i)     = sqrt((part.x(i)-part.x(1))^2+(part.y(i)-part.y(1))^2+(part.z(i)-part.z(1))^2);
+    part.disP(i)    = ll2dist(part.lat(1), part.lon(1), part.lat(i), part.lon(i), earth_radius);
     
     % Update indices relative to DEM
     [~, part.xD(i)] = min(abs(dem.X(1,:)-part.lon(i)));

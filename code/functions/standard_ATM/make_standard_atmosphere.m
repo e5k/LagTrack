@@ -22,9 +22,8 @@ v(:,:,:,2) = zeros(1,1,size(a,1),1);
 time = [datenum([1948,1,1]); now];
 
 clear atm
-atm.lat = lat;
-atm.lat = lat;
-atm.lon = lon;
+atm.lat = 0;
+atm.lon = 0;
 atm.time = time;
 atm.alt = alt;
 atm.u = u;

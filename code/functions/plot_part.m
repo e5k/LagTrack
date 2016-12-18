@@ -1,10 +1,11 @@
 function plot_part(varargin)
 
-varList     =     {'Time (s)',...
+varList     =     {'Time (s)',...    
+    'Altitude (m asl)',...
+    'Projected distance (m)',...
     'X distance (m)',...
     'Y distance (m)',...
-    'Altitude (m asl)',...
-    'Distance (m)',...
+    'Flight distance (m)',...
     'Latitude',...
     'Longitude',...
     'U velocity (m/s)',...
@@ -83,14 +84,14 @@ varY    = get_field(varList{vY});
 
 % Plot
 hold(AX, 'on');   grid(AX, 'on');
-for i = 1:length(fld)
-    
+for i = 1:length(fld)    
     plot(AX, pltData.(fld{i}).traj.(varX), pltData.(fld{i}).traj.(varY), '-');
     hold on
 end
 hold(AX, 'off')
 grid(AX, 'on')
 box(AX, 'on')
+axis(AX, 'square')
 
 legend(AX, fld, 'Tag', 'LegPlot', 'interpreter', 'none')
 xlabel(AX, varList{vX});
@@ -107,8 +108,10 @@ elseif strcmp(fldIn, 'Y distance (m)')
     fldOut = 'y';
 elseif strcmp(fldIn, 'Altitude (m asl)')
     fldOut = 'z';
-elseif strcmp(fldIn, 'Distance (m)')
+elseif strcmp(fldIn, 'Flight distance (m)')
     fldOut = 'dis';
+elseif strcmp(fldIn, 'Projected distance (m)')
+    fldOut = 'disP';
 elseif strcmp(fldIn, 'Latitude')
     fldOut = 'lat';
 elseif strcmp(fldIn, 'Longitude')

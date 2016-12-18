@@ -52,10 +52,10 @@ if nargin == 0
     
 elseif nargin == 2
     src = varargin{1};
-    set(findobj(ancestor(src, 'figure'), 'Tag', 'TopPanel'), 'Selection', 3);
-    set(findobj(ancestor(src, 'figure'), 'Tag', 'rel_vx'), 'String', num2str(a(1)));
-    set(findobj(ancestor(src, 'figure'), 'Tag', 'rel_vy'), 'String', num2str(a(2)));
-    set(findobj(ancestor(src, 'figure'), 'Tag', 'rel_vz'), 'String', num2str(a(3)));
+    set(findobj(ancestor(src, 'figure'), 'Tag', 'TopPanel'), 'Selection', 3); 
+    set(findobj(ancestor(src, 'figure'), 'Tag', 'rel_vx'), 'String', num2str(a(1))); check_var(findobj(ancestor(src, 'figure'), 'Tag', 'rel_vx'), '');
+    set(findobj(ancestor(src, 'figure'), 'Tag', 'rel_vy'), 'String', num2str(a(2))); check_var(findobj(ancestor(src, 'figure'), 'Tag', 'rel_vy'), '');
+    set(findobj(ancestor(src, 'figure'), 'Tag', 'rel_vz'), 'String', num2str(a(3))); check_var(findobj(ancestor(src, 'figure'), 'Tag', 'rel_vz'), '');
 end
 
 if nargout > 0
