@@ -1,4 +1,4 @@
-function [tiles,lat_minI, lat_maxI, lon_minI, lon_maxI] = get_SRTM_coordinates(lat_min, lat_max, lon_min, lon_max)
+function [tiles,lat_minI, lat_maxI, lon_minI, lon_maxI, lat, lon] = get_SRTM_coordinates(lat_min, lat_max, lon_min, lon_max)
 
 % If longitudes are expressed in degrees east up to 360, correct them in
 % negtive values
@@ -22,11 +22,15 @@ lon_grid = -180+2.5:5:180-2.5;
 [~, lon_maxI] = min(abs(lon_grid-lon_maxA));
 
 % Create the tile list
-tiles = cell(length(lat_maxI:lat_minI)*length(lon_minI:lon_maxI),1);
+tiles = cell(length(lat_maxI:lat_minI)*length(lon_minI:lon_maxI),1);        % Stor tiles names
+lat   = zeros(length(lat_maxI:lat_minI)*length(lon_minI:lon_maxI),1);       % Stor tiles lat
+lon   = zeros(length(lat_maxI:lat_minI)*length(lon_minI:lon_maxI),1);       % Stor tiles lon
 cnt = 1; % Counter
 for yy = lat_maxI:lat_minI
     for xx = lon_minI:lon_maxI
         tiles{cnt} = ['srtm_', num2str(xx, '%02d'), '_', num2str(yy, '%02d')];
-        cnt = cnt+1;
+        lat(cnt)   = lat_grid(yy)-2.5;
+        lon(cnt)   = lon_grid(xx)-2.5;
+        cnt        = cnt+1;
     end
 end

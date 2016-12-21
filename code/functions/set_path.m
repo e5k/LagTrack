@@ -1,5 +1,5 @@
 % Used to set path in GUI
-function set_path(~, ~, O, filter, pthI, ttl)
+function set_path(~, ~, src, filter, pthI, ttl)
 [fl, pth] = uigetfile([pthI, filter], ttl);
-set(O, 'String', fullfile(pth, fl));
-check_var(O);
+set(src, 'String', fullfile(pth, fl));
+check_var(src);

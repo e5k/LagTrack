@@ -53,7 +53,19 @@ elseif nargin == 6
     lon_max     = varargin{4};
     res         = varargin{5};
     filename    = varargin{6};
-    load(['input/dem/', filename, filesep, filename, '.mat']);
+    % If the .mat file is already present then load it, else create it
+    if exist(['input/dem/', filename, filesep, filename, '.mat'], 'file')
+        load(['input/dem/', filename, filesep, filename, '.mat']);
+    else
+        dem.lat_min = lat_min;
+        dem.lat_max = lat_max;
+        dem.lon_min = lon_min;
+        dem.lon_max = lon_max;
+        dem.res     = res;
+        dem.tiles   = get_SRTM_coordinates(lat_min, lat_max, lon_min, lon_max);
+        dem.type    = 'DEM';
+        save(['input/dem/', filename, filesep, filename, '.mat'], 'dem');
+    end
 else
     error('Wrong number of input arguments, should be either 0 or 6');
 end
@@ -112,6 +124,15 @@ for yy = lat_maxI:lat_minI
 end
 
 %% Post processing
+% Remove raw data
+for yy = lat_maxI:lat_minI
+    for xx = lon_minI:lon_maxI        
+        tile    = ['srtm_', num2str(xx, '%02d'), '_', num2str(yy, '%02d')];
+        if exist(['input/dem/', filename, filesep, tile], 'dir'); rmdir(['input/dem/', filename, filesep, tile], 's'); end
+        if exist(['input/dem/', filename, filesep, tile, '.zip'], 'file'); rm(['input/dem/', filename, filesep, tile, '.zip']); end
+    end
+end
+
 % Clean coordinates
 [XX,YY] = meshgrid(linspace(XX(1,1),XX(1,end), size(XX,2)), linspace(YY(1,1),YY(end,1), size(XX,1)));
 YY      = flipud(YY);

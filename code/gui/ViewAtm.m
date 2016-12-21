@@ -3,7 +3,7 @@ function ViewAtm(varargin)
 % Retrieve path to atmospheric file
 % If called independently
 if nargin == 0
-    [fl, pth]   = uigetfile('*.mat', 'Select atmospheric file');
+    [fl, pth]   = uigetfile('input/wind/*.mat', 'Select atmospheric file');
     PTH         = fullfile(pth,fl);
     part        = []; % Empty particle
     if fl == 0; return; end
@@ -14,7 +14,7 @@ else
     part    = guidata(ancestor(src, 'Figure'));
     
     if part.path.nc == -9999 %isempty(get(findobj(ancestor(src, 'figure'), 'Tag', 'atm'), 'String'))        
-        [fl, pth]   = uigetfile('*.mat', 'Select atmospheric file');
+        [fl, pth]   = uigetfile('input/wind/*.mat', 'Select atmospheric file');
         PTH         = fullfile(pth,fl);
         if fl == 0; return; end
     else
@@ -30,7 +30,13 @@ if ~isfield(atm, 'humid')
     return
 end
 
-varList = {'Wind velocity', 'U wind', 'V wind', 'Temperature', 'Relative humidity', 'Air density', 'Air viscosity'};
+% Define variables to plot
+if length(atm.lat) == 1 && length(atm.lon) == 1 % In case of a single point, activate only wind speed
+    varList = {'Wind velocity'};
+else
+    varList = {'Wind velocity', 'U wind', 'V wind', 'Temperature', 'Relative humidity', 'Air density', 'Air viscosity'};
+end
+
 levList = cellstr(num2str(atm.level));
 timList = cellstr(datestr(atm.time));
 

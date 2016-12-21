@@ -31,6 +31,9 @@ else
     error('Wrong number of input arguments, should be either 0 or 6');
 end
 
+% Retrieve tiles names and indices
+[tiles,~,~,~,~,LT,LN] = get_SRTM_coordinates(lat_min, lat_max, lon_min, lon_max);
+
 % Check if folder already exist
 if exist(['input/dem/', filename], 'dir') == 7
     choice = questdlg('A folder with the same name already exists. Do you want to retrieve a previous attempt or replace it?', ...
@@ -41,16 +44,15 @@ if exist(['input/dem/', filename], 'dir') == 7
         case 'Replace' % Create a new run
             rmdir(['input/dem/', filename], 's');   % Remove existing folder
             mkdir(['input/dem/', filename]);        % Create folder
-            
-            % Retrieve tiles names and indices
-            tiles = get_SRTM_coordinates(lat_min, lat_max, lon_min, lon_max);
-            
+
             dem.lat_min = lat_min;
             dem.lat_max = lat_max;
             dem.lon_min = lon_min;
             dem.lon_max = lon_max;
             dem.res     = res;
             dem.tiles   = tiles;
+            dem.lat     = LT;
+            dem.lon     = LN;
             dem.type    = 'DEM';
             save(['input/dem/', filename, filesep, filename, '.mat'], 'dem');
             
@@ -60,9 +62,21 @@ if exist(['input/dem/', filename], 'dir') == 7
         case 'Cancel'
             return
     end
+else
+    mkdir(['input/dem/', filename]);        % Create folder    
+    dem.lat_min = lat_min;
+    dem.lat_max = lat_max;
+    dem.lon_min = lon_min;
+    dem.lon_max = lon_max;
+    dem.res     = res;
+    dem.tiles   = tiles;
+    dem.lat     = LT;
+    dem.lon     = LN;
+    dem.type    = 'DEM';
+    save(['input/dem/', filename, filesep, filename, '.mat'], 'dem');    
 end
 
-% Main 2 loops
+% Main loop
 disp('Accessing SRTM server, please wait...')
 maindir = ['input/dem/', filename];
 for i = 1:length(dem.tiles)
@@ -77,14 +91,29 @@ for i = 1:length(dem.tiles)
     % Else download
     DL_check = 0;
     while DL_check == 0
-        DL_check = 1;
-        websave([maindir, filesep, tiles{i}, '.zip'], ['http://srtm.csi.cgiar.org/SRT-ZIP/SRTM_v41/SRTM_Data_ArcASCII/', tiles{i}, '.zip']);
+        DL_check    = 1;    % Check download worked
+        tile_check  = 1;    % Check that the tile exists (i.e. fails in the ocean)
         try
-            unzip([maindir, filesep, tiles{i}, '.zip'], outdir);
+            websave([maindir, filesep, tiles{i}, '.zip'], ['http://srtm.csi.cgiar.org/SRT-ZIP/SRTM_v41/SRTM_Data_ArcASCII/', tiles{i}, '.zip']);
         catch ME
-            if strcmp(ME.identifier, 'MATLAB:unzip:invalidZipFile')
-                DL_check = 0;
+            if strcmp(ME.identifier, 'MATLAB:webservices:HTTP404StatusCodeError')
+                tile_check = 0;
             end
+        end
+        
+        if tile_check == 1 % If the tile exists
+            try
+                unzip([maindir, filesep, tiles{i}, '.zip'], outdir);
+            catch ME
+                if strcmp(ME.identifier, 'MATLAB:unzip:invalidZipFile')
+                    DL_check = 0;
+                end
+            end
+        else % If the file doesn't exist, then create a matrix filled with zeros
+            fprintf('      SRTM tile %s does not exist... Creating an empty tile \n', tiles{i})
+            mkdir([maindir, filesep, tiles{i}]);
+            writeDEM([maindir, filesep, tiles{i}, filesep, tiles{i}, '.asc'],...
+                dem.lon(i), dem.lat(i,1), zeros(6001,6001), 0.00083333333333333);
         end
     end   
 end

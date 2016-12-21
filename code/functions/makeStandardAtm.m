@@ -1,10 +1,7 @@
 % Create a standard atmosphere (1976) with custom values of u wind and v
 % wind
 
-function makeStandardAtm(varargin)
-% Bearing:      Degree from north
-% Inclination:  Degree from vertical
-% Velocity:     Initial velocity (m/s)
+function atmName = makeStandardAtm(varargin)
 
 % check number of input parameters
 if nargin == 0 || nargin == 2
@@ -23,10 +20,7 @@ else
     error('Wrong number of input arguments, should be either 0 or 3');
 end
 
-% check number of output parameters
-if nargout > 3
-    error('Too many output parameters')
-end
+atmName = [atmName, '_STD'];
 
 % Check if folder already exist
 if exist(['input/wind/', atmName], 'dir') == 7

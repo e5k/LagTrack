@@ -1,5 +1,8 @@
 function LagTrack
 
+% Add folders to search path
+addpath(genpath('code/'));
+
 % Setup figure
 BGC     = get(0,'DefaultUicontrolBackgroundColor');
 sz      = [700 1000]; % figure size
@@ -7,8 +10,7 @@ screenS = get(0,'ScreenSize');
 xpos    = ceil((screenS(3)-sz(2))/2);
 ypos    = ceil((screenS(4)-sz(1))/2);
 
-% Add folders to search path
-addpath(genpath('code/'));
+
 
 % Check if GUI toolbox is installed
 if ~exist('layoutRoot', 'file')==2
@@ -26,27 +28,24 @@ display('Preparing the interface, please wait...')
 % Menu
 m = uimenu('Label', 'File');
 uimenu(m, 'Label', 'Load particle', 'Accelerator', 'O', 'Callback', @load_part);
-
 m2 = uimenu('Label', 'Input parameters');
 uimenu(m2, 'Label', 'Download amospheric data', 'Callback', @download_ATM);
-uimenu(m2, 'Label', 'Process amospheric data', 'Callback', @process_ATM);
-uimenu(m2, 'Label', 'ECMWF - Set API key', 'callback', @writeECMWFAPIKey);
-uimenu(m2, 'Label', 'ECMWF - Install library', 'callback', @installECMWFAPI);
 uimenu(m2, 'Label', 'Create standard atmosphere', 'Callback', @makeStandardAtm);
 uimenu(m2, 'Label', 'Display atmospheric data', 'Callback', @ViewAtm);
+    m22 = uimenu(m2, 'Label', 'ECMWF');
+    uimenu(m22, 'Label', 'ECMWF - Set API key', 'callback', @writeECMWFAPIKey);
+    uimenu(m22, 'Label', 'ECMWF - Install library', 'callback', @installECMWFAPI);
 uimenu(m2, 'Label', 'Download SRTM DEM', 'Separator', 'on', 'Callback', @download_SRTM);
-uimenu(m2, 'Label', 'Process SRTM DEM', 'Separator', 'on', 'Callback', @process_SRTM);
-
+uimenu(m2, 'Label', 'Process SRTM DEM', 'Callback', @process_SRTM);
+uimenu(m2, 'Label', 'Create empty calculation grid', 'Callback', @makeDefaultGrid)
 m3 = uimenu('Label', 'Tools');
 uimenu(m3, 'Label', 'Get u,v,w velocities', 'Callback', @sphere2cart);
 uimenu(m3, 'Label', 'Variable parameters', 'Callback', @vary_param, 'Separator', 'on', 'enable', 'off', 'tag', 'variable');
 
 % Main container
 MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
-
     % Top container
     top     = uix.HBox( 'Parent', MAIN , 'BackgroundColor', BGC);
-        
     TOP    = uix.HBoxFlex( 'Parent', top, 'BackgroundColor', BGC, 'Padding', 5 );
     TOPL   = uix.BoxPanel( 'Parent', TOP, 'Title', 'Input', 'FontWeight', 'Bold', 'TitleColor', [.2 .2 .2], 'BackgroundColor', BGC,  'Padding', 5 );
     TOPR   = uix.BoxPanel( 'Parent', TOP, 'Title', 'Display', 'FontWeight', 'Bold', 'TitleColor', [.2 .2 .2], 'BackgroundColor', BGC,  'Padding', 5 );
@@ -128,7 +127,7 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
                                                
                         topL_rel_x          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('X offset relative to the vent (m)\nPositive towards E, negative towards W'), 'Tag', 'rel_x', 'String', '0', 'callback', @check_var);                     
                         topL_rel_y          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Y offset relative to the vent (m)\nPositive towards N, negative towards S'), 'Tag', 'rel_y', 'String', '0', 'callback', @check_var);                     
-                        topL_rel_z          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', 'Altitude above vent (m)', 'Tag', 'rel_z', 'String', '0', 'callback', @check_var);  
+                        topL_rel_z          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', 'Altitude above vent (m)\nIn case a simple calculation grid is used\n,altitude above the mean grid level', 'Tag', 'rel_z', 'String', '0', 'callback', @check_var);  
                         uix.Empty( 'Parent', topL_rel );
                         topL_rel_t          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Time offset relative to the eruption date (sec)\nPositive in future, negative in past'), 'Tag', 'rel_t', 'String', '0', 'callback', @check_var);
                         uix.Empty( 'Parent', topL_rel );                        

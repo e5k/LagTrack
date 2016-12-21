@@ -143,14 +143,23 @@ elseif strcmp(src.Tag, 'adv_skip')
     
 end
 
-
-
-
-
 %% Update GUI
+% Check if using standard atmosphere AND standard grid
+if ~isempty(regexp(get(findobj(ancestor(src, 'figure'), 'Tag', 'dem'), 'String'),'_STD.mat', 'once')) && ~isempty(regexp(get(findobj(ancestor(src, 'figure'), 'Tag', 'atm'), 'String'),'_STD.mat', 'once'))
+    set(findobj(ancestor(src, 'figure'), 'Tag', 'vent_lat'), 'Enable', 'off'); 
+    set(findobj(ancestor(src, 'figure'), 'Tag', 'vent_lon'), 'Enable', 'off');
+    set(findobj(ancestor(src, 'figure'), 'Tag', 'vent_alt'), 'Enable', 'off');
+    gui_check = 1;
+else
+    set(findobj(ancestor(src, 'figure'), 'Tag', 'vent_lat'), 'Enable', 'on'); 
+    set(findobj(ancestor(src, 'figure'), 'Tag', 'vent_lon'), 'Enable', 'on');
+    set(findobj(ancestor(src, 'figure'), 'Tag', 'vent_alt'), 'Enable', 'on');
+    gui_check = 0;
+end
+
 % Check to enable Run button
 if ischar(part.run_name) && ...
-        part.vent.lat ~= -9999 && part.vent.lon ~= -9999 && part.vent.alt~= -9999 && ...
+        (gui_check == 1 || (part.vent.lat ~= -9999 && part.vent.lon ~= -9999 && part.vent.alt~= -9999)) && ...
         part.date ~= -9999 && ...
         ischar(part.path.nc) && ischar(part.path.dem) && ...
         ischar(part.part.name) && part.part.diam ~= -9999 && part.part.dens ~= -9999 && part.part.flat ~= -9999 && part.part.elon ~= -9999 && ...

@@ -20,7 +20,9 @@ levS = get(findobj(ancestor(src, 'figure'), 'Tag', 'levList'), 'Value');
 if strcmp(varT, 'Wind velocity')
     quiver(AX, atm.lon, atm.lat, squeeze(atm.u(:,:,levS,timS)), squeeze(atm.v(:,:,levS,timS)));
     axis equal
-    axis([min(atm.lon), max(atm.lon), min(atm.lat), max(atm.lat)]);
+    if length(atm.lon)>1 && length(atm.lat)>1
+        axis([min(atm.lon), max(atm.lon), min(atm.lat), max(atm.lat)]);
+    end
 else
     if strcmp(varT, 'U wind')
         var = 'u';
@@ -48,6 +50,7 @@ else
     c = colorbar;
     ylabel(c, lab)   
     axis(AX, 'equal'); axis(AX, 'tight');
+    caxis([min(min(min(tmp(:,:,levS,:)))) max(max(max(tmp(:,:,levS,:))))]);
 end
 
 % Plot options

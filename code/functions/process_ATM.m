@@ -1,4 +1,4 @@
-function preprocess_ATM(filename, dataset, varargin)
+function process_ATM(filename, dataset, varargin)
 % PREPROCESS_ATM Converts NetCDF data into a Matlab matrix.
 %   PREPROCESS_ATM(filename, dataset) Loads NetCDF files located in
 %       input/filename/ and save a .mat file in the same folder.
@@ -30,6 +30,24 @@ function preprocess_ATM(filename, dataset, varargin)
 %     error('Wrong number of input arguments')
 % end
 
+if ~isempty(regexp(dataset, 'Reanalysis', 'once'))
+    if length(varargin) ~= 8
+        error('Wrong number of arguments. NOAA data requires to input:\nlat_min, lat_max, lon_min, lon_max, year_min (yyyy), year_max (yyyy), month_min (mm), month_max (mm)'); 
+    else
+        lat_min     = varargin{1};
+        lat_max     = varargin{2};
+        lon_min     = varargin{3};
+        lon_max     = varargin{4};
+        year_min    = varargin{5};
+        year_max    = varargin{6};
+        month_min   = varargin{7};
+        month_max   = varargin{8};
+    end
+else
+
+end
+
+
 display('Processing atmospheric data...')
 if strcmp(dataset, 'Interim')
     ncfile = ['input/wind/', filename, filesep, filename, '.nc'];
@@ -44,19 +62,60 @@ if strcmp(dataset, 'Interim')
     atm.u               = permute(ncread(ncfile, 'u'), [2,1,3,4]);                  % U wind (ms-1)
     atm.v               = permute(ncread(ncfile, 'v'), [2,1,3,4]);                  % V wind (ms-1)
 
-elseif strcmp(dataset, 'Reanalysis2')    
-    ncfile          = ['input/wind/', filename, filesep, filename];
+else
+        
+    if strcmp(dataset, 'Reanalysis1')
+        source_dir = 'input/wind/_Reanalysis1_Rawdata/';
+    elseif strcmp(dataset, 'Reanalysis2')
+        source_dir = 'input/wind/_Reanalysis2_Rawdata/';
+    else
+        error('Unknown dataset requested')
+    end
     
-    atm.lat         = ncread([ncfile, '_gheight.nc'], 'lat');                       % Latitude (degrees)
-    atm.lon         = ncread([ncfile, '_gheight.nc'], 'lon');                       % Longitude (degrees)
-    atm.level       = ncread([ncfile, '_gheight.nc'], 'level');                     % Longitude (degrees)
-    atm.alt         = permute(ncread([ncfile, '_gheight.nc'], 'hgt'), [2,1,3,4]);   % Altitude (m asl)
-    atm.humid       = permute(ncread([ncfile, '_relhum.nc'], 'rhum'), [2,1,3,4]);   % Relative humidity (%)
-    atm.temp        = permute(ncread([ncfile, '_temp.nc'], 'air'), [2,1,3,4]);      % Temperature (deg K)
-    atm.time        = datenum(datenum([1800,1,1,0,0,0]) + double(ncread([ncfile, '_gheight.nc'], 'time'))./24);    % Time (year month day hour min sec)
-    atm.u           = permute(ncread([ncfile, '_uwind.nc'], 'uwnd'), [2,1,3,4]);    % U wind (ms-1)
-    atm.v           = permute(ncread([ncfile, '_vwind.nc'], 'vwnd'), [2,1,3,4]);    % V wind (ms-1)
-    
+    varList = {'hgt', 'uwnd', 'vwnd', 'rhum', 'air'};
+    strList = {'alt', 'u', 'v', 'humid', 'temp'};
+ 
+    for iY = year_min:year_max
+        for iV = 1:length(varList)
+            fprintf('\tReading file %s\n', [varList{iV}, '.', num2str(iY), '.nc'])
+            ncfile = [source_dir, varList{iV}, '.', num2str(iY), '.nc'];
+            % If reading the first file, define storage matrix
+            if iV == 1 && iY == year_min
+                LT          = sort(ncread(ncfile, 'lat')); % Make sure it is in inreasing order
+                LN          = sort(ncread(ncfile, 'lon')); % Make sure it is in inreasing order
+                [~,latImin] = min(abs(LT - lat_min));
+                [~,latImax] = min(abs(LT - lat_max));                
+                [~,lonImin] = min(abs(LN - lon_min));
+                [~,lonImax] = min(abs(LN - lon_max));
+                atm.lat     = double(LT(latImin:latImax));
+                atm.lon     = double(LN(lonImin:lonImax));
+                atm.level   = double(ncread(ncfile, 'level'));
+                atm.time    = datenum([year_min,month_min,1,0,0,0]):0.25:datenum([year_max,month_max,eomday(year_max,month_max),18,0,0]);
+                atm.temp    = zeros(length(atm.lat), length(atm.lon), length(atm.level), length(atm.time));
+                atm.alt     = zeros(size(atm.temp));
+                atm.humid   = zeros(size(atm.temp));
+                atm.u       = zeros(size(atm.temp));
+                atm.v       = zeros(size(atm.temp));
+            end
+            % Retrieve the time indices
+            time_tmp    = datenum(datenum([1800,1,1,0,0,0]) + double(ncread(ncfile, 'time'))./24)';    % Time (year month day hour min sec)
+            timeInc     = ismember(time_tmp, atm.time);
+            timeIatm    = ismember(atm.time, time_tmp);
+            
+            nc_tmp     = permute(double(ncread(ncfile, varList{iV})), [2,1,3,4]);   % Read nc data
+            
+            % Problem here: Humidity data for Reanalysis1 only goes to a
+            % pressure level of 300 mb (~10 km). I fill what is higher with
+            % the last value of humidity
+            if strcmp(dataset, 'Reanalysis1') && iV == 4
+                atm.(strList{iV})(1:length(atm.lat), 1:length(atm.lon), 1:8, timeIatm) = nc_tmp(latImin:latImax, lonImin:lonImax, :, timeInc);
+                atm.(strList{iV})(1:length(atm.lat), 1:length(atm.lon), 9:length(atm.level), timeIatm) = ...
+                    repmat(nc_tmp(latImin:latImax, lonImin:lonImax, 8, timeInc), 1,1,9,1);
+            else
+                atm.(strList{iV})(1:length(atm.lat), 1:length(atm.lon), :, timeIatm) = nc_tmp(latImin:latImax, lonImin:lonImax, :, timeInc);
+            end
+        end
+    end
 end
 
 % Express degrees E (i.e. >180) into negative values in W hemisphere

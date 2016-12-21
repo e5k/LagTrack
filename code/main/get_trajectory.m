@@ -4,6 +4,14 @@ function part = get_trajectory(P)
 % Input parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 disp('Run started...');
+
+% Check that all particles point to the same dem/atmospheric file
+for iP = 2:length(P)
+    if ~strcmp(P{iP}.path.dem, P{iP-1}.path.dem) || ~strcmp(P{iP}.path.nc, P{iP-1}.path.nc)
+        error('All particles must point to the same DEM and atmospheric data');
+    end
+end
+
 % Input parameters
 if isstruct(P)  % In case one particle is input
     atm  = load(P.path.nc); atm = atm.atm;                           % Atmospheric data
@@ -28,11 +36,10 @@ disp('Done!');
 
 function part = run_trajectory(P, atm, dem)
 
-% Set domain extent based on the union of DEM and wind data
-lat_min         = min([min(atm.lat), min(dem.Y(:,1))]);
-lat_max         = max([max(atm.lat), max(dem.Y(:,1))]);
-lon_min         = min([min(atm.lon), min(dem.X(1,:))]);
-lon_max         = max([max(atm.lon), max(dem.X(1,:))]);
+% In case the DEM is just a grid
+% if strcmp(dem.type, 'GRID');
+%     part.vent.alt = dem.Z(1);
+% end
 
 % Initialize particle release position/time
 part.x(1)       = 0;                                                        % X (m, Positive in E, negative in W)
@@ -57,6 +64,11 @@ part.dis0       = ll2dist(P.vent.lat, P.vent.lon, part.lat(1), part.lon(1), part
 % Find particle indices relative to DEM
 [~, part.xD(1)] = min(abs(dem.X(1,:) - part.lon(1)));
 [~, part.yD(1)] = min(abs(dem.Y(:,1) - part.lat(1)));
+% Check if release altitude is above DEM
+if part.z(1) < dem.Z(part.yD(1), part.xD(1))
+    part.out_msg = sprintf('Release altitude is below the DEM (%4.0f m)', dem.Z(part.yD(1), part.xD(1)));
+    error('Release altitude is below the DEM (%4.0f m)', dem.Z(part.yD(1), part.xD(1))),
+end
 
 % Initial atmosperic condidtions
 part.uf(1)      = atm.u(part.yI(1), part.xI(1), part.zI(1), part.tI(1));    % Initial u wind (m/s)
@@ -234,15 +246,23 @@ while test_run == 0
         part.out_msg = sprintf('Particle landed on the domain');
         test_run     = 1;       
     % Test domain
-    elseif part.lon(i) <= lon_min || part.lon(i) >= lon_max || part.lat(i) <= lat_min || part.lat(i) >= lat_max
+    %   1: Both DEM and atmospheric data are defined
+    elseif (isfield(atm, 'humid') && strcmp(dem.type, 'DEM')) && (part.lon(i) <= min([min(atm.lon), min(dem.X(1,:))]) || part.lon(i) >= max([max(atm.lon), max(dem.X(1,:))]) || part.lat(i) <= min([min(atm.lat), min(dem.Y(:,1))]) || part.lat(i) >= max([max(atm.lat), max(dem.Y(:,1))]))    
         part.out_msg = sprintf('Particle reached the domain border');
-        test_run     = 1;        
+        test_run     = 1;  
+    %   2: Only atmospheric data is defined
+    elseif (isfield(atm, 'humid') && strcmp(dem.type, 'GRID')) && (part.lon(i) <= min(atm.lon) || part.lon(i) >= max(atm.lon) || part.lat(i) <= min(atm.lat) || part.lat(i) >= max(atm.lat)) 
+        part.out_msg = sprintf('Particle reached the border of atmospheric domain');
+        test_run     = 1;    
+    %   3: Only DEM is defined
+    elseif (~isfield(atm, 'humid') && strcmp(dem.type, 'DEM')) && (part.lon(i) <= min(dem.X(1,:)) || part.lon(i) >= max(dem.X(1,:)) || part.lat(i) <= min(dem.Y(:,1)) || part.lat(i) >= max(dem.Y(:,1))) 
+        part.out_msg = sprintf('Particle reached the border of DEM');
+        test_run     = 1;      
     % Test time
-    elseif (P.date + i*P.adv.dt/3600/24) > max(atm.time)+0.25
-        part.out_msg = sprintf('Particle residence time longer than atmospheric data');
+    elseif isfield(atm, 'humid') && ((P.date + i*P.adv.dt/3600/24) > max(atm.time)+0.25)
+        part.out_msg = sprintf('Particle residence time is longer than atmospheric data');
         test_run     = 1;
-    else
-                               
+    else                             
         % Get u and v wind coordinates at new location
         if strcmp(P.adv.interp, 'none')
             % simple indexing method
