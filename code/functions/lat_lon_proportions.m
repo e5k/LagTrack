@@ -24,7 +24,7 @@ x_dist = ll2dist(ax(3), ax(1), ax(3), ax(2), 6371*1e3)/1e3; %diff(ax(3:4));
 % Calculate the ratio of axes
 xRatio = x_dist/min([x_dist y_dist]);
 yRatio = y_dist/min([x_dist y_dist]);
-zRatio = z_dist/min([x_dist y_dist]) *  min([x_dist y_dist z_dist])/max([x_dist y_dist z_dist])*100;
+zRatio = min([x_dist y_dist])/z_dist *  min([x_dist y_dist z_dist])/max([x_dist y_dist z_dist])*100;
 dar    = [xRatio yRatio zRatio];
 
 set(gca, 'DataAspectRatio',dar);

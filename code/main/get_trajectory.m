@@ -7,7 +7,7 @@ disp('Run started...');
 
 % Check that all particles point to the same dem/atmospheric file
 for iP = 2:length(P)
-    if ~strcmp(P{iP}.path.dem, P{iP-1}.path.dem) || ~strcmp(P{iP}.path.nc, P{iP-1}.path.nc)
+    if ~strcmp(P{iP}.path.dem, P{iP-1}.path.dem) && ~strcmp(P{iP}.path.nc, P{iP-1}.path.nc)
         error('All particles must point to the same DEM and atmospheric data');
     end
 end
@@ -36,10 +36,13 @@ disp('Done!');
 
 function part = run_trajectory(P, atm, dem)
 
-% In case the DEM is just a grid
-% if strcmp(dem.type, 'GRID');
-%     part.vent.alt = dem.Z(1);
-% end
+% In case the grid is not a DEM and standard atmosphere, set the vent
+% reference to 0
+if strcmp(dem.type, 'GRID') && ~isfield(atm, 'humid')  
+    P.vent.lon = 0;
+    P.vent.lat = 0;
+    P.vent.alt = dem.Z;
+end
 
 % Initialize particle release position/time
 part.x(1)       = 0;                                                        % X (m, Positive in E, negative in W)
@@ -111,12 +114,18 @@ int_count1      = 0;                                                        % Co
 int_count2      = 0;                                                        % Counter forskip check for wind velocity
 i               = 1;                                                        % Main iteration counter
 
+fprintf('Alt\tx\ty\tw\tlat\tlon\tdem\ttime\tuwind\tvwind\n')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Calculation of particle trajectory
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 while test_run == 0
     i = i+1;
+    
+    if mod(500,i) == 0
+        fprintf('%4.0f\t%4.1f\t%4.1f\t%3.2f\t%2.2f\t%3.2f\t%4.0f\t%4.1f\t%3.2f\t%3.2f\n', part.z(end), part.x(end), part.y(end), part.w(end), part.lat(end), part.lon(end), dem.Z(part.yD(end),part.xD(end)), part.t(end), part.uf(end), part.vf(end))
+    end
+    
     % Interpolation of physical properties of atmosphere     
     if strcmp(P.adv.interp, 'none')
     % Simple indexing method
@@ -247,15 +256,15 @@ while test_run == 0
         test_run     = 1;       
     % Test domain
     %   1: Both DEM and atmospheric data are defined
-    elseif (isfield(atm, 'humid') && strcmp(dem.type, 'DEM')) && (part.lon(i) <= min([min(atm.lon), min(dem.X(1,:))]) || part.lon(i) >= max([max(atm.lon), max(dem.X(1,:))]) || part.lat(i) <= min([min(atm.lat), min(dem.Y(:,1))]) || part.lat(i) >= max([max(atm.lat), max(dem.Y(:,1))]))    
-        part.out_msg = sprintf('Particle reached the domain border');
-        test_run     = 1;  
-    %   2: Only atmospheric data is defined
-    elseif (isfield(atm, 'humid') && strcmp(dem.type, 'GRID')) && (part.lon(i) <= min(atm.lon) || part.lon(i) >= max(atm.lon) || part.lat(i) <= min(atm.lat) || part.lat(i) >= max(atm.lat)) 
+%     elseif (isfield(atm, 'humid') && strcmp(dem.type, 'DEM')) && (part.lon(i) <= min([min(atm.lon), min(dem.X(1,:))]) || part.lon(i) >= max([max(atm.lon), max(dem.X(1,:))]) || part.lat(i) <= min([min(atm.lat), min(dem.Y(:,1))]) || part.lat(i) >= max([max(atm.lat), max(dem.Y(:,1))]))    
+%         part.out_msg = sprintf('Particle reached the domain border');
+%         test_run     = 1;  
+    %   2: Only atmospheric data is defined && strcmp(dem.type, 'GRID')) 
+    elseif isfield(atm, 'humid') && (part.lon(i) <= min(atm.lon) || part.lon(i) >= max(atm.lon) || part.lat(i) <= min(atm.lat) || part.lat(i) >= max(atm.lat)) 
         part.out_msg = sprintf('Particle reached the border of atmospheric domain');
         test_run     = 1;    
-    %   3: Only DEM is defined
-    elseif (~isfield(atm, 'humid') && strcmp(dem.type, 'DEM')) && (part.lon(i) <= min(dem.X(1,:)) || part.lon(i) >= max(dem.X(1,:)) || part.lat(i) <= min(dem.Y(:,1)) || part.lat(i) >= max(dem.Y(:,1))) 
+    %   3: Only DEM is defined (~isfield(atm, 'humid') && 
+    elseif strcmp(dem.type, 'DEM') && (part.lon(i) <= min(dem.X(1,:)) || part.lon(i) >= max(dem.X(1,:)) || part.lat(i) <= min(dem.Y(:,1)) || part.lat(i) >= max(dem.Y(:,1))) 
         part.out_msg = sprintf('Particle reached the border of DEM');
         test_run     = 1;      
     % Test time

@@ -123,16 +123,6 @@ for yy = lat_maxI:lat_minI
     county  = county + 1;    
 end
 
-%% Post processing
-% Remove raw data
-for yy = lat_maxI:lat_minI
-    for xx = lon_minI:lon_maxI        
-        tile    = ['srtm_', num2str(xx, '%02d'), '_', num2str(yy, '%02d')];
-        if exist(['input/dem/', filename, filesep, tile], 'dir'); rmdir(['input/dem/', filename, filesep, tile], 's'); end
-        if exist(['input/dem/', filename, filesep, tile, '.zip'], 'file'); rm(['input/dem/', filename, filesep, tile, '.zip']); end
-    end
-end
-
 % Clean coordinates
 [XX,YY] = meshgrid(linspace(XX(1,1),XX(1,end), size(XX,2)), linspace(YY(1,1),YY(end,1), size(XX,1)));
 YY      = flipud(YY);
@@ -143,8 +133,6 @@ ZZ      = flipud(ZZ);
 [~, lat_maxI]   = min(abs(YY(:,1)-lat_max));
 [~, lon_minI]   = min(abs(XX(1,:)-lon_min));
 [~, lon_maxI]   = min(abs(XX(1,:)-lon_max));
-
-disp('Done!');
 
 XX              = XX(lat_minI:lat_maxI, lon_minI:lon_maxI);
 YY              = YY(lat_minI:lat_maxI, lon_minI:lon_maxI);
@@ -158,3 +146,14 @@ dem.res = res;
 
 % Save
 save(['input/dem/', filename, filesep, filename, '.mat'], 'dem');
+
+% Remove raw data
+for yy = lat_maxI:lat_minI
+    for xx = lon_minI:lon_maxI        
+        tile    = ['srtm_', num2str(xx, '%02d'), '_', num2str(yy, '%02d')];
+        if exist(['input/dem/', filename, filesep, tile], 'dir'); rmdir(['input/dem/', filename, filesep, tile], 's'); end
+        if exist(['input/dem/', filename, filesep, tile, '.zip'], 'file'); delete(['input/dem/', filename, filesep, tile, '.zip']); end
+    end
+end
+
+fprintf('Done!');

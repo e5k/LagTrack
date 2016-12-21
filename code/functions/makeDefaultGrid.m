@@ -6,7 +6,7 @@ if nargin == 0 || nargin == 2
     if isempty(answer)
         return
     end
-    alt         = str2double(answer{2});
+    alt         = str2double(answer{1});
     grdName     = answer{2};    
 elseif nargin == 3   
     alt         = varargin{1};
