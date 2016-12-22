@@ -3,38 +3,50 @@ function part = get_trajectory(P)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-disp('Run started...');
+
+% If a single particle is given, convert the structure to a cell
+if isstruct(P); P = {P}; end
 
 % Check that all particles point to the same dem/atmospheric file
 for iP = 2:length(P)
     if ~strcmp(P{iP}.path.dem, P{iP-1}.path.dem) && ~strcmp(P{iP}.path.nc, P{iP-1}.path.nc)
         error('All particles must point to the same DEM and atmospheric data');
     end
+    if ~strcmp(P{iP}.run_name, P{iP-1}.run_name)
+        error('All particles must be part of the same project');
+    end
 end
 
+% Print message
+fprintf('_____________________________________________________________________________________\n')
+fprintf('LAGTRACK run %s started on %s...\n\n', P{1}.run_name, datestr(now));
+
+% Load input data
+atm  = load(P{1}.path.nc); atm = atm.atm;                           % Atmospheric data
+dem  = load(P{1}.path.dem); dem = dem.dem;                          % DEM
+
 % Input parameters
-if isstruct(P)  % In case one particle is input
-    atm  = load(P.path.nc); atm = atm.atm;                           % Atmospheric data
-    dem  = load(P.path.dem); dem = dem.dem;                          % DEM
-    part = run_trajectory(P, atm, dem);
-    
-elseif iscell(P) % In case multiple particles are input    
-    atm  = load(P{1}.path.nc); atm = atm.atm;                        % Atmospheric data
-    dem  = load(P{1}.path.dem); dem = dem.dem;                       % DEM
+if length(P) == 1%isstruct(P)  % In case one particle is input
+    multi= 0;                                                        % If multiple particles
+    part = run_trajectory(P{1}, atm, dem, multi);
+else %iscell(P) % In case multiple particles are input    
+    multi= 1;                                                        % If multiple particles
     if license('checkout', 'Distrib_Computing_Toolbox') == 1 && length(P)>1 % If parallel toolbox available
         gcp;
         parfor iP = 1:length(P)
-            run_trajectory(P{iP}, atm, dem);
+            run_trajectory(P{iP}, atm, dem, multi);
         end
     else
         for iP = 1:length(P)
-            run_trajectory(P{iP}, atm, dem);
+            run_trajectory(P{iP}, atm, dem, multi);
         end    
     end
 end
-disp('Done!');
 
-function part = run_trajectory(P, atm, dem)
+fprintf('LAGTRACK run %s ended on %s...\n\n', P{1}.run_name, datestr(now));
+fprintf('_____________________________________________________________________________________\n')
+
+function part = run_trajectory(P, atm, dem, multi)
 
 % In case the grid is not a DEM and standard atmosphere, set the vent
 % reference to 0
@@ -114,7 +126,12 @@ int_count1      = 0;                                                        % Co
 int_count2      = 0;                                                        % Counter forskip check for wind velocity
 i               = 1;                                                        % Main iteration counter
 
-fprintf('Alt\tx\ty\tw\tlat\tlon\tdem\ttime\tuwind\tvwind\n')
+% If single particle, print the detail
+if multi == 0
+    fprintf('Alt.\tDist.\t\tBearing\tw\tlat\tlon\tDEM\tTime\tuwind\tvwind\n')
+    fprintf('______\t______\t\t______\t______\t______\t______\t______\t______\t______\t______\n')
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Calculation of particle trajectory
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -122,8 +139,11 @@ fprintf('Alt\tx\ty\tw\tlat\tlon\tdem\ttime\tuwind\tvwind\n')
 while test_run == 0
     i = i+1;
     
-    if mod(500,i) == 0
-        fprintf('%4.0f\t%4.1f\t%4.1f\t%3.2f\t%2.2f\t%3.2f\t%4.0f\t%4.1f\t%3.2f\t%3.2f\n', part.z(end), part.x(end), part.y(end), part.w(end), part.lat(end), part.lon(end), dem.Z(part.yD(end),part.xD(end)), part.t(end), part.uf(end), part.vf(end))
+    % If single particle, print the detail
+    if multi == 0
+        if mod(i,500) == 0
+            fprintf('%4.0f\t%4.0f\t\t%3.2f\t%3.1f\t%2.2f\t%3.2f\t%4.0f\t%4.0f\t%3.2f\t%3.2f\n', part.z(end), part.disP(end), part.w(end), part.bear(end), part.lat(end), part.lon(end), dem.Z(part.yD(end),part.xD(end)), part.t(end), part.uf(end), part.vf(end))
+        end
     end
     
     % Interpolation of physical properties of atmosphere     
@@ -229,7 +249,7 @@ while test_run == 0
     [part.lat(i), part.lon(i)] = dist2ll(part.lat(i-1), part.lon(i-1), part.x(i)-part.x(i-1), part.y(i)-part.y(i-1));
     
     % Update bearing
-    part.bear(i)    = -(atan2d(part.lat(i)-P.vent.lat, part.lon(i)-P.vent.lon)-90);
+    part.bear(i) = atan2d( sind(abs(part.lon(i)-part.lon(i-1))) * cosd(part.lat(i)) ,  cosd(part.lat(i-1)) * sind(part.lat(i)) - sind(part.lat(i-1)) * cosd(part.lat(i))  * cosd(abs(part.lon(i)-part.lon(i-1))) );
     if part.bear(i) < 0
         part.bear(i)= 360+part.bear(i);
     end
@@ -261,15 +281,15 @@ while test_run == 0
 %         test_run     = 1;  
     %   2: Only atmospheric data is defined && strcmp(dem.type, 'GRID')) 
     elseif isfield(atm, 'humid') && (part.lon(i) <= min(atm.lon) || part.lon(i) >= max(atm.lon) || part.lat(i) <= min(atm.lat) || part.lat(i) >= max(atm.lat)) 
-        part.out_msg = sprintf('Particle reached the border of atmospheric domain');
+        part.out_msg = sprintf('\tParticle %s reached the border of atmospheric domain', P.part.name);
         test_run     = 1;    
     %   3: Only DEM is defined (~isfield(atm, 'humid') && 
     elseif strcmp(dem.type, 'DEM') && (part.lon(i) <= min(dem.X(1,:)) || part.lon(i) >= max(dem.X(1,:)) || part.lat(i) <= min(dem.Y(:,1)) || part.lat(i) >= max(dem.Y(:,1))) 
-        part.out_msg = sprintf('Particle reached the border of DEM');
+        part.out_msg = sprintf('\tParticle %s reached the border of DEM', P.part.name);
         test_run     = 1;      
     % Test time
     elseif isfield(atm, 'humid') && ((P.date + i*P.adv.dt/3600/24) > max(atm.time)+0.25)
-        part.out_msg = sprintf('Particle residence time is longer than atmospheric data');
+        part.out_msg = sprintf('\tParticle %s residence time is longer than atmospheric data', P.part.name);
         test_run     = 1;
     else                             
         % Get u and v wind coordinates at new location
@@ -317,6 +337,12 @@ while test_run == 0
     end    
 end
 
+% Display message
+if multi == 0
+    fprintf('______\t______\t\t______\t______\t______\t______\t______\t______\t______\t______\n')
+end
+fprintf([P.traj.out_msg, '\n']); 
+
 % Trick to make the uf and vf vectors the same size as everything else
 part.uf(i) = part.uf(i-1); 
 part.vf(i) = part.vf(i-1);
@@ -326,6 +352,5 @@ part.wf(i) = part.wf(i-1);
 P.traj = part;
 part   = P;
 
-% Display message
-disp(part.traj.out_msg); 
+% Save particle
 save(['projects', filesep, part.run_name, filesep, part.part.name, '.mat'], 'part');

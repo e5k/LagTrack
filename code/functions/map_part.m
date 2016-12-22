@@ -1,6 +1,8 @@
 function map_part(varargin)
 
+% Plotting steps to plot only a subset of the entire trajectory
 nSteps = 100;   % Number of steps to plot
+nWind  = 10;    % Percentage of nSteps to plot wind vectors
 
 if nargin == 0  % If calling the function independently
     [fl, pth] = uigetfile('projects/*.mat', 'Multiselect', 'on');
@@ -54,18 +56,28 @@ leg     = cell(length(fld),1);  % Setup legend
 legH    = zeros(length(fld),1); % Legend handles
 hold(AX, 'on')
 for i = 1:length(fld)
-    
-    idx = ceil(linspace(1, length(pltData.(fld{i}).traj.lon), nSteps));     % Indices for plotting only a subset of the trajectory (nSteps)
+    % Indices for plotting only a subset of the trajectory (nSteps)
+    if length(pltData.(fld{i}).traj.lon) >= nSteps
+        idx = ceil(linspace(1, length(pltData.(fld{i}).traj.lon), nSteps));     
+    else
+        idx = 1:length(pltData.(fld{i}).traj.lon);
+    end
+    idx_wind = ceil(linspace(1, length(pltData.(fld{i}).traj.lon), nSteps/nWind));
+        
     if strcmp(dem.type, 'DEM')
-        vent_lon = pltData.(fld{i}).vent.lon;
-        vent_lat = pltData.(fld{i}).vent.lat;
+        vent_lon    = pltData.(fld{i}).vent.lon;
+        vent_lat    = pltData.(fld{i}).vent.lat;
         part_x      = pltData.(fld{i}).traj.lon(idx);
         part_y      = pltData.(fld{i}).traj.lat(idx);
+        wind_x      = pltData.(fld{i}).traj.lon(idx_wind);
+        wind_y      = pltData.(fld{i}).traj.lat(idx_wind);
     else
         vent_lon    = 0;
         vent_lat    = 0;
         part_x      = pltData.(fld{i}).traj.x(idx);
         part_y      = pltData.(fld{i}).traj.y(idx);
+        wind_x      = pltData.(fld{i}).traj.x(idx_wind);
+        wind_y      = pltData.(fld{i}).traj.y(idx_wind);
     end
     % Plot vent
     plot3(AX, vent_lon, vent_lat, pltData.(fld{i}).vent.alt./1000,...
@@ -86,6 +98,13 @@ for i = 1:length(fld)
         [pltData.(fld{i}).traj.z(1)./1000, pltData.(fld{i}).traj.z(end)./1000],...
         'o', 'MarkerSize', 10, 'MarkerFaceColor', cmap(i,:), 'MarkerEdgeColor', 'k',...
         'Tag', ['end',pltData.(fld{i}).part.name]);
+    
+    % If only one particle, plot the wind field
+    if length(fld) == 1
+    quiver3(AX, wind_x, wind_y,pltData.(fld{i}).traj.z(idx_wind)./1000,...
+        pltData.(fld{i}).traj.uf(idx_wind),pltData.(fld{i}).traj.vf(idx_wind), zeros(size(pltData.(fld{i}).traj.u(idx_wind))),...
+        0.5, 'Color', cmap(i,:));
+    end
     
     leg{i} = pltData.(fld{i}).part.name;
 end
@@ -132,7 +151,6 @@ if strcmp(dem.type, 'DEM') % In case the grid is a DEM
     shading(AX, 'flat'); grid(AX, 'on');
     
     % Work on axes
-    axis(AX, [XMin, XMax, YMin, YMax])
     lat_lon_proportions(AX);
     
     xlabel('Longitude');
@@ -144,6 +162,7 @@ end
 
 box(AX, 'on')
 zlabel('Altitude (km asl)');
+axis(AX, [XMin, XMax, YMin, YMax]);
 
 % Legend
 legend(AX, legH, leg, 'Location', 'Best', 'Tag', 'LegMap', 'Interpreter', 'none');
