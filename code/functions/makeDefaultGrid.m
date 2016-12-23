@@ -1,4 +1,17 @@
 function makeDefaultGrid(varargin)
+% makeDefaultGrid Create an empty calculation grid for a specified altitude
+%   makeDefaultGrid
+%       Open the GUI
+%   makeDefaultGrid(alt, grdName)
+%       Download the SRTM tiles covering the specified extent
+%           alt     :  Altitude of the grid (m asl)
+%           grdName :  File name, saved in input/dem/
+%
+%   see also downloadSRTM, makeStandardAtm.
+% 
+% This function is part of LagTrack.
+% Written by Sebastien Biass & Gholamhossein Bagheri
+% GPLv3
 
 % check number of input parameters
 if nargin == 0 || nargin == 2
@@ -8,9 +21,9 @@ if nargin == 0 || nargin == 2
     end
     alt         = str2double(answer{1});
     grdName     = answer{2};    
-elseif nargin == 3   
+elseif nargin == 2   
     alt         = varargin{1};
-    grdName     = varargin{3};
+    grdName     = varargin{2};
 else
     error('Wrong number of input arguments, should be either 0 or 3');
 end

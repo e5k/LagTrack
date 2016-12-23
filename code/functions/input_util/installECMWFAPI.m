@@ -48,8 +48,8 @@ function installECMWFAPI
 if system('python --version') ~= 0
     errordlg('No version of python found on your system', ' ')
 else
-    cd('code/ecmwf-api-client-python/');
+    cd('code/dependencies/ecmwf-api-client-python/');
     system('python setup.py install --user');
-    cd('../../');
+    cd('../../../');
 end
     

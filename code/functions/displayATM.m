@@ -1,4 +1,13 @@
-function ViewAtm(varargin)
+function displayATM(varargin)
+% displayATM Download atmospheric data from Reanalysis datasets.
+%   displayATM
+%       Opens the GUI to display atmospheric data obtained from Reanalysis datasets.
+%
+%   See also downloadATM, processATM.
+%
+% This function is part of LagTrack.
+% Written by Sebastien Biass & Gholamhossein Bagheri
+% GPLv3
 
 % Retrieve path to atmospheric file
 % If called independently

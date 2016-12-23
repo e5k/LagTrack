@@ -1,20 +1,22 @@
-function download_ATM(varargin)%(lat_min, lat_max, lon_min, lon_max, year_min, year_max, month_min, month_max, filename, dataset)
-% DOWNLOAD_ATM Download atmospheric data from Reanalysis datasets.
-%   DOWNLOAD_ATM(lat_min, lat_max, lon_min, lon_max, year_min, year_max, month_min, month_max, filename, dataset)
+function downloadATM(varargin)
+% downloadATM Download atmospheric data from Reanalysis datasets.
+%   downloadATM
+%       Opens the GUI to download atmospheric data from Reanalysis datasets
+%   downloadATM(lat_min, lat_max, lon_min, lon_max, year_min, year_max, month_min, month_max, filename, dataset)
 %       Download data for the specified spatial and temporal extent with
 %       the output name filename. The dataset is either 'Interim' for ECMWF
 %       Era-Interim, 'Reanalysis' for NOAA Reanalysis 1 and 'Reanalysis2' 
 %       for NOAA Reanalysis 2.
 %
-%   See also writeECMWFAPIKey, process_ATM.
-
+%   See also processATM, displayATM, makeStandardAtm.
+%
 % This function is part of LagTrack.
 % Written by Sebastien Biass & Gholamhossein Bagheri
 % GPLv3
 
 % check number of input parameters
 if nargin == 0 || nargin == 2
-    answer      = inputdlg({'Minimum latitude (decimal degree, negative in S hemisphere)', 'Maximum latitude (decimal degree, negative in S hemisphere)', 'Minimum longitude (decimal degree, negative in W hemisphere)', 'Maximum longitude (decimal degree, negative in W hemisphere)', 'Start year (yyyy)', 'End year (yyyy)', 'Start month (mm)', 'End month (mm)', 'Name', 'Dataset (Interim or Reanalysis2)'}, 'Download atmospheric data', 1);
+    answer      = inputdlg({'Minimum latitude (decimal degree, negative in S hemisphere)', 'Maximum latitude (decimal degree, negative in S hemisphere)', 'Minimum longitude (decimal degree, negative in W hemisphere)', 'Maximum longitude (decimal degree, negative in W hemisphere)', 'Start year (yyyy)', 'End year (yyyy)', 'Start month (mm)', 'End month (mm)', 'Name', 'Dataset (Interim, Reanalysis1 or Reanalysis2)'}, 'Download atmospheric data', 1);
     if isempty(answer)
         return
     end
@@ -71,15 +73,20 @@ if strcmp(dataset, 'Interim')
     % Work on input coordinates
     if lon_min < 0; lon_min = 360+lon_min; end
     if lon_max < 0; lon_max = 360+lon_max; end
-
-    txt     = fileread('download_ECMWF_tmp.py');
-    txt_new = strrep(txt, 'var_date_start', [num2str(year_min), num2str(month_min, '%02d'), '01']);
-    txt_new = strrep(txt_new, 'var_date_end', [num2str(year_max), num2str(month_max, '%02d'), num2str(eomday(year_max, month_max),'%02d')]);
+    
+    txt     = fileread('code/dependencies/ecmwf-api-client-python/download_ECMWF_tmp.py');
+    txt_new = strrep(txt, 'var_year_start', num2str(year_min));
+    txt_new = strrep(txt_new, 'var_year_end', num2str(year_max));
+    txt_new = strrep(txt_new, 'var_month_start', num2str(month_min));
+    txt_new = strrep(txt_new, 'var_month_end', num2str(month_max));
     txt_new = strrep(txt_new, 'var_north', num2str(lat_max));
     txt_new = strrep(txt_new, 'var_south', num2str(lat_min));
     txt_new = strrep(txt_new, 'var_west', num2str(lon_min));
     txt_new = strrep(txt_new, 'var_east', num2str(lon_max));
     txt_new = strrep(txt_new, 'var_out', strrep(['input/wind/', filename, filesep, filename, '.nc'], '\', '/'));
+    
+   
+    
     
     fid = fopen('download_ECMWF.py', 'w');
     fprintf(fid, '%s', txt_new);
@@ -89,9 +96,6 @@ if strcmp(dataset, 'Interim')
     
     delete('download_ECMWF.py');
 
-    
-    
-    
 %% NOAA
 else
     % Work on input coordinates
@@ -140,4 +144,4 @@ else
     end
 end
 
-process_ATM(filename, dataset, lat_min, lat_max, lon_min, lon_max, year_min, year_max, month_min, month_max)
+processATM(filename, dataset, lat_min, lat_max, lon_min, lon_max, year_min, year_max, month_min, month_max)

@@ -1,4 +1,14 @@
 function plot_part(varargin)
+% plot_part Plot particle parameters along flight path
+%   plot_part
+%       Open the GUI to select particles
+%
+%   see also map_part, detail_part.
+% 
+% This function is part of LagTrack.
+% Written by Sebastien Biass & Gholamhossein Bagheri
+% GPLv3
+
 
 varList     =     {'Time (s)',...    
     'Altitude (m asl)',...

@@ -1,16 +1,21 @@
-function process_SRTM(varargin)
-% Function PROCESS_SRTM - extract the region of interests from a set of
-% 90-m SRTM tiles and interpolates to the desired resolution. If no
-% argument is passed to the function, select the folder containing the
-% unzipped SRTM tiles (i.e. each tile is a separate folder). Tiles must be
-% downloaded from http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp in
-% ArcInfo ASCII format. Else, 6 arguments must be provided:
-% lat_min:  Minimum latitude (decimal degree, negative in S hemisphere)
-% lat_max:  Maximum latitude (decimal degree, negative in S hemisphere)
-% lon_min:  Minimum longitude (decimal degree, negative in W hemisphere)
-% lon_max:  Maximum longitude (decimal degree, negative in W hemisphere)
-% res    :  Resolution (m) (Leave 90 m for no interpolation)
-% name   :  File name as saved in input/dem/
+function processSRTM(varargin)
+% processSRTM Extract the region of interests from a set of 90-m SRTM tiles and interpolates to the desired resolution. 
+%   processSRTM
+%       Opens the GUI to select the root folder for all tiles.
+%   processSRTM(lat_min, lat_max, lon_min, lon_max, res, name)
+%       Process the SRTM tiles covering the specified extent
+%           lat_min:  Minimum latitude (decimal degree, negative in S hemisphere)
+%           lat_max:  Maximum latitude (decimal degree, negative in S hemisphere)
+%           lon_min:  Minimum longitude (decimal degree, negative in W hemisphere)
+%           lon_max:  Maximum longitude (decimal degree, negative in W hemisphere)
+%           res    :  Resolution (m) (Leave 90 m for no interpolation)
+%           name   :  File name, saved in input/dem/
+%
+%   see also downloadSRTM, makeDefaultGrid.
+% 
+% This function is part of LagTrack.
+% Written by Sebastien Biass & Gholamhossein Bagheri
+% GPLv3
 
 % check number of input parameters
 if nargin == 0 || nargin == 2

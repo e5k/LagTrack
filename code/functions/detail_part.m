@@ -1,7 +1,16 @@
-function show_details(varargin)
+function detail_part(varargin)
+% DETAIL_PART Display information about a previously simulated particle. Requires the GUI to be validated.
+%   DETAIL_PART
+%       Opens the GUI to select one particle and display information
+%
+%   See also map_part, plot_part.
+%
+% This function is part of LagTrack.
+% Written by Sebastien Biass & Gholamhossein Bagheri
+% GPLv3
 
 if nargin == 0  % If calling the function independently
-    [fl, pth] = uigetfile('*.mat');
+    [fl, pth] = uigetfile('projects/*.mat');
     if isempty(fl)
         return
     end
@@ -73,8 +82,7 @@ CEdit = false(1, 16);
 
 %% GUI
 
-%BGC         = get(0,'DefaultUicontrolBackgroundColor');
-%PC          = [.9 .9 .9];
+
 sz          = [700 1000]; % figure size
 screensize  = get(0,'ScreenSize');
 xpos        = ceil((screensize(3)-sz(2))/2); % center the figure on the
@@ -83,8 +91,16 @@ ypos        = ceil((screensize(4)-sz(1))/2); % center the figure on the
 f           = figure( 'Name', [part.run_name, ' - ', part.part.name], 'position',[xpos, ypos, sz(2), sz(1)], 'Toolbar','none', 'Menubar', 'none', 'NumberTitle', 'off');
 
 main        = uix.VBox('Parent', f, 'Padding', 15, 'Spacing', 5);
-
-    TB  = uitable( 'Parent', main, 'Tag', 'DataTable');
+    
+    % Setup panels
+    p = uix.TabPanel( 'Parent', main, 'Padding', 5 );
+    
+        ED  = uicontrol('Parent', p, 'Style', 'Edit', 'String',summarize_part(part), 'units', 'normalized', 'position', [1,1,98,98], 'min',0,'max',2,'HorizontalAlignment', 'left');
+        TB  = uitable( 'Parent', p, 'Tag', 'DataTable');
+    
+        p.TabTitles = {'Summary', 'Trajectory'};
+        p.Selection = 1;
+    
     BOT = uix.HBox('Parent', main, 'Spacing', 5); 
         
         uix.Empty( 'Parent', BOT );
@@ -95,6 +111,23 @@ main        = uix.VBox('Parent', f, 'Padding', 15, 'Spacing', 5);
 set(main, 'Heights', [-1 50]);
 
 set(TB, 'Data', data, 'ColumnName', header, 'ColumnFormat', CForm, 'ColumnEditable', CEdit, 'ColumnWidth', 'auto');
+
+function part_str = summarize_part(part)
+s1 = sprintf('Run %s\n', part.run_name);
+s2 = sprintf('PARTICLE\n\t- Name:\t\t\t%s\n\t- Run date:\t\t%s\n\t- Diameter (mm):\t%4.4f\n\t- Density (kg/m3):\t%4.0f\n\t- Flatness:\t\t%4.2f\n\t- Elongation:\t\t%4.2f\n',...
+    part.part.name, datestr(part.timestamp), part.part.diam/1e3, part.part.dens, part.part.flat, part.part.elon);
+s3 = sprintf('ERUPTION\n\t- Date:\t\t\t%s\n\t- Vent lon:\t\t%3.2f\n\t- Vent lat:\t\t%3.2f\n\t- Vent altitude (m):\t%4.0f\n',...
+    datestr(part.date), part.vent.lon, part.vent.lat, part.vent.alt);
+s4 = sprintf('PARTICLE RELEASE\n\t- x (m):\t\t%4.0f\n\t- y (m):\t\t%4.0f\n\t- z (m above vent):\t%4.0f\n\t- time (sec):\t\t%4.0f\n\t- vx (m/s):\t\t%4.0f\n\t- vy (m/s):\t\t%4.0f\n\t- vz (m/s):\t\t%4.4f\n',...
+    part.rel.x, part.rel.y, part.rel.z, part.rel.t, part.rel.vx, part.rel.vy, part.rel.vz);
+s5 = sprintf('PATH TO INPUT\n\t- Grid:\t\t\t%s\n\t- Atmospheric data:\t%s\n',...
+    part.path.dem, part.path.nc);
+s6 = sprintf('ADVANCED\n\t- Solution:\t\t%s\n\t- dt (s):\t\t%4.3f\n\t- Reduced drag (m):\t%4.0f\n',...
+    part.adv.solution, part.adv.dt, part.adv.drag);
+s7 = sprintf('INTERPOLATION\n\t- Type:\t\t\t%s\n\t- Method:\t\t%s\n\t- Range:\t\t%4.0f\n\t- Step (dt):\t\t%4.0f\n',...
+    part.adv.interp, part.adv.method, part.adv.range, part.adv.skip);
+
+part_str = char(s1,s2,s3,s4,s5,s6,s7);
 
 
 function export_part(~, ~, part, data)

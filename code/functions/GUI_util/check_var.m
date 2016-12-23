@@ -139,7 +139,7 @@ elseif strcmp(src.Tag, 'adv_range')
 elseif strcmp(src.Tag, 'adv_skip')
     tmp = str2double(src.String);
     err = 'Check the time skip interval';
-    if isnan(tmp) || tmp<0 ; change_frame(jEdit,src,0,err); part.adv.skip = -9999; else; change_frame(jEdit,src,1,' '); part.adv_skip = tmp; end    
+    if isnan(tmp) || tmp<0 ; change_frame(jEdit,src,0,err); part.adv.skip = -9999; else; change_frame(jEdit,src,1,' '); part.adv.skip = tmp; end    
     
 end
 
@@ -177,10 +177,6 @@ end
 % Update GUI data
 guidata(src, part);
 
-%%
-
-
-
 function change_frame(jEdit,src, typ,errmsg)
 if typ == 0
     jEdit.Border = javax.swing.border.LineBorder(java.awt.Color(1,0,0),1,false);
@@ -188,22 +184,3 @@ if typ == 0
     jEdit.Border = javax.swing.border.LineBorder(java.awt.Color(.65,.65,.65),1,false);
 end
 set(findobj(ancestor(src, 'figure'), 'Tag', 'Errmsg'), 'String', errmsg);
-
-
-
-% 
-% if strcmp(typ, 'fl')
-%     
-% elseif strcmp(typ, 'num')
-%     
-% elseif strcmp(typ, 'str')
-%     go = 0;
-% end
-% 
-% 
-% if go == 0
-% 
-%     jEditbox.Border = javax.swing.border.LineBorder(java.awt.Color(1,0,0),1,false);
-% else
-%     jEditbox.Border = javax.swing.border.LineBorder(java.awt.Color(.171,.173,.179),1,false);
-% end

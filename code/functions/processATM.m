@@ -1,12 +1,13 @@
-function process_ATM(filename, dataset, varargin)
-% PREPROCESS_ATM Converts NetCDF data into a Matlab matrix.
-%   PREPROCESS_ATM(filename, dataset) Loads NetCDF files located in
-%       input/filename/ and save a .mat file in the same folder.
-%       The dataset is either 'Interim' for ECMWF Era-Interim or 
-%       'Reanalysis2' for NOAA Reanalysis 2 database.
+function processATM(ATMname, dataset, varargin)
+% processATM Converts NetCDF data into a Matlab matrix.
+%   processATM(ATMname, dataset) 
+%       Loads the ERA-Interim NetCDF files located in input/filename/ 
+%       and save a .mat file in the same folder.
+%   processATM(ATMname, dataset, lat_min, lat_max, lon_min, lon_max, year_min, year_max, month_min, month_max)
+%       Extract the zone of interest from the global NOAA NetCDF files. 
 %
-%   See also writeECMWFAPIKey, download_ATM.
-
+%   See also downloadATM, displayATM, makeStandardAtm.
+%
 % This function is part of LagTrack.
 % Written by Sebastien Biass & Gholamhossein Bagheri
 % GPLv3
@@ -50,7 +51,7 @@ end
 
 display('Processing atmospheric data...')
 if strcmp(dataset, 'Interim')
-    ncfile = ['input/wind/', filename, filesep, filename, '.nc'];
+    ncfile = ['input/wind/', ATMname, filesep, ATMname, '.nc'];
     
     atm.lat             = double(ncread(ncfile, 'latitude'));                       % Latitude (degrees)
     atm.lon             = double(ncread(ncfile, 'longitude'));                      % Longitude (degrees)
@@ -165,5 +166,5 @@ atm.muair       = mu0.*(a./b).*(tempR./t0R).^(3/2)./10^3;                   % Dy
 % end
 
 display('Saving...')
-save(['input/wind/', filename, filesep, filename, '.mat'], 'atm');
+save(['input/wind/', ATMname, filesep, ATMname, '.mat'], 'atm');
 display('Done!')

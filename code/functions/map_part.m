@@ -1,4 +1,13 @@
 function map_part(varargin)
+% map_part Plot particles on a 3D map
+%   map_part
+%       Open the GUI to select particles
+%
+%   see also plot_part, detail_part.
+% 
+% This function is part of LagTrack.
+% Written by Sebastien Biass & Gholamhossein Bagheri
+% GPLv3
 
 % Plotting steps to plot only a subset of the entire trajectory
 nSteps = 100;   % Number of steps to plot
@@ -99,14 +108,23 @@ for i = 1:length(fld)
         'o', 'MarkerSize', 10, 'MarkerFaceColor', cmap(i,:), 'MarkerEdgeColor', 'k',...
         'Tag', ['end',pltData.(fld{i}).part.name]);
     
+    leg{i} = pltData.(fld{i}).part.name;
+    
     % If only one particle, plot the wind field
     if length(fld) == 1
-    quiver3(AX, wind_x, wind_y,pltData.(fld{i}).traj.z(idx_wind)./1000,...
+    legH(i+1) = quiver3(AX, wind_x, wind_y,pltData.(fld{i}).traj.z(idx_wind)./1000,...
         pltData.(fld{i}).traj.uf(idx_wind),pltData.(fld{i}).traj.vf(idx_wind), zeros(size(pltData.(fld{i}).traj.u(idx_wind))),...
-        0.5, 'Color', cmap(i,:));
+        1e-2, 'Color', 'r');
+    leg{i+1} = 'Wind';
+    
+    legH(i+2) = quiver3(AX, wind_x, wind_y,pltData.(fld{i}).traj.z(idx_wind)./1000,...
+        pltData.(fld{i}).traj.u(idx_wind),pltData.(fld{i}).traj.v(idx_wind), pltData.(fld{i}).traj.w(idx_wind),...
+        1e-2, 'Color', 'k');
+    leg{i+2} = 'Particle';
+    
+    
     end
     
-    leg{i} = pltData.(fld{i}).part.name;
 end
 axis tight
 
@@ -141,15 +159,20 @@ if strcmp(dem.type, 'DEM') % In case the grid is a DEM
     [lonVec, latVec, imag] = plot_google_map('Axis', a_tmp, 'Maptype', 'terrain');
     delete(f_tmp);
     
-    % Interpolate for a sharp background
-    [Xp, Yp] = meshgrid(linspace(dem.X(1,XiMin), dem.X(1,XiMax), size(imag,2)), linspace(dem.Y(YiMin,1), dem.Y(YiMax,1), size(imag,1)));
-    Zp       = interp2(dem.X, dem.Y, dem.Z, Xp, Yp);
-    
-    % Set topography and corrects ratio
-    surface( Xp,Yp,Zp./1000,...
-        prepare_google_map(Xp, Yp, lonVec, latVec, imag), 'Parent', AX); % Map the background to the topography
-    shading(AX, 'flat'); grid(AX, 'on');
-    
+    if ~isempty(imag)
+        % Interpolate for a sharp background
+        [Xp, Yp] = meshgrid(linspace(dem.X(1,XiMin), dem.X(1,XiMax), size(imag,2)), linspace(dem.Y(YiMin,1), dem.Y(YiMax,1), size(imag,1)));
+        Zp       = interp2(dem.X, dem.Y, dem.Z, Xp, Yp);
+
+        % Set topography and corrects ratio
+        surface( Xp,Yp,Zp./1000,...
+            prepare_google_map(Xp, Yp, lonVec, latVec, imag), 'Parent', AX); % Map the background to the topography
+        shading(AX, 'flat'); grid(AX, 'on');
+    else
+        surface(dem.X(YiMin:YiMax, XiMin:XiMax), dem.Y(YiMin:YiMax,XiMin:XiMax), dem.Z(YiMin:YiMax,XiMin:XiMax)./1e3);
+        shading(AX, 'flat'); grid(AX, 'on'); colormap(landcolor);
+    end
+        
     % Work on axes
     lat_lon_proportions(AX);
     

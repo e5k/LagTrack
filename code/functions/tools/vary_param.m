@@ -171,7 +171,7 @@ for idiam = 1:length(diamVec)
                                 PART{countP}.rel.z     = zoffVec(izoff);
                                 PART{countP}.rel.t     = toffVec(itoff);
                                 countP = countP + 1;
-                                zoffVec(izoff)
+                                zoffVec(izoff);
                             end
                         end
                     end

@@ -56,6 +56,9 @@ if strcmp(dem.type, 'GRID') && ~isfield(atm, 'humid')
     P.vent.alt = dem.Z;
 end
 
+% Record when the particle was ran
+P.timestamp     = now;
+
 % Initialize particle release position/time
 part.x(1)       = 0;                                                        % X (m, Positive in E, negative in W)
 part.y(1)       = 0;                                                        % Y (m, Positive in N, negative in S)
@@ -101,12 +104,12 @@ part.tau(1)     = P.part.dens * P.part.diam^2 / (18 * atm.muair(part.yI(1), part
 
 % Initial particle velocities
 % If no initial x or y velocity is given, assume the particle is carried by the wind
-if P.rel.vx == -1
+if P.rel.vx == 0
     part.u(1)   = part.uf(1);
 else
     part.u(1)   = P.rel.vx;
 end
-if P.rel.vy == -1
+if P.rel.vy == 0
     part.v(1)   = part.vf(1);
 else
     part.v(1)   = P.rel.vy;

@@ -1,7 +1,7 @@
 function writeECMWFAPIKey
 % writeECMWFAPIKey Writes ECMWF API key to home folder.
 %
-%   See also download_ATM, preprocess_ATM.
+%   See also downloadATM, preprocessATM.
 
 % This function is part of LagTrack.
 % Written by Sebastien Biass & Gholamhossein Bagheri

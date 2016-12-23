@@ -1,12 +1,21 @@
-function download_SRTM(varargin)
-% Function DOWNLOAD_SRTM - downloads tiles from the 90-m SRTM DEM dataset.
-% Input either 0 or 6 arguments:
-% lat_min:  Minimum latitude (decimal degree, negative in S hemisphere)
-% lat_max:  Maximum latitude (decimal degree, negative in S hemisphere)
-% lon_min:  Minimum longitude (decimal degree, negative in W hemisphere)
-% lon_max:  Maximum longitude (decimal degree, negative in W hemisphere)
-% res    :  Resolution (m) (Leave 90 m for no interpolation)
-% name   :  File name, saved in input/dem/
+function downloadSRTM(varargin)
+% downloadSRTM Download tiles from the 90-m SRTM DEM dataset (http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp) in ArcInfo ASCII format.
+%   downloadSRTM
+%       Open the GUI to specify the extent
+%   downloadSRTM(lat_min, lat_max, lon_min, lon_max, res, name)
+%       Download the SRTM tiles covering the specified extent
+%           lat_min:  Minimum latitude (decimal degree, negative in S hemisphere)
+%           lat_max:  Maximum latitude (decimal degree, negative in S hemisphere)
+%           lon_min:  Minimum longitude (decimal degree, negative in W hemisphere)
+%           lon_max:  Maximum longitude (decimal degree, negative in W hemisphere)
+%           res    :  Resolution (m) (Leave 90 m for no interpolation)
+%           name   :  File name, saved in input/dem/
+%
+%   see also processSRTM, makeDefaultGrid.
+% 
+% This function is part of LagTrack.
+% Written by Sebastien Biass & Gholamhossein Bagheri
+% GPLv3
 
 % check number of input parameters
 if nargin == 0 || nargin == 2
@@ -118,5 +127,5 @@ for i = 1:length(dem.tiles)
     end   
 end
 
-process_SRTM(lat_min, lat_max, lon_min, lon_max, res, filename);
+processSRTM(lat_min, lat_max, lon_min, lon_max, res, filename);
 

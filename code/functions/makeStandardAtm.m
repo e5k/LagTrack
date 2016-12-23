@@ -1,7 +1,20 @@
-% Create a standard atmosphere (1976) with custom values of u wind and v
-% wind
-
 function atmName = makeStandardAtm(varargin)
+% makeStandardAtm Create an atmosphere file based on the 1976 Standard
+% atmosphere specified in code/var/1976_standard_ATM.xlsx with a custom
+% wind velocity constant with height.
+%   makeStandardAtm
+%       Open the GUI
+%   makeStandardAtm(uwind, vwind, atmName)
+%       Download the SRTM tiles covering the specified extent
+%           uwind   :  U wind velocity (m/s)
+%           vwind   :  V wind velocity (m/s)
+%           atmName :  File name, saved in input/wind/
+%
+%   see also downloadSRTM, makeStandardAtm.
+% 
+% This function is part of LagTrack.
+% Written by Sebastien Biass & Gholamhossein Bagheri
+% GPLv3
 
 % check number of input parameters
 if nargin == 0 || nargin == 2

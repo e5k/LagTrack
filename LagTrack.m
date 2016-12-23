@@ -1,15 +1,33 @@
-function LagTrack
+function LagTrack(varargin)
+% LagTrack Lagrangian particle tracking code
+%   LagTrack
+%       Opens the main GUI
+%   LagTrack(P)
+%       Runs the particle P. P is either a structure or a cell array where
+%       each cell contains a particle structure
+%   LagTrack('functions')
+%       Summary of all usable functions
+%   LagTrack('particle')
+%       Summary of all parameters of a particle structure
+
 
 % Add folders to search path
 addpath(genpath('code/'));
 
-% Setup figure
-BGC     = get(0,'DefaultUicontrolBackgroundColor');
-sz      = [700 1000]; % figure size
-screenS = get(0,'ScreenSize');
-xpos    = ceil((screenS(3)-sz(2))/2);
-ypos    = ceil((screenS(4)-sz(1))/2);
-
+if nargin > 1
+    error('Too many input arguments');
+else
+   if nargin == 1 && strcmpi(varargin{1}, 'functions')
+       help LagTrack_functions
+       return
+   elseif nargin == 1 && strcmpi(varargin{1}, 'particle')
+        help LagTrack_particle
+        return
+   elseif (nargin == 1 && isstruct(varargin{1})) || (nargin == 1 && iscell(varargin{1}))
+       get_trajectory(varargin{1});
+       return
+   end 
+end
 
 
 % Check if GUI toolbox is installed
@@ -20,23 +38,30 @@ end
 % Check Matlab version
 if verLessThan('matlab','8.4')
     error('You need at least Matlab R2014b to run the GUI, but you can still use separate functions.')
-end    
+end   
+
 % GUI
-f = figure( 'Name', 'LagTrack', 'position',[xpos, ypos, sz(2), sz(1)], 'Toolbar','none', 'Menubar', 'none', 'NumberTitle', 'off', 'Visible', 'off' );
-display('Preparing the interface, please wait...')
+BGC     = get(0,'DefaultUicontrolBackgroundColor');
+sz      = [700 1000]; % figure size
+screenS = get(0,'ScreenSize');
+xpos    = ceil((screenS(3)-sz(2))/2);
+ypos    = ceil((screenS(4)-sz(1))/2);
+
+f       = figure( 'Name', 'LagTrack', 'position',[xpos, ypos, sz(2), sz(1)], 'Toolbar','none', 'Menubar', 'none', 'NumberTitle', 'off', 'Visible', 'off' );
+disp('Preparing the interface, please wait...')
 
 % Menu
 m = uimenu('Label', 'File');
 uimenu(m, 'Label', 'Load particle', 'Accelerator', 'O', 'Callback', @load_part);
 m2 = uimenu('Label', 'Input parameters');
-uimenu(m2, 'Label', 'Download amospheric data', 'Callback', @download_ATM);
+uimenu(m2, 'Label', 'Download amospheric data', 'Callback', @downloadATM);
 uimenu(m2, 'Label', 'Create standard atmosphere', 'Callback', @makeStandardAtm);
-uimenu(m2, 'Label', 'Display atmospheric data', 'Callback', @ViewAtm);
+uimenu(m2, 'Label', 'Display atmospheric data', 'Callback', @displayATM);
     m22 = uimenu(m2, 'Label', 'ECMWF');
     uimenu(m22, 'Label', 'ECMWF - Set API key', 'callback', @writeECMWFAPIKey);
     uimenu(m22, 'Label', 'ECMWF - Install library', 'callback', @installECMWFAPI);
-uimenu(m2, 'Label', 'Download SRTM DEM', 'Separator', 'on', 'Callback', @download_SRTM);
-uimenu(m2, 'Label', 'Process SRTM DEM', 'Callback', @process_SRTM);
+uimenu(m2, 'Label', 'Download SRTM DEM', 'Separator', 'on', 'Callback', @downloadSRTM);
+uimenu(m2, 'Label', 'Process SRTM DEM', 'Callback', @processSRTM);
 uimenu(m2, 'Label', 'Create empty calculation grid', 'Callback', @makeDefaultGrid)
 m3 = uimenu('Label', 'Tools');
 uimenu(m3, 'Label', 'Get u,v,w velocities', 'Callback', @sphere2cart);
@@ -45,7 +70,7 @@ uimenu(m3, 'Label', 'Variable parameters', 'Callback', @vary_param, 'Separator',
 % Main container
 MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
     % Top container
-    top     = uix.HBox( 'Parent', MAIN , 'BackgroundColor', BGC);
+    top    = uix.HBox( 'Parent', MAIN , 'BackgroundColor', BGC);
     TOP    = uix.HBoxFlex( 'Parent', top, 'BackgroundColor', BGC, 'Padding', 5 );
     TOPL   = uix.BoxPanel( 'Parent', TOP, 'Title', 'Input', 'FontWeight', 'Bold', 'TitleColor', [.2 .2 .2], 'BackgroundColor', BGC,  'Padding', 5 );
     TOPR   = uix.BoxPanel( 'Parent', TOP, 'Title', 'Display', 'FontWeight', 'Bold', 'TitleColor', [.2 .2 .2], 'BackgroundColor', BGC,  'Padding', 5 );
@@ -131,8 +156,8 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
                         uix.Empty( 'Parent', topL_rel );
                         topL_rel_t          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Time offset relative to the eruption date (sec)\nPositive in future, negative in past'), 'Tag', 'rel_t', 'String', '0', 'callback', @check_var);
                         uix.Empty( 'Parent', topL_rel );                        
-                        topL_rel_vx         = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Initial velocity in X direction (m/s)\nPositive towards E, negative towards W\nEnter -1 to initialize the particle velocity with the u wind component'), 'Tag', 'rel_vx', 'String', '-1', 'callback', @check_var);                     
-                        topL_rel_vy         = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Initial velocity in Y direction (m/s)\nPositive towards N, negative towards S\nEnter -1 to initialize the particle velocity with the v wind component'), 'Tag', 'rel_vy', 'String', '-1', 'callback', @check_var);                        
+                        topL_rel_vx         = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Initial velocity in X direction (m/s)\nPositive towards E, negative towards W\nEnter 0 to initialize the particle velocity with the u wind component'), 'Tag', 'rel_vx', 'String', '-1', 'callback', @check_var);                     
+                        topL_rel_vy         = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Initial velocity in Y direction (m/s)\nPositive towards N, negative towards S\nEnter 0  to initialize the particle velocity with the v wind component'), 'Tag', 'rel_vy', 'String', '-1', 'callback', @check_var);                        
                         topL_rel_vz         = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Initial velocity in Z direction (m/s)\nPositive upwards, negative downwards'), 'Tag', 'rel_vz', 'String', '0', 'callback', @check_var);
                        
                         set( topL_rel,  'Heights', [35 35 35 0 35 0 35 35 35], 'Widths', [120, -1] );
@@ -189,7 +214,7 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
         uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Clear', 'Enable', 'off', 'Tag', 'Bclear', 'Tooltip', 'Clear selected particles', 'Callback', @clear_part )
         uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Delete', 'Enable', 'off', 'Tag', 'Bdelete', 'Tooltip', 'Delete selected particles', 'Callback', @delete_part )
         uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Export', 'Enable', 'off', 'Tag', 'Bexport', 'Tooltip', 'Export figure to new axes', 'Callback', @update_plots )
-        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Details', 'Enable', 'off', 'Tag', 'Bdetail', 'Callback', @show_details )
+        uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Details', 'Enable', 'off', 'Tag', 'Bdetail', 'Callback', @detail_part )
         uicontrol( 'Parent', GRD, 'Style', 'Pushbutton', 'String', 'Close', 'Enable', 'on', 'Tag', 'Bclose', 'Callback', 'delete(gcf)' )
     set(GRD, 'Heights', [-1 -1 -1], 'Widths', [-1 -1] );
     set(BOT, 'Widths', [-4 -1 200], 'Spacing', 5 );
@@ -282,8 +307,8 @@ part.rel.x          = 0;
 part.rel.y          = 0;
 part.rel.z          = 0;
 part.rel.t          = 0;
-part.rel.vx         = 0;
-part.rel.vy         = 0;
+part.rel.vx         = -1;
+part.rel.vy         = -1;
 part.rel.vz         = 1e-4;
 part.adv.solution   = 'euler';
 part.adv.dt         = 0.1;
@@ -291,7 +316,7 @@ part.adv.drag       = 0;
 part.adv.interp     = 'subset';
 part.adv.method     = 'linear';
 part.adv.range      = 1;
-part.adv.skip       = 0;
+part.adv.skip       = 600;
 part.run_check      = 0;
 
 guidata(f, part)
@@ -300,4 +325,3 @@ guidata(f, part)
 set(f, 'Visible', 'on');
 
 disp('Done!');
-
