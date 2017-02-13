@@ -17,6 +17,11 @@ for iP = 2:length(P)
     end
 end
 
+% Create output folder if does not exist
+if ~exist(['projects', filesep, P{1}.run_name], 'dir')
+    mkdir(['projects', filesep, P{1}.run_name]);
+end
+
 % Print message
 fprintf('_____________________________________________________________________________________\n')
 fprintf('LAGTRACK run %s started on %s...\n\n', P{1}.run_name, datestr(now));
@@ -27,7 +32,7 @@ dem  = load(P{1}.path.dem); dem = dem.dem;                          % DEM
 
 % Input parameters
 if length(P) == 1%isstruct(P)  % In case one particle is input
-    multi= 0;                                                        % If multiple particles
+    multi= 0;                                                        % If single particle
     part = run_trajectory(P{1}, atm, dem, multi);
 else %iscell(P) % In case multiple particles are input    
     multi= 1;                                                        % If multiple particles
@@ -120,7 +125,7 @@ part.w(1)       = P.rel.vz;
 part.out_msg    = ' ';                                                      % Initial output message
 test_run        = 0;                                                        % Control variable
 
-% Constant
+% Constants
 g               = 9.806;                                                    % Gravity m/s2  
 earth_radius    = 6371*1e3;                                                 % Earth radius
 
@@ -144,7 +149,7 @@ while test_run == 0
     
     % If single particle, print the detail
     if multi == 0
-        if mod(i,500) == 0
+        if mod(i,500) == 0  % Print the particle status every 500 iterations
             fprintf('%4.0f\t%4.0f\t\t%3.2f\t%3.1f\t%2.2f\t%3.2f\t%4.0f\t%4.0f\t%3.2f\t%3.2f\n', part.z(end), part.disP(end), part.w(end), part.bear(end), part.lat(end), part.lon(end), dem.Z(part.yD(end),part.xD(end)), part.t(end), part.uf(end), part.vf(end))
         end
     end
@@ -275,7 +280,7 @@ while test_run == 0
     % Test conditions
     % Test altitude
     if part.z(i) <= dem.Z(part.yD(i), part.xD(i))
-        part.out_msg = sprintf('Particle landed on the domain');
+        part.out_msg = sprintf('\tParticle %s landed on the domain', P.part.name);
         test_run     = 1;       
     % Test domain
     %   1: Both DEM and atmospheric data are defined
@@ -344,7 +349,6 @@ end
 if multi == 0
     fprintf('______\t______\t\t______\t______\t______\t______\t______\t______\t______\t______\n')
 end
-fprintf([P.traj.out_msg, '\n']); 
 
 % Trick to make the uf and vf vectors the same size as everything else
 part.uf(i) = part.uf(i-1); 
@@ -354,6 +358,8 @@ part.wf(i) = part.wf(i-1);
 % Clean output
 P.traj = part;
 part   = P;
+
+fprintf([P.traj.out_msg, '\n']); 
 
 % Save particle
 save(['projects', filesep, part.run_name, filesep, part.part.name, '.mat'], 'part');

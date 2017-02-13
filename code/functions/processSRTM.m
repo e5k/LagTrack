@@ -161,4 +161,4 @@ for yy = lat_maxI:lat_minI
     end
 end
 
-fprintf('Done!');
+fprintf('Done!\n');

@@ -5,7 +5,7 @@ function downloadATM(varargin)
 %   downloadATM(lat_min, lat_max, lon_min, lon_max, year_min, year_max, month_min, month_max, filename, dataset)
 %       Download data for the specified spatial and temporal extent with
 %       the output name filename. The dataset is either 'Interim' for ECMWF
-%       Era-Interim, 'Reanalysis' for NOAA Reanalysis 1 and 'Reanalysis2' 
+%       Era-Interim, 'Reanalysis1' for NOAA Reanalysis 1 and 'Reanalysis2' 
 %       for NOAA Reanalysis 2.
 %
 %   See also processATM, displayATM, makeStandardAtm.
