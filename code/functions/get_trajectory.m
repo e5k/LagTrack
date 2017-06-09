@@ -9,10 +9,15 @@ if isstruct(P); P = {P}; end
 
 % Check that all particles point to the same dem/atmospheric file
 for iP = 2:length(P)
-    if ~strcmp(P{iP}.path.dem, P{iP-1}.path.dem) && ~strcmp(P{iP}.path.nc, P{iP-1}.path.nc)
-        error('All particles must point to the same DEM and atmospheric data');
+    if length(unique(cellfun(@getfield, P,repmat({'path'}, size(P)), repmat({'nc'}, size(P)), 'UniformOutput', false))) > 1
+        error('All particles must point to the same atmospheric data');
     end
-    if ~strcmp(P{iP}.run_name, P{iP-1}.run_name)
+    
+    if length(unique(cellfun(@getfield, P,repmat({'path'}, size(P)), repmat({'dem'}, size(P)), 'UniformOutput', false))) > 1
+        error('All particles must point to the same DEM');
+    end
+    
+    if length(unique(cellfun(@getfield, P,repmat({'run_name'}, size(P)),  'UniformOutput', false))) > 1
         error('All particles must be part of the same project');
     end
 end
