@@ -5,17 +5,17 @@ import os
 ## Enter the required data below
 
 # Time of dataset
-year_start  = 1980
-year_end    = 1980
-month_start = 5
-month_end   = 5
+year_start  = 1996
+year_end    = 1996
+month_start = 6
+month_end   = 6
 # Area
-north       = 48
-south       = 41
-west        = 237
-east        = 260
+north       = -36
+south       = -41
+west        = 174
+east        = 179
 # Output folder, i.e. replace by your project name
-out_path    = 'input/wind/MSH_ECMWF/MSH_ECMWF.nc'
+out_path    = 'input/wind/Rua_0696_ERA/'
 
 
 ## Time of dataset
@@ -61,10 +61,10 @@ for year in range(year_start, year_end+1):
             'type'      : "an",
             'class'     : "ei",
             'grid'      : "0.25/0.25",
-            'param'     : "129/131/132/156",
+            'param'     : "129/130/131/132/156/157",
             'area'      : "%d/%d/%d/%d"%(north, west, south, east),
             'format'	: 'netcdf',
-            'target'    : "%s%05d_%s_%04d.nc"%(out_path+"nc_output_files/", count, calendar.month_abbr[month],year)
+            'target'    : "%s.nc"%(out_path)
         }) 
         
         count = count + 1

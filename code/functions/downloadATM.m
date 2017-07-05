@@ -74,7 +74,7 @@ if strcmp(dataset, 'Interim')
     if lon_min < 0; lon_min = 360+lon_min; end
     if lon_max < 0; lon_max = 360+lon_max; end
     
-    txt     = fileread('code/dependencies/ecmwf-api-client-python/download_ECMWF_tmp.py');
+    txt     = fileread('code/functions/dependencies/ecmwf-api-client-python/download_ECMWF_tmp.py');
     txt_new = strrep(txt, 'var_year_start', num2str(year_min));
     txt_new = strrep(txt_new, 'var_year_end', num2str(year_max));
     txt_new = strrep(txt_new, 'var_month_start', num2str(month_min));
@@ -83,7 +83,7 @@ if strcmp(dataset, 'Interim')
     txt_new = strrep(txt_new, 'var_south', num2str(lat_min));
     txt_new = strrep(txt_new, 'var_west', num2str(lon_min));
     txt_new = strrep(txt_new, 'var_east', num2str(lon_max));
-    txt_new = strrep(txt_new, 'var_out', strrep(['input/wind/', filename, filesep, filename, '.nc'], '\', '/'));
+    txt_new = strrep(txt_new, 'var_out', strrep(['input/wind/', filename, filesep], '\', '/'));
     
    
     
