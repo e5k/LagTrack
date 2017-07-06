@@ -83,7 +83,7 @@ if strcmp(dataset, 'Interim')
     txt_new = strrep(txt_new, 'var_south', num2str(lat_min));
     txt_new = strrep(txt_new, 'var_west', num2str(lon_min));
     txt_new = strrep(txt_new, 'var_east', num2str(lon_max));
-    txt_new = strrep(txt_new, 'var_out', strrep(['input/wind/', filename, filesep], '\', '/'));
+    txt_new = strrep(txt_new, 'var_out', strrep(['input/wind/', filename, filesep, filename], '\', '/'));
     
    
     

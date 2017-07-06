@@ -60,9 +60,9 @@ if strcmp(dataset, 'Interim')
     atm.temp            = permute(ncread(ncfile, 't'), [2,1,3,4]);                  % Temperature (deg K)
     atm.alt             = permute(ncread(ncfile, 'z')./9.80665, [2,1,3,4]);         % Altitude (m asl)
     atm.humid           = permute(ncread(ncfile, 'r'), [2,1,3,4]);                  % Relative humidity (%)
-    atm.u               = permute(ncread(ncfile, 'u'), [2,1,3,4]);                  % U wind (ms-1)
-    atm.v               = permute(ncread(ncfile, 'v'), [2,1,3,4]);                  % V wind (ms-1)
-
+    atm.u               = permute(ncread(ncfile, 'u'), [2,1,3,4]);                  % U wind (m s-1)
+    atm.v               = permute(ncread(ncfile, 'v'), [2,1,3,4]);                  % V wind (m s-1)
+    %atm.humidS          = permute(ncread(ncfile, 'q'), [2,1,3,4]).*1e3;             % Specific humidity (g kg-1)
 else
         
     if strcmp(dataset, 'Reanalysis1')

@@ -61,10 +61,10 @@ for year in range(year_start, year_end+1):
             'type'      : "an",
             'class'     : "ei",
             'grid'      : "0.25/0.25",
-            'param'     : "129/130/131/132/156/157",
+            'param'     : "129/130/131/132/133/156/157",
             'area'      : "%d/%d/%d/%d"%(north, west, south, east),
             'format'	: 'netcdf',
-            'target'    : "%s%05d_%s_%04d.nc"%(out_path, count, calendar.month_abbr[month],year)
+            'target'    : "%s.nc"%(out_path)
         }) 
         
         count = count + 1
