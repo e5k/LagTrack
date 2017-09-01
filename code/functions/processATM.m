@@ -55,7 +55,7 @@ if strcmp(dataset, 'Interim')
     
     atm.lat             = double(ncread(ncfile, 'latitude'));                       % Latitude (degrees)
     atm.lon             = double(ncread(ncfile, 'longitude'));                      % Longitude (degrees)
-    atm.level           = ncread(ncfile, 'level');                                  % Pressure level (mb)
+    atm.level           = double(ncread(ncfile, 'level'));                          % Pressure level (mb)
     atm.time            = datenum(datenum([1900,1,1,0,0,0])+double(ncread(ncfile, 'time'))./24);    % Time (year month day hour min sec)
     atm.temp            = permute(ncread(ncfile, 't'), [2,1,3,4]);                  % Temperature (deg K)
     atm.alt             = permute(ncread(ncfile, 'z')./9.80665, [2,1,3,4]);         % Altitude (m asl)

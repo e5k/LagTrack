@@ -59,4 +59,4 @@ dem.Z       = alt;
 
 % Save data
 save(['input/dem/', grdName, filesep, grdName, '.mat'], 'dem');
-disp(['Saved as ', 'input/wind/', grdName, filesep, grdName, '.mat']);
+disp(['Saved as ', 'input/dem/', grdName, filesep, grdName, '.mat']);
