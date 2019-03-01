@@ -46,9 +46,9 @@ downloadSRTM(latMin, latMax, lonMin, lonMax, resolution, name)
 
 #### DEM format
 The DEM format in LagTrack is a Matlab structure containing called ```dem``` and containing the following fields, where *m* and *n* are the number of cells in the *y* and *x* dimensions, respectively. Adopt this convention to use a DEM obtained from a different source in LagTrack. 
-- ```X```: *[m×n$]* matrix of longitudes
-- ```Y```: *[m×n$]* matrix of latitudes. In the Matlab matrix, ```dem.Y(1,:)``` should be the southernmost points and ```dem.Y(end,:)``` the northernmost
-- ```Z```: *[m×n$]* matrix of elevations (m asl). The orientation should be the same as ```dem.Y```
+- ```X```: *[m×n]* matrix of longitudes
+- ```Y```: *[m×n]* matrix of latitudes. In the Matlab matrix, ```dem.Y(1,:)``` should be the southernmost points and ```dem.Y(end,:)``` the northernmost
+- ```Z```: *[m×n]* matrix of elevations (m asl). The orientation should be the same as ```dem.Y```
 - ```res```: Cell size (m) (obsolete)
 
 #### Empty grid
