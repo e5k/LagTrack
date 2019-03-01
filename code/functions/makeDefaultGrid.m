@@ -3,7 +3,6 @@ function makeDefaultGrid(varargin)
 %   makeDefaultGrid
 %       Open the GUI
 %   makeDefaultGrid(alt, grdName)
-%       Download the SRTM tiles covering the specified extent
 %           alt     :  Altitude of the grid (m asl)
 %           grdName :  File name, saved in input/dem/
 %

@@ -5,7 +5,6 @@ function atmName = makeStandardAtm(varargin)
 %   makeStandardAtm
 %       Open the GUI
 %   makeStandardAtm(uwind, vwind, atmName)
-%       Download the SRTM tiles covering the specified extent
 %           uwind   :  U wind velocity (m/s)
 %           vwind   :  V wind velocity (m/s)
 %           atmName :  File name, saved in input/wind/
