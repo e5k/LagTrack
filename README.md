@@ -1,14 +1,21 @@
 # LagTrack
 
-Functions are written to be used both as part of the GUI and as standalone. 
+Functions are written to be used both as part of the GUI and as standalone. The main GUI is opened using:
+```
+LagTrack
+```
+Note that the GUI requires the [GUI Layout toolbox](https://www.mathworks.com/matlabcentral/fileexchange/47982-gui-layout-toolbox). A summary of all functions is printed with the command:
+```
+help LagTrack_functions
+```
 
-
+## Table of content
 
   - [Input parameters](#input-parameters)
     - [DEM](#dem)
       - [Download the DEM](#download-the-dem)
       - [DEM format](#dem-format)
-      - [Create an empty grid](#create-an-empty-grid)
+      - [Empty grid](#empty-grid)
     - [Atmospheric data](#atmospheric-data)
       - [Download atmospheric data](#download-atmospheric-data)
       - [Format of atmospheric data](#format-of-atmospheric-data)
@@ -18,6 +25,11 @@ Functions are written to be used both as part of the GUI and as standalone.
   - [Running the model](#running-the-model)
     - [Defining particles](#defining-particles)
     - [Default particle](#default-particle)
+    - [Model run](#model-run)
+  - [Results](#results)
+    - [Trajectory](#trajectory)
+    - [Plot results](#plot-results)
+  - [Credits](#credits)
     - [Requirements](#requirements)
     - [Dependencies](#dependencies)
 
@@ -94,7 +106,7 @@ The format of atmospheric data in LagTrack is a Matlab structure called ```atm``
 - ```lat```, ```lon```: Latitude and longitude vectors. ```lat``` is a *[m×1]* vector and ```lon``` is a *[n×1]* vector, where *m* and *n* are the number of points along latitude and longitude, respectively
 - ```level```: Geopotential height (mb). *[l×1]* vector, where *l* is the number of levels
 - ```time```: Date vector of each data point in number of days from January 0, 0000 (see Matlab function ```datenum```). *[t×1]* vector, where *t* is the number of data point in time
-- ```temp```: Temperature (deg K). $[m\times n\times l\times t]$ matrix
+- ```temp```: Temperature (deg K). *[m×n×l×t]* matrix
 - ```alt```: Altitude (m asl). *[m×n×l×t]* matrix
 - ```humid```: Relative humidity (%). *[m×n×l×t]* matrix
 - ```u```, ```v```: U and V components of wind (m/s). Each is a *[m×n×l×t]* matrix
@@ -147,7 +159,7 @@ In LagTrack, each particle belongs to a **run**. Multiple particles can depend o
     - ```diam```: Particle diameter (m)
     - ```dens```: Particle density (kg/m3)
     - ```flat```: Flatness (0-1)
-    - ```elon```: Elongatiion (0-1)
+    - ```elon```: Elongation (0-1)
 - ```rel```: Structure containing the particle's release properties
     - ```x```, ```y```: Horizontal displacement (m) of release point relative to the vent; positive towards N and E, negative towards S and W
     - ```z```: Release elevation (m asl)
@@ -172,15 +184,33 @@ Details of particles requirements can be displayed in Matlab with the command:
 help LagTrack_particle
 ```
 
-### Multiple particles
+### Model run
+The trajectory of particles is computed with the function ```get_trajectory```, where ```part``` is a particle previously defined:
 
+```
+get_trajectory(part)
+```
+It is possible to run several particles in one command by grouping the into a cell array, in which case they are run in parallel using the Parallel Computing Toolbox (if available):
+```
+get_trajectory({part1, part2, partn})
+```
+
+## Results
+### Trajectory
+Upon run completion, each particle is saved as a ```.mat``` file in ```project/runName/particleName.mat```. Three fields are appended to the original structure:
+- ```run_check```: Status of the run - 1 if completed normally, 0 if the particle landed outside of the domain or did not hit the ground before the end of the atmospheric dataset
+- ```timestamp```: Time of impact with the ground
+- ```traj```: Structure containing the particle's properties at each time step
+
+### Plot results
+Particles can be visualised using the functions ```map_part``` and ```plot_part```. These functions open GUIs and take no input arguments.
 
 
 ## Credits
 
 ### Requirements
 - Matlab > 2014b
-- [GUI Layout toolbox](https://www.mathworks.com/matlabcentral/fileexchange/47982-gui-layout-toolbox)
+- 
 
 ### Dependencies
 
@@ -188,3 +218,4 @@ help LagTrack_particle
 | ---- | ---- | ----|
 | ```readhgt``` | Downloads SRTM data | [François Beauducel](https://uk.mathworks.com/matlabcentral/fileexchange/36379-readhgt-import-download-nasa-srtm-data-files-hgt) |
 | ```ll2utm```, ```utm2ll``` | Latitude/longitude to and from UTM coordinates | [François Beauducel](https://www.mathworks.com/matlabcentral/fileexchange/45699-ll2utm-and-utm2ll) |
+| ```GUI Layout toolbox``` | GUI tools | [ David Sampson](https://www.mathworks.com/matlabcentral/fileexchange/47982-gui-layout-toolbox)
