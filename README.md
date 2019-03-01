@@ -63,15 +63,15 @@ downloadATM(latMin, latMax, lonMin, lonMax, yearMin, yearMax, monthMin, monthMax
 #### Format of atmospheric data
 The format of the DEM used in LagTrack is a Matlab structure containing called ```atm``` and containing the following fields:
 
-- ```lat```, ```lon```: Latitude and longitude vectors. ```lat``` is a $[m\times1]$ vector and ```lon``` is a $[n]\times1]$ vector, where $m$ and $n$ are the number of points along latitude and longitude, respectively
-- ```level```: Geopotential height (mb). $[l\times1]$ vector, where $l$ is the number of levels
-- ```time```: Date vector of each data point in number of days from January 0, 0000 (see Matlab function $datenum$). $[t\times1]$ vector, where $t$ is the number of data point in time
-- ```temp```: Temperature ($\text{\textdegree}$K). $[m\times n\times l\times t]$ matrix
-- ```alt```: Altitude (m asl). $[m\times n\times l\times t]$ matrix
-- ```humid```: Relative humidity (%). $[m\times n\times l\times t]$ matrix
-- ```u```, ```v```: U and V components of wind (m/s). Each is a $[m\times n\times l\times t]$ matrix
-- ```rhoair```: Atmosphere density (kg/m$^2$). $[m\times n\times l\times t]$ matrix
-- ```muair```: Atmosphere dynamic viscosity viscosity (Pa$\cdot$s). $[m\times n\times l\times t]$ matrix
+- ```lat```, ```lon```: Latitude and longitude vectors. ```lat``` is a *[m×1]* vector and ```lon``` is a *[n×1]* vector, where *m* and *n* are the number of points along latitude and longitude, respectively
+- ```level```: Geopotential height (mb). *[l×1]* vector, where *l* is the number of levels
+- ```time```: Date vector of each data point in number of days from January 0, 0000 (see Matlab function ```datenum```). *[t×1]* vector, where *t* is the number of data point in time
+- ```temp```: Temperature (deg K). $[m\times n\times l\times t]$ matrix
+- ```alt```: Altitude (m asl). *[m×n×l×t]* matrix
+- ```humid```: Relative humidity (%). *[m×n×l×t]* matrix
+- ```u```, ```v```: U and V components of wind (m/s). Each is a *[m×n×l×t]* matrix
+- ```rhoair```: Atmosphere density (kg/m2). *[m×n×l×t]* matrix
+- ```muair```: Atmosphere dynamic viscosity viscosity (Pa s). *[m×n×l×t]* matrix
 
 #### Post processing the atmospheric data
 Post-processing of the atmospheric dataset should be automatic upon successful completion of the download step. To manually post-process wind data, use:
@@ -85,7 +85,7 @@ processATM(name, dataset, latMin, latMax, lonMin, lonMax, yearMin, yearMax, mont
 #### Manually downloading Reanalysis data
 **Era-Interim:** There are two possible options. To access data in [batch access mode](https://confluence.ecmwf.int/display/WEBAPI/Access+ECMWF+Public+Datasets) outside of LagTrack, use the python template provided in ```code/functions/dependencies/ecmwf-api-client-python/download_ECMWF_tmp.py```. Otherwise, NetCDF should be manually downloaded *for each separate month* from [here]([here](https://apps.ecmwf.int/datasets/data/interim-full-daily/levtype=pl/)) and placed in the folder ```input/wind/windName/```. NetCDF files should contain the following variables: ```latitude```, ```longitude```, ```time```, ```level```, ```u```, ```v```, ```z```, ```t``` and ```r```. More details on the procedure is available [here](https://e5k.github.io/codes/2017/09/15/tephraprob-ecmwf-manual/).
 
-**Reanalysis 1/2:** [Reanalysis 1](https://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.pressure.html) and [Reanalysis 2](https://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis2.pressure.html) must be retrieved *for entire years* at *pressure levels*. Variables to be retrieved are ```Air temperature```, ```Geopotential height```, ```Relative humidity```, ```u-wind``` and ```v-wind```.
+**Reanalysis 1/2:** [Reanalysis 1](https://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.pressure.html) and [Reanalysis 2](https://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis2.pressure.html) must be retrieved *for entire years* at *pressure levels*. Variables to be retrieved are ```Air temperature```, ```Geopotential height```, ```Relative humidity```, ```u-wind``` and ```v-wind```. The yearly NetCDF files must be placed in the folders ```input/wind/_Reanalysis1_Rawdata/``` or ```input/wind/_Reanalysis2_Rawdata/```.
 
 ![reanalysis](manual/reanalysis.gif)
 
