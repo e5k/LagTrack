@@ -39,7 +39,7 @@ out_path    = 'var_out'
 server = ECMWFDataServer()
 count  = 1
 for year in range(year_start, year_end+1):
-    print 'YEAR ',year
+    #print 'YEAR ',year
     for month in range(month_start, month_end+1):
         lastday1=calendar.monthrange(year,month)
         lastday=lastday1[1]
@@ -47,7 +47,7 @@ for year in range(year_start, year_end+1):
         edate="%s%02d%s"%(year,month,lastday)
 
         print "######### ERA-interim  #########"
-        print 'Accessing wind data from ', bdate,' to ',edate,' (YYYYMMDD)'
+        #print 'Accessing wind data from ', bdate,' to ',edate,' (YYYYMMDD)'
         print "################################"
         
         server.retrieve({

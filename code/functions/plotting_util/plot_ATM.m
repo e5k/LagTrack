@@ -57,7 +57,7 @@ end
 xlabel(AX, 'Longitude');
 ylabel(AX, 'Latitude');
 
-plot_google_map('maptype','terrain');
+%plot_google_map('maptype','terrain');
 AX.Layer = 'top';
 
 % If the vent is defined in the GUI, plot it

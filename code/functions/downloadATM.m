@@ -131,7 +131,7 @@ else
     for iV = 1:length(varList)
         for iY = year_min:year_max
             fl = [varList{iV}, '.', num2str(iY), '.nc'];
-            if exist([target_dir, fl], 'file');     % If the file exists
+            if exist([target_dir, fl], 'file')     % If the file exists
                 fprintf('\t%s already exists, skipping download...\n', fl)
             else                                                        % Else request ftp
                 fprintf('\tDownloading %s, please wait...\n', fl)
@@ -142,6 +142,5 @@ else
         end
         
     end
-end
-
+ftp.cdc.noaa.gov/Datasets/ncep.reanalysis2/pressure/
 processATM(filename, dataset, lat_min, lat_max, lon_min, lon_max, year_min, year_max, month_min, month_max)
