@@ -87,6 +87,9 @@ processATM(name, dataset, latMin, latMax, lonMin, lonMax, yearMin, yearMax, mont
 
 **Reanalysis 1/2:** [Reanalysis 1](https://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.pressure.html) and [Reanalysis 2](https://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis2.pressure.html) must be retrieved *for entire years* at *pressure levels*. Variables to be retrieved are ```Air temperature```, ```Geopotential height```, ```Relative humidity```, ```u-wind``` and ```v-wind```.
 
+![reanalysis](manual/reanalysis.gif)
+
+
 Requirements:
 - Matlab 2014b
 - GUI Layout toolbox: https://www.mathworks.com/matlabcentral/fileexchange/47982-gui-layout-toolbox
