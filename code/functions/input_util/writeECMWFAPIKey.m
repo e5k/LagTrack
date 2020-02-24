@@ -7,7 +7,7 @@ function writeECMWFAPIKey
 % Written by Sebastien Biass & Gholamhossein Bagheri
 % GPLv3
 
-if ispc; 
+if ispc
     userdir= getenv('USERPROFILE'); 
 else
     userdir= getenv('HOME');

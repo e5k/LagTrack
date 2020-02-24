@@ -74,7 +74,8 @@ else % If the function is called through the GUI
     
     if nargin == 2
         AX      = findobj(ancestor(src, 'figure'), 'Tag', 'PlotAx');        % Set plotting target - i.e. GUI axis       
-        cla(AX);                                                            % Clear axes
+        cla(AX, 'reset');                                                   % Clear axes
+        AX.Tag = 'PlotAx';
         delete(findobj(ancestor(src, 'figure'), 'Tag', 'LegPlot'));         % Delete legend
     elseif nargin == 3
         FG      = figure;

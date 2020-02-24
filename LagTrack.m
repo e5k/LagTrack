@@ -53,13 +53,16 @@ disp('Preparing the interface, please wait...')
 % Menu
 m = uimenu('Label', 'File');
 uimenu(m, 'Label', 'Load particle', 'Accelerator', 'O', 'Callback', @load_part);
+uimenu(m, 'Label', 'Set Google Map API', 'Callback', @google_API, 'Separator', 'on');
 m2 = uimenu('Label', 'Input parameters');
 uimenu(m2, 'Label', 'Download amospheric data', 'Callback', @downloadATM);
 uimenu(m2, 'Label', 'Create standard atmosphere', 'Callback', @makeStandardAtm);
 uimenu(m2, 'Label', 'Display atmospheric data', 'Callback', @displayATM);
     m22 = uimenu(m2, 'Label', 'ECMWF');
-    uimenu(m22, 'Label', 'ECMWF - Set API key', 'callback', @writeECMWFAPIKey);
-    uimenu(m22, 'Label', 'ECMWF - Install library', 'callback', @installECMWFAPI);
+    uimenu(m22, 'Label', 'Set ERA-Interim API key', 'callback', @writeECMWFAPIKey);
+    uimenu(m22, 'Label', 'Install ERA-Interim API', 'callback', @installECMWFAPI);
+    uimenu(m22, 'Label', 'Set ERA-5 API key', 'callback', @writeECMWFAPIKey, 'Separator', 'on');
+    uimenu(m22, 'Label', 'Install ERA-5 API', 'callback', @installECMWFAPI);
 uimenu(m2, 'Label', 'Download SRTM DEM', 'Separator', 'on', 'Callback', @downloadSRTM);
 uimenu(m2, 'Label', 'Process SRTM DEM', 'Callback', @processSRTM);
 uimenu(m2, 'Label', 'Create empty calculation grid', 'Callback', @makeDefaultGrid)
@@ -90,15 +93,17 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
                     % Project
                     topL_proj = uix.Grid( 'Parent', topL_PROJ, 'Padding', 15, 'Spacing', 8, 'BackgroundColor', BGC );
                         topL_proj_nameL     = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Run name', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
-                        topL_proj_latL      = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Vent latitude', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
-                        topL_proj_lonL      = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Vent longitude', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
-                        topL_proj_altL      = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Vent altitude', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
+                        topl_proj_modeL     = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Run mode', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame);  
+                        topL_proj_latL      = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Vent latitude', 'BackgroundColor', BGC, 'Tag', 'vent_latL', 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
+                        topL_proj_lonL      = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Vent longitude', 'BackgroundColor', BGC, 'Tag', 'vent_lonL', 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
+                        topL_proj_altL      = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Vent altitude', 'BackgroundColor', BGC, 'Tag', 'vent_altL',  'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
                         topL_proj_dateL     = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Eruption date', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
                         uix.Empty( 'Parent', topL_proj );
                         topL_proj_atmL     = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'Atmospheric data', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
                         topL_proj_demL     = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'DEM', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
 
                         topL_proj_name      = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Run name', 'Tag', 'name', 'callback', @check_var);
+                        topl_proj_mode      = uicontrol( 'Parent', topL_proj, 'Style', 'Popupmenu', 'String', {'Forward', 'Backward'}, 'Tooltip', sprintf('Model run mode.\n- Forward: Run from above vent up to intersection with DEM\n- Backward: Run from ground to selected elevation'), 'Tag', 'run_mode', 'callback', @check_run_mode);
                         topL_proj_lat       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Vent latitude (negative in southern hemisphere)', 'Tag', 'vent_lat', 'callback', @check_var);
                         topL_proj_lon       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Vent longitude (negative in western hemisphere)', 'Tag', 'vent_lon', 'callback', @check_var);
                         topL_proj_alt       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Vent elevation (m asl)', 'Tag', 'vent_alt', 'callback', @check_var);
@@ -116,7 +121,7 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
                         topL_proj_atmP      = uicontrol( 'Parent', topL_proj, 'Style', 'Pushbutton', 'String', '...', 'callback', {@set_path, topL_proj_atm, '*.mat', 'input/wind/', 'Load .nc file'});
                         topL_proj_demP      = uicontrol( 'Parent', topL_proj, 'Style', 'Pushbutton', 'String', '...', 'callback', {@set_path, topL_proj_dem, '*.mat', 'input/dem/', 'Load .mat file'});
 
-                        set( topL_proj,  'Heights', [35 35 35 35 35 0 35 35], 'Widths', [120, -1 40] );
+                        set( topL_proj,  'Heights', [35 35 35 35 35 35 0 35 35], 'Widths', [120, -1 40] );
                     
                     % Particle  
                     topLT.Selection = 2;
@@ -139,7 +144,7 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
                     
                     % Release    
                     topLT.Selection = 3;
-                    topL_rel = uix.Grid( 'Parent', topL_REL, 'Padding', 15, 'Spacing', 8, 'BackgroundColor', BGC );                        
+                    topL_rel = uix.Grid( 'Parent', topL_REL, 'Padding', 15, 'Spacing', 8, 'BackgroundColor', BGC ); 
                         topL_rel_xL         = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'String', 'X offset (m)', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame);                         
                         topL_rel_yL         = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'String', 'Y offset (m)', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame);                         
                         topL_rel_zL         = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'String', 'Altitude (m above vent)', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
@@ -149,10 +154,10 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
                         topL_rel_vxL        = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'String', 'Initial X velocity (m/s)', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame);                         
                         topL_rel_vyL        = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'String', 'Initial Y velocity (m/s)', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame);                         
                         topL_rel_vzL        = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'String', 'Initial Z velocity (m/s)', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
-                                               
+                        
                         topL_rel_x          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('X offset relative to the vent (m)\nPositive towards E, negative towards W'), 'Tag', 'rel_x', 'String', '0', 'callback', @check_var);                     
                         topL_rel_y          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Y offset relative to the vent (m)\nPositive towards N, negative towards S'), 'Tag', 'rel_y', 'String', '0', 'callback', @check_var);                     
-                        topL_rel_z          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', 'Altitude above vent (m)\nIn case a simple calculation grid is used\n,altitude above the mean grid level', 'Tag', 'rel_z', 'String', '0', 'callback', @check_var);  
+                        topL_rel_z          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Altitude above vent (m)\nIn case a simple calculation grid is used\n,altitude above the mean grid level'), 'Tag', 'rel_z', 'String', '0', 'callback', @check_var);  
                         uix.Empty( 'Parent', topL_rel );
                         topL_rel_t          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Time offset relative to the eruption date (sec)\nPositive in future, negative in past'), 'Tag', 'rel_t', 'String', '0', 'callback', @check_var);
                         uix.Empty( 'Parent', topL_rel );                        
@@ -321,7 +326,46 @@ part.run_check      = 0;
 
 guidata(f, part)
 
+
 %% Display interface
 set(f, 'Visible', 'on');
 
 disp('Done!');
+
+%% A few callbacks
+function check_run_mode(src, ~)
+
+
+if event.Source.Value == 1
+    x_str = 'Vent latitude';
+    y_str = 'Vent longitude';
+    z_str = 'Vent altitude';
+    
+    x_ttp = sprintf('Vent latitude (negative in southern hemisphere)');
+    y_ttp = sprintf('Vent longitude (negative in western hemisphere)');
+    z_ttp = sprintf('Vent elevation (m asl)');
+else
+    x_str = 'Landing latitude';
+    y_str = 'Landing longitude';
+    z_str = 'Maximum altitude';
+    
+    x_ttp = sprintf('Latitude of impact point (negative in southern hemisphere)');
+    y_ttp = sprintf('Longitude of impact point (negative in western hemisphere)');
+    z_ttp = sprintf('Maximum altitude reached by the particle (m asl)');
+end
+
+% Update labels
+x_tmpL = findobj(ancestor(src, 'figure'), 'Tag', 'vent_latL');
+x_tmpL.String = x_str;
+y_tmpL = findobj(ancestor(src, 'figure'), 'Tag', 'vent_lonL');
+y_tmpL.String = y_str;
+z_tmpL = findobj(ancestor(src, 'figure'), 'Tag', 'vent_altL');
+z_tmpL.String = z_str;
+
+% Update tooltips
+x_tmpL = findobj(ancestor(src, 'figure'), 'Tag', 'vent_lat');
+x_tmpL.Tooltip = x_ttp;
+y_tmpL = findobj(ancestor(src, 'figure'), 'Tag', 'vent_lon');
+y_tmpL.Tooltip = y_ttp;
+z_tmpL = findobj(ancestor(src, 'figure'), 'Tag', 'vent_alt');
+z_tmpL.Tooltip = z_ttp;

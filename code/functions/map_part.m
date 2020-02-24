@@ -152,30 +152,32 @@ if YiMin-YiMax<3 && YiMin>2 && YiMax<size(dem.Y,1)-1
 end
 
 if strcmp(dem.type, 'DEM') % In case the grid is a DEM
-    % Create a temporary figure to retrieve Google background
-    f_tmp   = figure('visible', 'off');
-    a_tmp   = axes('Parent', f_tmp);
-    plot(a_tmp, [XMin, XMax], [YMin, YMax], '.');
-    %[lonVec, latVec, imag] = plot_google_map('Axis', a_tmp, 'Maptype', 'terrain');
-    delete(f_tmp);
-    
-%     if ~isempty(imag)
-%         % Interpolate for a sharp background
-%         [Xp, Yp] = meshgrid(linspace(dem.X(1,XiMin), dem.X(1,XiMax), size(imag,2)), linspace(dem.Y(YiMin,1), dem.Y(YiMax,1), size(imag,1)));
-%         Zp       = interp2(dem.X, dem.Y, dem.Z, Xp, Yp);
-% 
-%         % Set topography and corrects ratio
-%         surface( Xp,Yp,Zp./1000,...
-%             prepare_google_map(Xp, Yp, lonVec, latVec, imag), 'Parent', AX); % Map the background to the topography
-%         shading(AX, 'flat'); grid(AX, 'on');
-%     else
+    % If the Google Map API exists
+    if exist(fullfile('code', 'var', 'google_api.mat'), 'file') == 2
+        % Create a temporary figure to retrieve Google background
+        f_tmp   = figure('visible', 'off');
+        a_tmp   = axes('Parent', f_tmp);
+        plot(a_tmp, [XMin, XMax], [YMin, YMax], '.');
+        [lonVec, latVec, imag] = plot_google_map('Axis', a_tmp, 'Maptype', 'terrain');
+        delete(f_tmp);
+        
+        if ~isempty(imag)
+            % Interpolate for a sharp background
+            [Xp, Yp] = meshgrid(linspace(dem.X(1,XiMin), dem.X(1,XiMax), size(imag,2)), linspace(dem.Y(YiMin,1), dem.Y(YiMax,1), size(imag,1)));
+            Zp       = interp2(dem.X, dem.Y, dem.Z, Xp, Yp);
+            
+            % Set topography and corrects ratio
+            surface( Xp,Yp,Zp./1000,...
+                prepare_google_map(Xp, Yp, lonVec, latVec, imag), 'Parent', AX); % Map the background to the topography
+            shading(AX, 'flat'); grid(AX, 'on');
+        end
+    else
         surf(dem.X(YiMin:YiMax, XiMin:XiMax), dem.Y(YiMin:YiMax,XiMin:XiMax), dem.Z(YiMin:YiMax,XiMin:XiMax)./1e3);
         shading(AX, 'flat'); grid(AX, 'on'); colormap(landcolor);
-%    end
-        
+    end
     % Work on axes
     lat_lon_proportions(AX);
-    
+
     xlabel('Longitude');
     ylabel('Latitude');
 else
