@@ -1,4 +1,4 @@
-function varargout=dem(x,y,z,varargin)
+function varargout=dem_plot(x,y,z,varargin)
 %DEM Shaded relief image plot
 %
 %	DEM(X,Y,Z) plots the Digital Elevation Model defined by X and Y 

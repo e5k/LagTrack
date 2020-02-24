@@ -94,7 +94,7 @@ if strcmp(dataset, 'Interim')
     
     !python download_ECMWF.py
     
-    delete('download_ECMWF.py');
+    %delete('download_ECMWF.py');
 
 %% NOAA
 else
@@ -142,5 +142,5 @@ else
         end
         
     end
-ftp.cdc.noaa.gov/Datasets/ncep.reanalysis2/pressure/
+end
 processATM(filename, dataset, lat_min, lat_max, lon_min, lon_max, year_min, year_max, month_min, month_max)

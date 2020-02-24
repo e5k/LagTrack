@@ -206,11 +206,10 @@ Upon run completion, each particle is saved as a ```.mat``` file in ```project/r
 Particles can be visualised using the functions ```map_part``` and ```plot_part```. These functions open GUIs and take no input arguments.
 
 
-## Credits
+## Additional information
 
 ### Requirements
-- Matlab > 2014b
-- 
+LagTrack has been initially developed using Matlab 2014b and has been tested to run on all versions up to 2018b.
 
 ### Dependencies
 
