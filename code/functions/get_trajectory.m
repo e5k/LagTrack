@@ -108,9 +108,11 @@ part.Fs         = P.part.flat * P.part.elon^1.3;                            % Sh
 part.Fn         = P.part.flat^2 * P.part.elon;                              % Shape descriptor - Newton regime
 part.Ks         = .5 * (part.Fs^(1/3) + part.Fs^(-1/3));                    % Stoke's drag correction
 part.Kn         = 10^(.45 * (-log10(part.Fn))^.99);                         % Newton's drag correction     
+part.tau(1)     = P.part.dens * P.part.diam^2 / (18 * atm.muair(part.yI(1), part.xI(1), part.zI(1), part.tI(1)));    % Particle relaxation time (s)
+% Mohssen: Are we actually using that?
 part.Re_w(1)    = 0;        
 part.Cd_w(1)    = 0;
-part.tau(1)     = P.part.dens * P.part.diam^2 / (18 * atm.muair(part.yI(1), part.xI(1), part.zI(1), part.tI(1)));    % Particle relaxation time (s)
+
 
 % Initial particle velocities
 % If no initial x or y velocity is given, assume the particle is carried by the wind
@@ -215,7 +217,7 @@ while test_run == 0
     if part.Re_S(i) > 3e10^5
         part.Cd(i)  = 0.2;
     else
-        part.Cd(i)  = part.Kn * (24 * (1 + .125 * part.Re_S(i)^(2/3)) / part.Re_S(i) + .46 / (1+5330/part.Re_S(i)));  % Drag coef
+        part.Cd(i)  = part.Kn * (24 * (1 + .125 * part.Re_S(i)^(2/3)) / part.Re_S(i) + .46 / (1+5330/part.Re_S(i)));  % Drag coef (eq. 34)
     end
     
     % If particle within region of reduced drag
