@@ -165,7 +165,7 @@ while test_run == 0
     if strcmp(P.adv.interp, 'none')
     % Simple indexing method
         denf    = atm.rhoair(part.yI(i-1), part.xI(i-1), part.zI(i-1), part.tI(i-1));   % Fluid density
-        visf    = atm.muair( part.yI(i-1), part.xI(i-1), part.zI(i-1), part.tI(i-1));   % fluid viscosity
+        visf    = atm.muair( part.yI(i-1), part.xI(i-1), part.zI(i-1), part.tI(i-1));   % Fluid viscosity
     
     elseif strcmp(P.adv.interp, 'complete')
     % Complete interpolation method (Slow)
