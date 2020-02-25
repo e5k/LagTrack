@@ -8,6 +8,11 @@ if strcmp(src.Tag, 'name')
     tmp = src.String;
     err = 'Enter a valid run name';
     if isempty(tmp); change_frame(jEdit,src,0,err); part.run_name = -9999; else; change_frame(jEdit,src,1,' '); part.run_name = tmp; end
+
+elseif strcmp(src.Tag, 'mode')
+    tmp = src.Value;
+    err = 'Enter a valid run mode';
+    if isempty(tmp); change_frame(jEdit,src,0,err); part.run_mode = -9999; else; change_frame(jEdit,src,1,' '); part.run_mode = tmp; end 
     
 elseif strcmp(src.Tag, 'vent_lat')
     tmp = str2double(src.String);
@@ -160,6 +165,7 @@ end
 % Check to enable Run button
 if ischar(part.run_name) && ...
         (gui_check == 1 || (part.vent.lat ~= -9999 && part.vent.lon ~= -9999 && part.vent.alt~= -9999)) && ...
+        part.run_mode ~= -9999 && ...
         part.date ~= -9999 && ...
         ischar(part.path.nc) && ischar(part.path.dem) && ...
         ischar(part.part.name) && part.part.diam ~= -9999 && part.part.dens ~= -9999 && part.part.flat ~= -9999 && part.part.elon ~= -9999 && ...

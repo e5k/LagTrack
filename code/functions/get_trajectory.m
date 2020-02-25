@@ -36,7 +36,7 @@ atm  = load(P{1}.path.nc); atm = atm.atm;                           % Atmospheri
 dem  = load(P{1}.path.dem); dem = dem.dem;                          % DEM
 
 % Input parameters
-if length(P) == 1%isstruct(P)  % In case one particle is input
+if length(P) == 1 % In case one particle is input
     multi= 0;                                                        % If single particle
     part = run_trajectory(P{1}, atm, dem, multi);
 else %iscell(P) % In case multiple particles are input    
@@ -97,6 +97,11 @@ if part.z(1) < dem.Z(part.yD(1), part.xD(1))
     part.out_msg = sprintf('Release altitude is below the DEM (%4.0f m)', dem.Z(part.yD(1), part.xD(1)));
     error('Release altitude is below the DEM (%4.0f m)', dem.Z(part.yD(1), part.xD(1))),
 end
+% If run mode is backward, overwrite the initial part.z(i) to DEM value + release elevation
+if P.run_mode == 2
+    part.z(1)   = dem.Z(part.yD(1), part.xD(1)) + P.rel.z;
+    [~, part.zI(1)] = min(abs(atm.alt(part.yI(1), part.xI(1), :, part.tI(1)) - part.z(1)));
+end
 
 % Initial atmosperic condidtions
 part.uf(1)      = atm.u(part.yI(1), part.xI(1), part.zI(1), part.tI(1));    % Initial u wind (m/s)
@@ -133,8 +138,11 @@ part.out_msg    = ' ';                                                      % In
 test_run        = 0;                                                        % Control variable
 
 % Constants
-g               = 9.806;                                                    % Gravity m/s2  
 earth_radius    = 6371*1e3;                                                 % Earth radius
+g               = 9.806;                                                    % Gravity m/s2  
+if P.run_mode == 2
+    g = -g;
+end
 
 % Initialize counters
 int_count1      = 0;                                                        % Counter for skip check for density and viscosity
@@ -172,7 +180,10 @@ while test_run == 0
         alt_sub = squeeze(atm.alt(part.yI(i-1), part.xI(i-1), :, part.tI(i-1)));
         denf    = interpn(double(atm.lat), double(atm.lon), alt_sub, atm.time, atm.rhoair, part.lat(i-1), part.lon(i-1), part.z(i-1), P.date+part.t(i-1)/3600/24, P.adv.method);
         visf    = interpn(double(atm.lat), double(atm.lon), alt_sub, atm.time, atm.muair,  part.lat(i-1), part.lon(i-1), part.z(i-1), P.date+part.t(i-1)/3600/24, P.adv.method);
-
+        if isnan(denf)
+            error('Interpolation returned a Nan. Trying changing the interpolation method.')
+        end
+        
     elseif strcmp(P.adv.interp, 'subset')
     % Interpolation by subsetting method
         % check if the subsetting range is within in the downloaded data
@@ -258,7 +269,11 @@ while test_run == 0
     end
     
     % Update particle time
-    part.t(i) = part.t(i-1) + P.adv.dt;
+    if P.run_mode == 1
+        part.t(i) = part.t(i-1) + P.adv.dt;
+    else
+        part.t(i) = part.t(i-1) - P.adv.dt;
+    end
     
     % Update geographic coordinates
     [part.lat(i), part.lon(i)] = dist2ll(part.lat(i-1), part.lon(i-1), part.x(i)-part.x(i-1), part.y(i)-part.y(i-1));
@@ -285,9 +300,13 @@ while test_run == 0
     part.tau(i) = P.part.dens * P.part.diam^2 / (18 * atm.muair(part.yI(i), part.xI(i), part.zI(i), part.tI(i)));    % Particle relaxation time (s)
       
     % Test conditions
-    % Test altitude
-    if part.z(i) <= dem.Z(part.yD(i), part.xD(i))
+    % Test altitude of forward run
+    if P.run_mode == 1 && part.z(i) <= dem.Z(part.yD(i), part.xD(i))
         part.out_msg = sprintf('\tParticle %s landed on the domain', P.part.name);
+        test_run     = 1;       
+    % Test altitude of backward run 
+    elseif P.run_mode == 2 && part.z(i) >= P.vent.alt
+        part.out_msg = sprintf('\tParticle %s reached the maximum altitude', P.part.name);
         test_run     = 1;       
     % Test domain
     %   1: Both DEM and atmospheric data are defined

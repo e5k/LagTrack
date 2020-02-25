@@ -16,7 +16,7 @@ function downloadATM(varargin)
 
 % check number of input parameters
 if nargin == 0 || nargin == 2
-    answer      = inputdlg({'Minimum latitude (decimal degree, negative in S hemisphere)', 'Maximum latitude (decimal degree, negative in S hemisphere)', 'Minimum longitude (decimal degree, negative in W hemisphere)', 'Maximum longitude (decimal degree, negative in W hemisphere)', 'Start year (yyyy)', 'End year (yyyy)', 'Start month (mm)', 'End month (mm)', 'Name', 'Dataset (Interim, Reanalysis1 or Reanalysis2)'}, 'Download atmospheric data', 1);
+    answer      = inputdlg({'Minimum latitude (decimal degree, negative in S hemisphere)', 'Maximum latitude (decimal degree, negative in S hemisphere)', 'Minimum longitude (decimal degree, negative in W hemisphere)', 'Maximum longitude (decimal degree, negative in W hemisphere)', 'Start year (yyyy)', 'End year (yyyy)', 'Start month (mm)', 'End month (mm)', 'Name', 'Dataset (ERA5, Interim, Reanalysis1 or Reanalysis2)'}, 'Download atmospheric data', 1);
     if isempty(answer)
         return
     end
@@ -67,14 +67,20 @@ end
 % Make output folder
 mkdir(['input/wind/', filename])
 
-%% ERA-INTERIM
-if strcmp(dataset, 'Interim')
+%% ECMWF
+if strcmp(dataset, 'Interim') || strcmp(dataset, 'ERA5') 
     
     % Work on input coordinates
     if lon_min < 0; lon_min = 360+lon_min; end
     if lon_max < 0; lon_max = 360+lon_max; end
     
-    txt     = fileread('code/functions/dependencies/ecmwf-api-client-python/download_ECMWF_tmp.py');
+    if strcmp(dataset, 'Interim')
+        fl2read = 'code/functions/dependencies/ecmwf-api-client-python/download_Interim_tmp.py';
+    else
+        fl2read = 'code/functions/dependencies/cdsapi-0.2.5/download_ERA5_tmp.py';
+    end
+    
+    txt     = fileread(fl2read);
     txt_new = strrep(txt, 'var_year_start', num2str(year_min));
     txt_new = strrep(txt_new, 'var_year_end', num2str(year_max));
     txt_new = strrep(txt_new, 'var_month_start', num2str(month_min));
@@ -84,9 +90,6 @@ if strcmp(dataset, 'Interim')
     txt_new = strrep(txt_new, 'var_west', num2str(lon_min));
     txt_new = strrep(txt_new, 'var_east', num2str(lon_max));
     txt_new = strrep(txt_new, 'var_out', strrep(['input/wind/', filename, filesep, filename], '\', '/'));
-    
-   
-    
     
     fid = fopen('download_ECMWF.py', 'w');
     fprintf(fid, '%s', txt_new);

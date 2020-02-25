@@ -96,7 +96,7 @@ varY    = get_field(varList{vY});
 % Plot
 hold(AX, 'on');   grid(AX, 'on');
 for i = 1:length(fld)    
-    plot(AX, pltData.(fld{i}).traj.(varX), pltData.(fld{i}).traj.(varY), '-');
+    plot(AX, pltData.(fld{i}).traj.(varX), pltData.(fld{i}).traj.(varY), '-', 'linewidth', .75);
     hold on
 end
 hold(AX, 'off')

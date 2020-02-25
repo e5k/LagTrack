@@ -59,10 +59,10 @@ uimenu(m2, 'Label', 'Download amospheric data', 'Callback', @downloadATM);
 uimenu(m2, 'Label', 'Create standard atmosphere', 'Callback', @makeStandardAtm);
 uimenu(m2, 'Label', 'Display atmospheric data', 'Callback', @displayATM);
     m22 = uimenu(m2, 'Label', 'ECMWF');
-    uimenu(m22, 'Label', 'Set ERA-Interim API key', 'callback', @writeECMWFAPIKey);
-    uimenu(m22, 'Label', 'Install ERA-Interim API', 'callback', @installECMWFAPI);
-    uimenu(m22, 'Label', 'Set ERA-5 API key', 'callback', @writeECMWFAPIKey, 'Separator', 'on');
-    uimenu(m22, 'Label', 'Install ERA-5 API', 'callback', @installECMWFAPI);
+    uimenu(m22, 'Label', 'Set ERA-Interim API key', 'callback', {@writeAPI, 0});
+    uimenu(m22, 'Label', 'Install ERA-Interim API', 'callback', {@installAPI, 0});
+    uimenu(m22, 'Label', 'Set ERA-5 API key', 'callback', {@writeAPI, 1}, 'Separator', 'on');
+    uimenu(m22, 'Label', 'Install ERA-5 API', 'callback', {@installAPI, 1});
 uimenu(m2, 'Label', 'Download SRTM DEM', 'Separator', 'on', 'Callback', @downloadSRTM);
 uimenu(m2, 'Label', 'Process SRTM DEM', 'Callback', @processSRTM);
 uimenu(m2, 'Label', 'Create empty calculation grid', 'Callback', @makeDefaultGrid)
@@ -103,7 +103,7 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
                         topL_proj_demL     = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'DEM', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
 
                         topL_proj_name      = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Run name', 'Tag', 'name', 'callback', @check_var);
-                        topl_proj_mode      = uicontrol( 'Parent', topL_proj, 'Style', 'Popupmenu', 'String', {'Forward', 'Backward'}, 'Tooltip', sprintf('Model run mode.\n- Forward: Run from above vent up to intersection with DEM\n- Backward: Run from ground to selected elevation'), 'Tag', 'run_mode', 'callback', @check_run_mode);
+                        topl_proj_mode      = uicontrol( 'Parent', topL_proj, 'Style', 'Popupmenu', 'String', {'Forward', 'Backward'}, 'Tooltip', sprintf('Model run mode.\n- Forward: Run from above vent up to intersection with DEM\n- Backward: Run from ground to selected elevation'), 'Tag', 'mode', 'callback', @check_var); %run_mode);
                         topL_proj_lat       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Vent latitude (negative in southern hemisphere)', 'Tag', 'vent_lat', 'callback', @check_var);
                         topL_proj_lon       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Vent longitude (negative in western hemisphere)', 'Tag', 'vent_lon', 'callback', @check_var);
                         topL_proj_alt       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Vent elevation (m asl)', 'Tag', 'vent_alt', 'callback', @check_var);
@@ -297,6 +297,7 @@ topR_plot   = uix.VBox('Parent', topR_PLOT, 'BackgroundColor', BGC, 'Padding', 5
 
 %% Setup GUI data
 part.run_name       = -9999;
+part.run_mode       = -9999;
 part.vent.lat       = -9999;
 part.vent.lon       = -9999;
 part.vent.alt       = -9999;
