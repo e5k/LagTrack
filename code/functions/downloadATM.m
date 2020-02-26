@@ -5,14 +5,20 @@ function downloadATM(varargin)
 %   downloadATM(lat_min, lat_max, lon_min, lon_max, year_min, year_max, month_min, month_max, filename, dataset)
 %       Download data for the specified spatial and temporal extent with
 %       the output name filename. The dataset is either 'Interim' for ECMWF
-%       Era-Interim, 'Reanalysis1' for NOAA Reanalysis 1 and 'Reanalysis2' 
-%       for NOAA Reanalysis 2.
+%       Era-Interim, 'ERA5', 'Reanalysis1' for NOAA Reanalysis 1 and 'Reanalysis2' 
+%       for NOAA Reanalysis 2. When using ERA5, it is also possible to add
+%       the number of hours between wind profiles as a last argument:
+%   downloadATM(lat_min, lat_max, lon_min, lon_max, year_min, year_max, month_min, month_max, filename, 'ERA5', nHours)
+%       nHours accepts 1, 2, 3, 4, 6, 8 and 12. Default is 6.
 %
 %   See also processATM, displayATM, makeStandardAtm.
 %
 % This function is part of LagTrack.
 % Written by Sebastien Biass & Gholamhossein Bagheri
 % GPLv3
+
+% variables initiation
+nHours = 6; % Number of hours between wind profiles. Only used for ERA-5
 
 % check number of input parameters
 if nargin == 0 || nargin == 2
@@ -30,7 +36,7 @@ if nargin == 0 || nargin == 2
     month_max   = str2double(answer{8});
     filename    = answer{9};
     dataset     = answer{10};
-elseif nargin == 10   
+elseif nargin == 10 || nargin == 11
     lat_min     = varargin{1};
     lat_max     = varargin{2};
     lon_min     = varargin{3};   
@@ -41,6 +47,13 @@ elseif nargin == 10
     month_max   = varargin{8};
     filename    = varargin{9};
     dataset     = varargin{10};
+    % If ERA 5 and last argument
+    if strcmp(dataset, 'ERA5') && nargin == 11
+        nHours = varargin{11};
+        if ~ismember(nHours, [1,2,3,4,6,8,12,24])
+            error('nHours accepts 1, 2, 3, 4, 6, 8, 12 or 24')
+        end        
+    end
 else
     error('Wrong number of input arguments, should be either 0 or 10');
 end
@@ -62,6 +75,17 @@ if exist(['input/wind/', filename], 'dir') == 7
         case 'No'
             return
     end
+end
+
+% If ERA-5, prepare the hours vector
+if strcmp(dataset, 'ERA5')
+    vHours = 0:nHours:23;
+    vHours = datestr(datetime([ones(size(vHours))', ones(size(vHours))', ones(size(vHours))', vHours', zeros(size(vHours))', zeros(size(vHours))']), 15);
+    t = '[';
+    for i=1:size(vHours,1)
+        t = [t, '''',vHours(i,:),''', '];
+    end
+    t = [t(1:end-2), ']'];
 end
 
 % Make output folder
@@ -90,6 +114,10 @@ if strcmp(dataset, 'Interim') || strcmp(dataset, 'ERA5')
     txt_new = strrep(txt_new, 'var_west', num2str(lon_min));
     txt_new = strrep(txt_new, 'var_east', num2str(lon_max));
     txt_new = strrep(txt_new, 'var_out', strrep(['input/wind/', filename, filesep, filename], '\', '/'));
+    
+    if strcmp(dataset, 'ERA5')
+        txt_new = strrep(txt_new, 'nHours', t);
+    end
     
     fid = fopen('download_ECMWF.py', 'w');
     fprintf(fid, '%s', txt_new);

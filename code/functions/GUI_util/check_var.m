@@ -10,9 +10,10 @@ if strcmp(src.Tag, 'name')
     if isempty(tmp); change_frame(jEdit,src,0,err); part.run_name = -9999; else; change_frame(jEdit,src,1,' '); part.run_name = tmp; end
 
 elseif strcmp(src.Tag, 'mode')
-    tmp = src.Value;
-    err = 'Enter a valid run mode';
-    if isempty(tmp); change_frame(jEdit,src,0,err); part.run_mode = -9999; else; change_frame(jEdit,src,1,' '); part.run_mode = tmp; end 
+    check_run_mode(src);
+%     tmp = src.Value;
+%     err = 'Enter a valid run mode';
+%     if isempty(tmp); change_frame(jEdit,src,0,err); part.run_mode = -9999; else; part.run_mode = tmp; end 
     
 elseif strcmp(src.Tag, 'vent_lat')
     tmp = str2double(src.String);
@@ -186,7 +187,7 @@ guidata(src, part);
 function change_frame(jEdit,src, typ,errmsg)
 if typ == 0
     jEdit.Border = javax.swing.border.LineBorder(java.awt.Color(1,0,0),1,false);
-    else
+else
     jEdit.Border = javax.swing.border.LineBorder(java.awt.Color(.65,.65,.65),1,false);
 end
 set(findobj(ancestor(src, 'figure'), 'Tag', 'Errmsg'), 'String', errmsg);

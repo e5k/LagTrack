@@ -25,13 +25,13 @@ end
 % Update labels
 x_tmpL = findobj(ancestor(src, 'figure'), 'Tag', 'vent_latL');
 x_tmpL.String = x_str;
-% x_tmpL.setBorder([]);
+remove_frame(x_tmpL)
 y_tmpL = findobj(ancestor(src, 'figure'), 'Tag', 'vent_lonL');
 y_tmpL.String = y_str;
-% y_tmpL.setBorder([]);
+remove_frame(y_tmpL)
 z_tmpL = findobj(ancestor(src, 'figure'), 'Tag', 'vent_altL');
 z_tmpL.String = z_str;
-% z_tmpL.setBorder([]);
+remove_frame(z_tmpL)
 
 % Update tooltips
 x_tmpL = findobj(ancestor(src, 'figure'), 'Tag', 'vent_lat');

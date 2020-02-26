@@ -73,9 +73,9 @@ for year in range(year_start, year_end+1):
                 'day'           : dayList,       
                 'area'          : [north, west, south, east], # North, West, South, East. Default: global
                 'grid'          : [0.25, 0.25], # Latitude/longitude grid: east-west (longitude) and north-south resolution (latitude). Default: 0.25 x 0.25
-                'time'          : ['00:00', '01:00', '02:00','03:00', '04:00', '05:00','06:00', '07:00', '08:00','09:00', '10:00', '11:00','12:00', '13:00', '14:00', '15:00', '16:00', '17:00','18:00', '19:00', '20:00','21:00', '22:00', '23:00'],
+                'time'          : nHours,
                 'format'        : 'netcdf' # Supported format: grib and netcdf. Default: grib
             }, 
-            "%s%05d_%s_%04d.nc"%(out_path, count, calendar.month_abbr[month],year))
+            "%s.nc"%(out_path, count, calendar.month_abbr[month],year))
 
         count = count + 1

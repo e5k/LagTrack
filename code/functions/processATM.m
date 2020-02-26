@@ -49,8 +49,8 @@ else
 end
 
 
-display('Processing atmospheric data...')
-if strcmp(dataset, 'Interim')
+disp('Processing atmospheric data...')
+if strcmp(dataset, 'Interim') || strcmp(dataset, 'ERA5') 
     ncfile = ['input/wind/', ATMname, filesep, ATMname, '.nc'];
     
     atm.lat             = double(ncread(ncfile, 'latitude'));                       % Latitude (degrees)

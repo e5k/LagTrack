@@ -103,7 +103,7 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
                         topL_proj_demL     = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'String', 'DEM', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
 
                         topL_proj_name      = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Run name', 'Tag', 'name', 'callback', @check_var);
-                        topl_proj_mode      = uicontrol( 'Parent', topL_proj, 'Style', 'Popupmenu', 'String', {'Forward', 'Backward'}, 'Tooltip', sprintf('Model run mode.\n- Forward: Run from above vent up to intersection with DEM\n- Backward: Run from ground to selected elevation'), 'Tag', 'mode', 'callback', @check_var); %run_mode);
+                        topl_proj_mode      = uicontrol( 'Parent', topL_proj, 'Style', 'Popupmenu', 'String', {'Forward', 'Backward'}, 'Tooltip', sprintf('Model run mode.\n- Forward: Run from above vent up to intersection with DEM\n- Backward: Run from ground to selected elevation'), 'Tag', 'mode', 'callback', @check_var); % , 'SelectionChangeFcn', @run_mode);
                         topL_proj_lat       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Vent latitude (negative in southern hemisphere)', 'Tag', 'vent_lat', 'callback', @check_var);
                         topL_proj_lon       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Vent longitude (negative in western hemisphere)', 'Tag', 'vent_lon', 'callback', @check_var);
                         topL_proj_alt       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Vent elevation (m asl)', 'Tag', 'vent_alt', 'callback', @check_var);
@@ -112,6 +112,7 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
                         topL_proj_atm       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Path to .nc file of atmospheric data', 'Tag', 'atm', 'callback', @check_var);
                         topL_proj_dem       = uicontrol( 'Parent', topL_proj, 'Style', 'Edit', 'Tooltip', 'Path to DEM file', 'Tag', 'dem', 'callback', @check_var);
 
+                        uix.Empty( 'Parent', topL_proj );
                         uix.Empty( 'Parent', topL_proj );
                         uix.Empty( 'Parent', topL_proj );
                         uix.Empty( 'Parent', topL_proj );
@@ -147,7 +148,7 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
                     topL_rel = uix.Grid( 'Parent', topL_REL, 'Padding', 15, 'Spacing', 8, 'BackgroundColor', BGC ); 
                         topL_rel_xL         = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'String', 'X offset (m)', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame);                         
                         topL_rel_yL         = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'String', 'Y offset (m)', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame);                         
-                        topL_rel_zL         = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'String', 'Altitude (m above vent)', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
+                        topL_rel_zL         = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'String', 'Z offset (m)', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
                         uix.Empty( 'Parent', topL_rel );
                         topL_rel_tL         = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'String', 'Time offset (s)', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame);
                         uix.Empty( 'Parent', topL_rel );                        
@@ -155,9 +156,9 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
                         topL_rel_vyL        = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'String', 'Initial Y velocity (m/s)', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame);                         
                         topL_rel_vzL        = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'String', 'Initial Z velocity (m/s)', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
                         
-                        topL_rel_x          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('X offset relative to the vent (m)\nPositive towards E, negative towards W'), 'Tag', 'rel_x', 'String', '0', 'callback', @check_var);                     
-                        topL_rel_y          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Y offset relative to the vent (m)\nPositive towards N, negative towards S'), 'Tag', 'rel_y', 'String', '0', 'callback', @check_var);                     
-                        topL_rel_z          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Altitude above vent (m)\nIn case a simple calculation grid is used\n,altitude above the mean grid level'), 'Tag', 'rel_z', 'String', '0', 'callback', @check_var);  
+                        topL_rel_x          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('X offset relative to the release point (m)\nPositive towards E, negative towards W'), 'Tag', 'rel_x', 'String', '0', 'callback', @check_var);                     
+                        topL_rel_y          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Y offset relative to the release point (m)\nPositive towards N, negative towards S'), 'Tag', 'rel_y', 'String', '0', 'callback', @check_var);                     
+                        topL_rel_z          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Z offset relative to the release point (m)'), 'Tag', 'rel_z', 'String', '0', 'callback', @check_var);  
                         uix.Empty( 'Parent', topL_rel );
                         topL_rel_t          = uicontrol( 'Parent', topL_rel, 'Style', 'Edit', 'Tooltip', sprintf('Time offset relative to the eruption date (sec)\nPositive in future, negative in past'), 'Tag', 'rel_t', 'String', '0', 'callback', @check_var);
                         uix.Empty( 'Parent', topL_rel );                        
