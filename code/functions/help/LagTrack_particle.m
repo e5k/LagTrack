@@ -10,6 +10,7 @@ function LagTrack_particle
 % PARTICLE VARIABLES
 % General:
 %   part.run_name           Run name, i.e. folder name in projects/ containing the output particles
+%   part.run_mode           Defines if the code is run forward (1) or backward (2)
 %   part.date               Eruption date, should be within the time extent of atmospheric data
 %
 % Vent:

@@ -74,7 +74,7 @@ makeDefaultGrid(alt, name)
 
 
 ### Atmospheric data
-Atmospheric data in LagTrack can be retrieved from the [NCEP/NCAR Reanalysis 1](https://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.html), the [NCEP-DOE Reanalysis 2](https://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis2.html) and the [ECMWF Era-Interim](https://www.ecmwf.int/en/forecasts/datasets/archive-datasets/reanalysis-datasets/era-interim) datasets. To access Era-Interim data, it is assumed that the procedure described [here](https://confluence.ecmwf.int/display/WEBAPI/Access+ECMWF+Public+Datasets) has been followed. To test the installation, run the following command in Matlab. I no message is output, then the ECMWF library is working properly:
+Atmospheric data in LagTrack can be retrieved from the [NCEP/NCAR Reanalysis 1](https://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.html), the [NCEP-DOE Reanalysis 2](https://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis2.html), the [ECMWF Era-Interim](https://www.ecmwf.int/en/forecasts/datasets/archive-datasets/reanalysis-datasets/era-interim) and the [ECMWF Era-5](https://www.ecmwf.int/en/forecasts/datasets/reanalysis-datasets/era5) datasets. To access Era-Interim data, it is assumed that the procedure described [here](https://confluence.ecmwf.int/display/WEBAPI/Access+ECMWF+Public+Datasets) has been followed. To test the installation, run the following command in Matlab. If no message is output, then the ECMWF library is working properly:
 
 ```
 !python -c "from ecmwfapi import ECMWFDataServer"
@@ -90,7 +90,7 @@ downloadATM
 Using the command line:
 
 ```
-downloadATM(latMin, latMax, lonMin, lonMax, yearMin, yearMax, monthMin, monthMax, name, dataset)
+downloadATM(latMin, latMax, lonMin, lonMax, yearMin, yearMax, monthMin, monthMax, name, dataset, varargin)
 ```
 
 - ```latMin```, ```latMax```: Minimum and maximum latitudes in decimal degrees. Negative in southern hemisphere
@@ -98,7 +98,8 @@ downloadATM(latMin, latMax, lonMin, lonMax, yearMin, yearMax, monthMin, monthMax
 - ```yearMin```, ```yearMax```: Minimum and maximum years to retrieve (e.g. 2017). For a single year, ```yearMin```=```yearMax```
 - ```monthMin```, ```monthMax```: Minimum and maximum months to retrieve (e.g. 02 for Feb). For a single month, ```monthMin```=```monthMax```
 - ```name```: Name of the atmospheric dataset stored in ```input/wind/```
-- ```dataset```: Reanalysis dataset, accepts ```'Interim'```, ```'Reanalysis1'``` and ```'Reanalysis2'```
+- ```dataset```: Reanalysis dataset, accepts `'ERA5'`, ```'Interim'```, ```'Reanalysis1'``` and ```'Reanalysis2'```
+- If using `'ERA5'`, an additional optional parameter can be passed representing the number of hours between two data points (accepts `1`, `2`, `3`, `4`, `6`, `8`, `10`, `12`, `24`, where `6` represents one data point every 6 hours, i.e. 4 data points per day) (default=`6`)
 
 #### Format of atmospheric data
 The format of atmospheric data in LagTrack is a Matlab structure called ```atm``` and containing the following fields:
@@ -146,33 +147,40 @@ makeStandardAtm(uwind, vwind, name)
 ### Defining particles
 In LagTrack, each particle belongs to a **run**. Multiple particles can depend on a same run. Each particle is a Matlab structure containing various fields described below. The following list describes the structure's fields, whose descriptions are also applicable in the main GUI.
 
-- ```run_name```: Run name to which particles are associated
-- ```vent```: Structure containing vent properties
-    - ```lat```, ```lon```: Vent latitude and longitude (decimal degree)
-    - ```alt```: Vent elevation (m asl)
-- ```date```: Eruption date (number of days since Jan 0, 0000)
-- ```path```: Structure containing paths to input parameters
-    - ```nc```: Path to the atmospheric data
-    - ```dem```: Path to the dem
-- ```part```: Structure containing the particle's aerodynamical properties
-    - ```name```: Particle name
-    - ```diam```: Particle diameter (m)
-    - ```dens```: Particle density (kg/m3)
-    - ```flat```: Flatness (0-1)
-    - ```elon```: Elongation (0-1)
-- ```rel```: Structure containing the particle's release properties
-    - ```x```, ```y```: Horizontal displacement (m) of release point relative to the vent; positive towards N and E, negative towards S and W
-    - ```z```: Release elevation (m asl)
-    - ```vx```, ```vy```: Initial release velocities along the x and y axes (m/s). Use a value of *-1* to set particle's initial velocities to be equal to the u and v components of wind
-    - ```vz```: Initial vertical velocity (m/s), positive upwards, negative downwards. **Must not be null**
-- ```adv```: Structure containing advanced properties
-    - ```solution```: Accepts 'euler' or 'analytical'
-    - ```dt```: Time step (s)
-    - ```drag```: Region of reduced drag (m) around initial particle release point
-    - ```interp```: Interpolation of the atmospheric data. Accepts 'subset' (default; only a subset of the domain is interpolated), 'complete' (the entire domain is interpolated) and 'none' (no interpolation)
-    - ```method```: Interpolation method. Accepts 'linear', 'nearest', 'pchip', 'cubic' and 'spline' (see ```interpn``` Matlab function)
-    - ```range```: If the interpolation iis set to 'subset', defines a range of points in each direction around the current particle location to interpolate the atmospheric data
-    - ```skip```: Number of ```dt``` between interpolations
+- `run_name`: Run name to which particles are associated
+- `run_mode`: Forward (`1`) or backward (`2`) runs (see next section)
+- `vent`: Structure containing vent properties
+    - `lat`, `lon`: Vent latitude and longitude (decimal degree)
+    - `alt`: Vent elevation (m asl)
+- `date`: Eruption date (number of days since Jan 0, 0000)
+- `path`: Structure containing paths to input parameters
+    - `nc`: Path to the atmospheric data
+    - `dem`: Path to the dem
+- `part`: Structure containing the particle's aerodynamical properties
+    - `name`: Particle name
+    - `diam`: Particle diameter (m)
+    - `dens`: Particle density (kg/m3)
+    - `flat`: Flatness (0-1)
+    - `elon`: Elongation (0-1)
+- `rel`: Structure containing the particle's release properties
+    - `x`, `y`: Horizontal displacement (m) of release point relative to the vent; positive towards N and E, negative towards S and W
+    - `z`: Release elevation (m relative to vent)
+    - `t`: Time offset (s relative to `date`)
+    - `vx`, `vy`: Initial release velocities along the x and y axes (m/s). Use a value of *-1* to set particle's initial velocities to be equal to the u and v components of wind
+    - `vz`: Initial vertical velocity (m/s), positive upwards, negative downwards. **Must not be null**
+- `adv`: Structure containing advanced properties
+    - `solution`: Accepts 'euler' or 'analytical'
+    - `dt`: Time step (s)
+    - `drag`: Region of reduced drag (m) around initial particle release point
+    - `interp`: Interpolation of the atmospheric data. Accepts 'subset' (default; only a subset of the domain is interpolated), 'complete' (the entire domain is interpolated) and 'none' (no interpolation)
+    - `method`: Interpolation method. Accepts 'linear', 'nearest', 'pchip', 'cubic' and 'spline' (see `interpn` Matlab function)
+    - `range`: If the interpolation iis set to 'subset', defines a range of points in each direction around the current particle location to interpolate the atmospheric data
+    - `skip`: Number of `dt` between interpolations
+
+### Run mode
+LagTrack can be used calculate the trajectory of particles either in a *forward* or *backward* mode.
+- In *forward* mode (`run_mode = 1`), particles are release in the atmosphere at the coordinates [`vent.lat`, `vent.lon`, `vent.alt`] (± `rel.x`, `rel.y`, and `rel.z`) at time `date` (± `rel.t`) and their trajectories are computed by advancing in time (`dt = dt`) and with a gravity force oriented downwards (`g = -9.81`) until the particle intersects the DEM;
+- In *backward* mode (`run_mode = 2`), particles are release in the atmosphere at the coordinates [`vent.lat`, `vent.lon`] (± `rel.x`, `rel.y`) at the DEM elevation at this location (± `rel.z`) at time `date` (± `rel.t`) and their trajectories are computed **backwards** in time (`dt = -dt`) and with a gravity force oriented upwards (`g = 9.81`) until the particle intersects the altitude defined by `vent.alt`.
 
 ### Default particle
 It is possible to create a default particle with the command:
@@ -218,3 +226,4 @@ LagTrack has been initially developed using Matlab 2014b and has been tested to 
 | ```readhgt``` | Downloads SRTM data | [François Beauducel](https://uk.mathworks.com/matlabcentral/fileexchange/36379-readhgt-import-download-nasa-srtm-data-files-hgt) |
 | ```ll2utm```, ```utm2ll``` | Latitude/longitude to and from UTM coordinates | [François Beauducel](https://www.mathworks.com/matlabcentral/fileexchange/45699-ll2utm-and-utm2ll) |
 | ```GUI Layout toolbox``` | GUI tools | [ David Sampson](https://www.mathworks.com/matlabcentral/fileexchange/47982-gui-layout-toolbox)
+| `lat_lon_proportions` | Constrains map proportions | [Jonathan Sullivan](https://www.mathworks.com/matlabcentral/fileexchange/32462-correctly-proportion-a-lat-lon-plot) |

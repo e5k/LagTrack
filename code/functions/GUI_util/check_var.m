@@ -11,7 +11,7 @@ if strcmp(src.Tag, 'name')
 
 elseif strcmp(src.Tag, 'mode')
     check_run_mode(src);
-%     tmp = src.Value;
+    part.run_mode = src.Value;
 %     err = 'Enter a valid run mode';
 %     if isempty(tmp); change_frame(jEdit,src,0,err); part.run_mode = -9999; else; part.run_mode = tmp; end 
     

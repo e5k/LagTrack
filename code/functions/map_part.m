@@ -114,16 +114,16 @@ for i = 1:length(fld)
     
     % If only one particle, plot the wind field
     if length(fld) == 1
-    legH(i+1) = quiver3(AX, wind_x, wind_y,pltData.(fld{i}).traj.z(idx_wind)./1000,...
-        pltData.(fld{i}).traj.uf(idx_wind),pltData.(fld{i}).traj.vf(idx_wind), zeros(size(pltData.(fld{i}).traj.u(idx_wind))),...
-        1e-2, 'Color', 'r');
-    leg{i+1} = 'Wind';
-    
-    legH(i+2) = quiver3(AX, wind_x, wind_y,pltData.(fld{i}).traj.z(idx_wind)./1000,...
-        pltData.(fld{i}).traj.u(idx_wind),pltData.(fld{i}).traj.v(idx_wind), pltData.(fld{i}).traj.w(idx_wind),...
-        1e-2, 'Color', 'k');
-    leg{i+2} = 'Particle';
-    
+        legH(i+1) = quiver3(AX, wind_x, wind_y,pltData.(fld{i}).traj.z(idx_wind)./1000,...
+            pltData.(fld{i}).traj.uf(idx_wind),pltData.(fld{i}).traj.vf(idx_wind), zeros(size(pltData.(fld{i}).traj.w(idx_wind))),...
+            1e-2, 'Color', 'r', 'autoscale', 'off');
+        leg{i+1} = 'Wind';
+
+        legH(i+2) = quiver3(AX, wind_x, wind_y,pltData.(fld{i}).traj.z(idx_wind)./1000,...
+            pltData.(fld{i}).traj.u(idx_wind),pltData.(fld{i}).traj.v(idx_wind), pltData.(fld{i}).traj.w(idx_wind),...
+            1e-2, 'Color', 'k', 'autoscale', 'off');
+        leg{i+2} = 'Particle';
+        
     
     end
     
@@ -184,6 +184,8 @@ if strcmp(dem.type, 'DEM') % In case the grid is a DEM
     ylabel('Latitude');
 else
     xlabel('X displacement (m)');    ylabel('Y displacement (m)');
+    a_tmp   = gca;
+    a_tmp.DataAspectRatio = [1e3 1e3 1];
 end
 
 box(AX, 'on')
