@@ -76,6 +76,6 @@ for year in range(year_start, year_end+1):
                 'time'          : nHours,
                 'format'        : 'netcdf' # Supported format: grib and netcdf. Default: grib
             }, 
-            "%s.nc"%(out_path, count, calendar.month_abbr[month],year))
+            "%s.nc"%(out_path))
 
         count = count + 1

@@ -298,7 +298,7 @@ topR_plot   = uix.VBox('Parent', topR_PLOT, 'BackgroundColor', BGC, 'Padding', 5
 
 %% Setup GUI data
 part.run_name       = -9999;
-part.run_mode       = -9999;
+part.run_mode       = 1;
 part.vent.lat       = -9999;
 part.vent.lon       = -9999;
 part.vent.alt       = -9999;
