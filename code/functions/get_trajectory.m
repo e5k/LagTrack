@@ -209,23 +209,30 @@ while test_run == 0
     end
 
     % Update particle state
-    velr            = sqrt((part.u(i-1)-part.uf(i-1))^2+(part.v(i-1)-part.vf(i-1))^2+(part.w(i-1)-part.wf(i-1))^2);	% Particle relative velocity
+    velr            = sqrt((part.u(i-1)-part.uf(i-1))^2 + (part.v(i-1)-part.vf(i-1))^2 + (part.w(i-1)-part.wf(i-1))^2);	% Particle relative velocity
 
     if sqrt((part.u(i-1)-part.uf(i-1))^2+(part.v(i-1)-part.vf(i-1))^2)==0
         theta       = 90;
     else
-        theta       = atand((part.vf(i-1)-part.v(i-1))/sqrt((part.u(i-1)-part.uf(i-1))^2+(part.v(i-1)-part.vf(i-1))^2));	% direction of particle in the horizontal plane (x-y)
+        % theta       = atand((part.vf(i-1) - part.v(i-1)) / sqrt((part.u(i-1) - part.uf(i-1))^2 + (part.v(i-1) - part.vf(i-1))^2));	% direction of particle in the horizontal plane (x-y)
+        theta       = atand( (part.v(i-1) - part.vf(i-1)) / (part.u(i-1) - part.uf(i-1)) );	% direction of particle in the horizontal plane (x-y) % Fixed 2020-20-09
     end
     if sqrt((part.u(i-1)-part.uf(i-1))^2+(part.v(i-1)-part.vf(i-1))^2)==0
         Beta        = 90;
     else
-        Beta        = atand(part.w(i-1)/sqrt((part.u(i-1)-part.uf(i-1))^2+(part.v(i-1)-part.vf(i-1))^2)); % direction of particle in the vertical plane (x-z or y-z)
+        % Beta        = atand(part.w(i-1)/sqrt((part.u(i-1)-part.uf(i-1))^2+(part.v(i-1)-part.vf(i-1))^2)); % direction of particle in the vertical plane (x-z or y-z)
+        Beta        = atand( (part.w(i-1)-part.wf(i-1)) / sqrt( (part.u(i-1)-part.uf(i-1))^2 + (part.v(i-1)-part.vf(i-1))^2) ); % direction of particle in the vertical plane (x-z or y-z) % Fixed 2020-20-09
     end
+    
+    % Avoid possible divisions by 0
+    if ismember(theta, [0,90,180,270]); theta = theta + 1e-6; end
+    if ismember(Beta, [0,90,180,270]); Beta = Beta + 1e-6; end
+    
     part.Re(i)      = denf * velr * P.part.diam / visf;                     % Reynolds
     part.Re_S(i)    = part.Re(i) * part.Kn / part.Ks;                       % Ganser Re
     
     % Drag coefficient
-    if part.Re_S(i) > 3e10^5
+    if part.Re_S(i) > 3e5
         part.Cd(i)  = 0.2;
     else
         part.Cd(i)  = part.Kn * (24 * (1 + .125 * part.Re_S(i)^(2/3)) / part.Re_S(i) + .46 / (1+5330/part.Re_S(i)));  % Drag coef (eq. 34)
@@ -237,6 +244,12 @@ while test_run == 0
     end
     
     Fd              = part.Cd(i) * part.Re(i) / (24*part.tau(i-1));         % Total Drag force
+    
+    % Added 2020-03-09 to avoid division by 0 - check with Mohssen
+    if Fd == 0
+        Fd = 1e-6;
+    end
+    
     Fd_u            = abs(Fd * cosd(Beta) * cosd(theta));                   % Drag force in x direction
     G_u             = 0.;                                                   % Other forces in x direction 
     Fd_v            = abs(Fd * cosd(Beta) * sind(theta));                   % Drag force in y direction
@@ -245,15 +258,22 @@ while test_run == 0
     G_w             = (1-denf/P.part.dens) * -g;                            % Gravity force
     
     if strcmp(P.adv.solution, 'analytical')
+    % 2020-03-09: Fixed problem - i.e. the full drag force was considered instead of its components
     % Analytical solution
-        part.u(i)   = part.uf(i-1) + exp(-Fd * P.adv.dt) *(part.u(i-1)-part.uf(i-1)) - G_u * (1/Fd) * (exp(-P.adv.dt*Fd)-1);
-        part.x(i)   = part.x(i-1) + (G_u * (1/Fd)+part.uf(i-1)) * P.adv.dt + (1/Fd)* (1-exp(-P.adv.dt*Fd)) * (part.u(i)-part.uf(i-1)- G_u/Fd);
+%         part.u(i)   = part.uf(i-1) + exp(-Fd * P.adv.dt) *(part.u(i-1)-part.uf(i-1)) - G_u * (1/Fd) * (exp(-P.adv.dt*Fd)-1);
+%         part.x(i)   = part.x(i-1) + (G_u * (1/Fd)+part.uf(i-1)) * P.adv.dt + (1/Fd)* (1-exp(-P.adv.dt*Fd)) * (part.u(i)-part.uf(i-1)- G_u/Fd);
+        part.u(i)   = part.uf(i-1) + exp(-Fd_u * P.adv.dt) *(part.u(i-1)-part.uf(i-1)) - G_u * (1/Fd_u) * (exp(-P.adv.dt*Fd_u)-1);
+        part.x(i)   = part.x(i-1) + (G_u * (1/Fd_u)+part.uf(i-1)) * P.adv.dt + (1/Fd_u)* (1-exp(-P.adv.dt*Fd_u)) * (part.u(i)-part.uf(i-1) - G_u/Fd_u);
 
-        part.v(i)   = part.vf(i-1) + exp(-Fd * P.adv.dt) *(part.v(i-1)-part.vf(i-1)) - G_v * (1/Fd) * (exp(-P.adv.dt*Fd)-1);
-        part.y(i)   = part.y(i-1) + (G_v * (1/Fd)+part.vf(i-1)) * P.adv.dt + (1/Fd)* (1-exp(-P.adv.dt*Fd)) * (part.v(i)-part.vf(i-1)- G_v/Fd);
+%         part.v(i)   = part.vf(i-1) + exp(-Fd * P.adv.dt) *(part.v(i-1)-part.vf(i-1)) - G_v * (1/Fd) * (exp(-P.adv.dt*Fd)-1);
+%         part.y(i)   = part.y(i-1) + (G_v * (1/Fd)+part.vf(i-1)) * P.adv.dt + (1/Fd)* (1-exp(-P.adv.dt*Fd)) * (part.v(i)-part.vf(i-1)- G_v/Fd);
+        part.v(i)   = part.vf(i-1) + exp(-Fd_v * P.adv.dt) *(part.v(i-1)-part.vf(i-1)) - G_v * (1/Fd_v) * (exp(-P.adv.dt*Fd_v)-1);
+        part.y(i)   = part.y(i-1) + (G_v * (1/Fd_v)+part.vf(i-1)) * P.adv.dt + (1/Fd_v)* (1-exp(-P.adv.dt*Fd_v)) * (part.v(i)-part.vf(i-1)- G_v/Fd_v);
         
-        part.w(i)   = part.wf(i-1) + exp(-Fd * P.adv.dt) *(part.w(i-1)-part.wf(i-1)) - G_w * (1/Fd) * (exp(-P.adv.dt*Fd)-1);
-        part.z(i)   = part.z(i-1) + (G_w * (1/Fd)+part.wf(i-1)) * P.adv.dt + (1/Fd)* (1-exp(-P.adv.dt*Fd)) * (part.w(i)-part.wf(i-1)- G_w/Fd);
+%         part.w(i)   = part.wf(i-1) + exp(-Fd * P.adv.dt) *(part.w(i-1)-part.wf(i-1)) - G_w * (1/Fd) * (exp(-P.adv.dt*Fd)-1);
+%         part.z(i)   = part.z(i-1) + (G_w * (1/Fd)+part.wf(i-1)) * P.adv.dt + (1/Fd)* (1-exp(-P.adv.dt*Fd)) * (part.w(i)-part.wf(i-1)- G_w/Fd);        
+        part.w(i)   = part.wf(i-1) + exp(-Fd_w * P.adv.dt) *(part.w(i-1)-part.wf(i-1)) - G_w * (1/Fd_w) * (exp(-P.adv.dt*Fd_w)-1);
+        part.z(i)   = part.z(i-1) + (G_w * (1/Fd_w)+part.wf(i-1)) * P.adv.dt + (1/Fd_w)* (1-exp(-P.adv.dt*Fd_w)) * (part.w(i)-part.wf(i-1)- G_w/Fd_w);
                       
     elseif strcmp(P.adv.solution, 'euler')
     % Euler semi-implicit 
