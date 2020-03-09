@@ -239,8 +239,9 @@ while test_run == 0
     end
     
     % If particle within region of reduced drag
-    if part.dis < P.adv.drag
-       part.Cd(i)   = 0; 
+    if part.dis(i-1) < P.adv.drag
+%        part.Cd(i)   = 0; 
+        part.Cd(i)  = part.Cd(i) * ( part.dis(i-1) / P.adv.drag)^2;
     end
     
     Fd              = part.Cd(i) * part.Re(i) / (24*part.tau(i-1));         % Total Drag force
