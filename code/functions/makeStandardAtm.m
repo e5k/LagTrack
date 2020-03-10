@@ -75,6 +75,11 @@ v = zeros(1,1, size(a,1), 2);
 v(:,:,:,1) = ones(1,1,size(a,1),1).*vwind;
 v(:,:,:,2) = ones(1,1,size(a,1),1).*vwind;
 
+temp = zeros(1,1, size(a,1), 2);
+temp(:,:,:,1) = reshape(a(:,4), 1,1,size(a,1),1);
+temp(:,:,:,2) = reshape(a(:,4), 1,1,size(a,1),1);
+
+
 time = [datenum([1948,1,1]); now];
 
 atm.lat = 0;
@@ -85,6 +90,7 @@ atm.u = u;
 atm.v = v;
 atm.rhoair = rhoair;
 atm.muair = muair;
+atm.temp = temp;
 
 % Save data
 save(['input/wind/', atmName, filesep, atmName, '.mat'], 'atm');

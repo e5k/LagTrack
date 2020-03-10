@@ -1,7 +1,5 @@
 function [ cd ] = draghicube( mach )
 
-x=zeros(19);
-y=zeros(19);
 
     x(1) = -0.9624766;
     y(1) = 1.064151;

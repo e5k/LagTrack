@@ -18,10 +18,17 @@ else                                                % If the user cancelled
     return
 end
 
+% function exist_var(src, tag, fld, mode)
+% if mode == 1 % Field
+%     set(findobj(ancestor(src, 'figure'), 'Tag', tag), 'String', fld);
+% else % Popupmenu
+%     
+% end
 
 function preprocess_part(part, APDTA, src)
 % Fill up GUI
 set(findobj(ancestor(src, 'figure'), 'Tag', 'name'), 'String', part.run_name);
+set(findobj(ancestor(src, 'figure'), 'Tag', 'mode'), 'Value', part.run_mode);
 set(findobj(ancestor(src, 'figure'), 'Tag', 'vent_lat'), 'String', num2str(part.vent.lat));
 set(findobj(ancestor(src, 'figure'), 'Tag', 'vent_lon'), 'String', num2str(part.vent.lon));
 set(findobj(ancestor(src, 'figure'), 'Tag', 'vent_alt'), 'String', num2str(part.vent.alt));
@@ -53,6 +60,9 @@ if strcmp(part.adv.solution, 'linear'); V = 1; elseif strcmp(part.adv.solution, 
 set(findobj(ancestor(src, 'figure'), 'Tag', 'adv_meth'), 'Value', V);
 set(findobj(ancestor(src, 'figure'), 'Tag', 'adv_range'), 'String', num2str(part.adv.range));
 set(findobj(ancestor(src, 'figure'), 'Tag', 'adv_skip'), 'String', num2str(part.adv.skip));
+set(findobj(ancestor(src, 'figure'), 'Tag', 'adv_mach'), 'String', num2str(part.adv.mach));
+if strcmp(part.adv.machMeth, 'high cube'); V = 1; elseif strcmp(part.adv.machMeth, 'low cube'); V = 2; elseif strcmp(part.adv.machMeth, 'sphere'); V = 3; elseif strcmp(part.adv.machMeth, 'cylinder'); end
+set(findobj(ancestor(src, 'figure'), 'Tag', 'adv_machMeth'), 'Value', V);
 
 set(findobj(ancestor(src, 'figure'), 'Tag', 'run_btn'), 'Enable', 'on');
 

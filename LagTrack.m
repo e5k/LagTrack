@@ -172,30 +172,31 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
                     topLT.Selection = 4;
                     topL_adv = uix.Grid( 'Parent', topL_ADV, 'Padding', 15, 'Spacing', 8, 'BackgroundColor', BGC );
                         topL_adv_solL       = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', 'Solution', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
-                        uix.Empty( 'Parent', topL_adv );
                         topL_adv_dTL        = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', 'Time step (s)', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
                         topL_adv_dragL      = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', 'Reduced drag (m)', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
                         uix.Empty( 'Parent', topL_adv );
                         topL_adv_interL     = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', 'Interpolation', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
                         topL_adv_methodL    = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', 'Method', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
                         topL_adv_rangeL     = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', 'Range', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
-                        topL_adv_skipL      = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', 'Interpolation', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
-                        
-                        
-                        %topL_adv_sol        = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', 'Euler', 'Tooltip', sprintf('Solution. Enter Euler, Analytical or RungeKutta'), 'Tag', 'adv_sol', 'callback', @check_var);
-                        topL_adv_sol        = uicontrol( 'Parent', topL_adv, 'Style', 'Popupmenu', 'String', {'Euler', 'Analytical'}, 'Tooltip', sprintf('Solution'), 'Tag', 'adv_sol', 'callback', @check_var);
+                        topL_adv_skipL      = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', 'Interpolation step', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
                         uix.Empty( 'Parent', topL_adv );
+                        topL_adv_machL      = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', 'Critical Mach number', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
+                        topL_adv_machMethL  = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', 'High Mach drag', 'BackgroundColor', BGC, 'Enable', 'off', 'HorizontalAlign', 'Left', 'CreateFcn', @remove_frame); 
+                        
+                        
+                        topL_adv_sol        = uicontrol( 'Parent', topL_adv, 'Style', 'Popupmenu', 'String', {'Euler', 'Analytical'}, 'Tooltip', sprintf('Solution'), 'Tag', 'adv_sol', 'callback', @check_var);
                         topL_adv_dT         = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', '0.1', 'Tooltip', sprintf('Time step between advancing states (s)'), 'Tag', 'adv_dt', 'callback', @check_var);
                         topL_adv_drag       = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', '0', 'Tooltip', sprintf('Radius of reduced drag (m above vent)'), 'Tag', 'adv_drag', 'callback', @check_var); 
                         uix.Empty( 'Parent', topL_adv );
-                        %topL_adv_inter      = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', 'Subset', 'Tooltip', sprintf('Interpolation of atmospheric data, either None, Subset or Complete\n-None: No interpolation\n-Subset: Only specified indices around current points are interpolated\n-Complete: Then entire atmospheric dataset is interpolated at each time step'), 'Tag', 'adv_int','callback', @check_var);
                         topL_adv_inter      = uicontrol( 'Parent', topL_adv, 'Style', 'Popupmenu', 'String', {'None', 'Subset', 'Complete'}, 'Value', 2, 'Tooltip', sprintf('Interpolation of atmospheric data, either None, Subset or Complete\n-None: No interpolation\n-Subset: Only specified indices around current points are interpolated\n-Complete: Then entire atmospheric dataset is interpolated at each time step'), 'Tag', 'adv_int','callback', @check_var);    
-                        %topL_adv_method     = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', 'Linear', 'Tooltip', sprintf('Interpolation method, either linear, nearest, pchip, cubic or spline\nSee the Matlab documentation for interpn for more detail'), 'Tag', 'adv_meth', 'callback', @check_var);
                         topL_adv_method     = uicontrol( 'Parent', topL_adv, 'Style', 'Popupmenu', 'String', {'Linear', 'Nearest', 'Pchip', 'Cubic', 'Spline'}, 'Tooltip', sprintf('Interpolation method, either linear, nearest, pchip, cubic or spline\nSee the Matlab documentation for interpn for more detail'), 'Tag', 'adv_meth', 'callback', @check_var);
                         topL_adv_range      = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', '1', 'Tooltip', sprintf('Range of neighbor indexes used for subset interpolation (higher: slower interpolation)'), 'Tag', 'adv_range', 'callback', @check_var);
                         topL_adv_skip       = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', '0', 'Tooltip', sprintf('Number of time steps to skip between two interpolations (higher: faster interpolation)'), 'Tag', 'adv_skip', 'callback', @check_var);
+                        uix.Empty( 'Parent', topL_adv );
+                        topL_adv_mach       = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', '-1', 'Tooltip', sprintf('Mach number above which to change drag model. Enter -1 to ignore'), 'Tag', 'adv_mach', 'callback', @check_var);
+                        topL_adv_machMeth   = uicontrol( 'Parent', topL_adv, 'Style', 'Popupmenu', 'String', {'High cube', 'Low cube', 'Sphere', 'Cylinder'}, 'Tooltip', sprintf('Method to estimate drag coefficient at high Mach number'), 'Tag', 'adv_machMeth', 'callback', @check_var);
                         
-                        set( topL_adv,  'Heights', [35 0 35 35 0 35 35 35 35], 'Widths', [120, -1] );
+                        set( topL_adv,  'Heights', [25 35 35 0 25 25 35 35 0 35 25], 'Widths', [120, -1] );
                         
                         
                     topLT.Selection = 1;
@@ -261,7 +262,8 @@ varList     =     {'Time (s)',...
     'Re',...
     'Ganser Re',...
     'Drag coefficient', ...
-    'Relaxation time (s)'};
+    'Relaxation time (s)',...
+    'Mach number'};
 
 % Setup tabs of map/plt
 topRT       = uix.TabPanel( 'Parent', TOPR, 'Padding', 5 , 'BackgroundColor', BGC, 'Tag', 'DispTab');
@@ -320,6 +322,8 @@ part.rel.vz         = 1e-4;
 part.adv.solution   = 'euler';
 part.adv.dt         = 0.1;
 part.adv.drag       = 0;
+part.adv.mach       = -1;
+part.adv.machMeth   = 'high cube';
 part.adv.interp     = 'subset';
 part.adv.method     = 'linear';
 part.adv.range      = 1;

@@ -126,7 +126,17 @@ elseif strcmp(src.Tag, 'adv_drag')
     tmp = str2double(src.String);
     err = 'Check the radius of reduced drag';
     if isnan(tmp) || tmp<0 ; change_frame(jEdit,src,0,err); part.adv.drag = -9999; else; change_frame(jEdit,src,1,' '); part.adv.drag = tmp; end    
-    
+
+elseif strcmp(src.Tag, 'adv_mach')
+    tmp = str2double(src.String);
+    err = 'Check the critical mach number';
+    if isnan(tmp); change_frame(jEdit,src,0,err); part.adv.mach = -9999; else; change_frame(jEdit,src,1,' '); part.adv.mach = tmp; end    
+
+elseif strcmp(src.Tag, 'adv_machMeth')
+    tmp = lower(src.String{src.Value});
+    err = 'Mach method is High cube, Low cube, Sphere or Cylinder';
+    if isempty(regexp(tmp, '(high cube|low cube|sphere|cylinder)', 'once')); change_frame(jEdit,src,0,err); part.adv.machMeth = -9999; else; change_frame(jEdit,src,1,' '); part.adv.machMeth = tmp; end 
+
 elseif strcmp(src.Tag, 'adv_int')
     tmp = lower(src.String{src.Value});
     err = 'Interpolation is None, Subset or Complete';

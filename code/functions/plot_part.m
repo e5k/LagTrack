@@ -26,7 +26,8 @@ varList     =     {'Time (s)',...
     'Re',...
     'Ganser Re',...
     'Drag coefficient', ...
-    'Relaxation time (s)'};
+    'Relaxation time (s)',...
+    'Mach number'};
 
 if nargin == 0  % If calling the function independently
     [fl, pth] = uigetfile('projects/*.mat', 'Multiselect', 'on');
@@ -145,5 +146,7 @@ elseif strcmp(fldIn, 'Drag coefficient')
     fldOut = 'Cd';
 elseif strcmp(fldIn, 'Relaxation time (s)')
     fldOut = 'tau';
+elseif strcmp(fldIn, 'Mach number')
+    fldOut = 'Mach';
 end
 

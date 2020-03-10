@@ -174,12 +174,13 @@ while test_run == 0
     % Simple indexing method
         denf    = atm.rhoair(part.yI(i-1), part.xI(i-1), part.zI(i-1), part.tI(i-1));   % Fluid density
         visf    = atm.muair( part.yI(i-1), part.xI(i-1), part.zI(i-1), part.tI(i-1));   % Fluid viscosity
-    
+        tempf   = atm.temp( part.yI(i-1), part.xI(i-1), part.zI(i-1), part.tI(i-1));    % Air temperature
     elseif strcmp(P.adv.interp, 'complete')
     % Complete interpolation method (Slow)
         alt_sub = squeeze(atm.alt(part.yI(i-1), part.xI(i-1), :, part.tI(i-1)));
         denf    = interpn(double(atm.lat), double(atm.lon), alt_sub, atm.time, atm.rhoair, part.lat(i-1), part.lon(i-1), part.z(i-1), P.date+part.t(i-1)/3600/24, P.adv.method);
         visf    = interpn(double(atm.lat), double(atm.lon), alt_sub, atm.time, atm.muair,  part.lat(i-1), part.lon(i-1), part.z(i-1), P.date+part.t(i-1)/3600/24, P.adv.method);
+        tempf   = interpn(double(atm.lat), double(atm.lon), alt_sub, atm.time, atm.temp,  part.lat(i-1), part.lon(i-1), part.z(i-1), P.date+part.t(i-1)/3600/24, P.adv.method);
         if isnan(denf)
             error('Interpolation returned a Nan. Trying changing the interpolation method.')
         end
@@ -190,6 +191,7 @@ while test_run == 0
         if part.xI(i-1)-P.adv.range < 1 || part.xI(i-1)+P.adv.range > size(atm.lon,1) || part.yI(i-1)-P.adv.range < 1 || part.yI(i-1)+P.adv.range > size(atm.lat,1) || part.zI(i-1)-P.adv.range < 1 || part.zI(i-1)+P.adv.range > size(atm.alt,3)
              denf       = atm.rhoair(part.yI(i-1), part.xI(i-1), part.zI(i-1), part.tI(i-1));   % Fluid density
              visf       = atm.muair( part.yI(i-1), part.xI(i-1), part.zI(i-1), part.tI(i-1));   % fluid viscosity
+             tempf      = atm.temp( part.yI(i-1), part.xI(i-1), part.zI(i-1), part.tI(i-1));    % Air temperature
         elseif int_count1==0 || P.adv.skip==0
              int_count1 = int_count1+1;
              alt_vec    = squeeze(atm.alt(part.yI(i-1), part.xI(i-1), part.zI(i-1)-P.adv.range:part.zI(i-1)+P.adv.range, part.tI(i-1)));
@@ -198,8 +200,10 @@ while test_run == 0
              lat_sub    = atm.lat(part.yI(i-1)  - P.adv.range:part.yI(i-1) + P.adv.range);
              den_sub    = atm.rhoair(part.yI(i-1)-P.adv.range:part.yI(i-1) + P.adv.range, part.xI(i-1)-P.adv.range:part.xI(i-1)+P.adv.range, part.zI(i-1)-P.adv.range:part.zI(i-1)+P.adv.range, part.tI(i-1)-P.adv.range:part.tI(i-1)+P.adv.range);
              vis_sub    = atm.muair(part.yI(i-1) -P.adv.range:part.yI(i-1) + P.adv.range, part.xI(i-1)-P.adv.range:part.xI(i-1)+P.adv.range, part.zI(i-1)-P.adv.range:part.zI(i-1)+P.adv.range, part.tI(i-1)-P.adv.range:part.tI(i-1)+P.adv.range);
+             temp_sub   = atm.temp(part.yI(i-1) -P.adv.range:part.yI(i-1) + P.adv.range, part.xI(i-1)-P.adv.range:part.xI(i-1)+P.adv.range, part.zI(i-1)-P.adv.range:part.zI(i-1)+P.adv.range, part.tI(i-1)-P.adv.range:part.tI(i-1)+P.adv.range);
              denf       = interpn(lat_sub, lon_sub, alt_vec, time_sub, den_sub, part.lat(i-1), part.lon(i-1), part.z(i-1), P.date+part.t(i-1)/3600/24, P.adv.method);   % Fluid density
              visf       = interpn(lat_sub, lon_sub, alt_vec, time_sub, vis_sub, part.lat(i-1), part.lon(i-1), part.z(i-1), P.date+part.t(i-1)/3600/24, P.adv.method);   % Fluid viscosity
+             tempf      = interpn(lat_sub, lon_sub, alt_vec, time_sub, temp_sub, part.lat(i-1), part.lon(i-1), part.z(i-1), P.date+part.t(i-1)/3600/24, P.adv.method);  % Air temperature
          else
              int_count1  = int_count1+1;
              if int_count1==P.adv.skip
@@ -230,6 +234,7 @@ while test_run == 0
     
     part.Re(i)      = denf * velr * P.part.diam / visf;                     % Reynolds
     part.Re_S(i)    = part.Re(i) * part.Kn / part.Ks;                       % Ganser Re
+    part.Mach(i)    = velr / sqrt(1.4*286*273.15+tempf);                    % Mach number
     
     % Drag coefficient
     if part.Re_S(i) > 3e5
@@ -238,9 +243,13 @@ while test_run == 0
         part.Cd(i)  = part.Kn * (24 * (1 + .125 * part.Re_S(i)^(2/3)) / part.Re_S(i) + .46 / (1+5330/part.Re_S(i)));  % Drag coef (eq. 34)
     end
     
+    % Correct drag coefficient at high mach number following the method of Mastin/Eject!
+    if P.adv.mach ~= -1 && part.Mach(i)>P.adv.mach
+       part.Cd(i)   = getCdHighMach(part.Mach(i), P.adv.machMeth); 
+    end
+    
     % If particle within region of reduced drag
     if part.dis(i-1) < P.adv.drag
-%        part.Cd(i)   = 0; 
         part.Cd(i)  = part.Cd(i) * ( part.dis(i-1) / P.adv.drag)^2;
     end
     
