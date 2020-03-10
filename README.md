@@ -1,5 +1,13 @@
 # LagTrack
 
+**LagTrack** is a 3D lagrangian particle tracking code written in Matlab designed to compute the trajectory of non-spherical particles in realistic atmospheric conditions. Characteristics of **LagTrack** include:
+- The implementation of the method of [Bagheri and Bonadonna (2016)](https://www.sciencedirect.com/science/article/abs/pii/S0032591016303539) to estimate the drag coefficient of non-spherical particles over a wide range of Reynolds number
+- For larger particles (i.e. volcanic ballistic projectiles), the implementation of the *Eject!* approach ([Mastin et al., 2001](https://pubs.usgs.gov/of/2001/0045/))
+- Modules to retrieve input parameters (e.g. topography from SRTM, atmospheric conditions from varios NOAA and ECMWF datasets)
+- Modules to plot and analyse the results
+- Modules to automatize inversion and sensitivity analyses
+- The ability to use the code through a user-friendly GUI or via the command line
+
 Functions are written to be used both as part of the GUI and as standalone. The main GUI is opened using:
 ```
 LagTrack
@@ -140,19 +148,24 @@ makeStandardAtm(uwind, vwind, name)
 - ```uwind```, ```vwind```: Trigonometric *u* and *v* components of the wind (m/s)
 - ```name```: Name of the dataset stored in ```input/wind/```
 
-
+### Vertical velocity
+Vertical wind velocity is rarely implemented in Reanalysis datasets, but its inclusion is already implemented in the architecture of LagTrack. All vertical velocities are set to `w=0` but the formatting of WRF output has been successfully achieved.
 
 ## Running the model
 
 ### Defining particles
-In LagTrack, each particle belongs to a **run**. Multiple particles can depend on a same run. Each particle is a Matlab structure containing various fields described below. The following list describes the structure's fields, whose descriptions are also applicable in the main GUI.
+In LagTrack, each particle belongs to a **run**. Multiple particles can depend on a same run. Each particle is a Matlab structure containing various fields described below. The following list describes the structure's fields, whose descriptions are also applicable in the main GUI. It is possible to create an empty particle `P` containing all fields by typing:
+
+```matlab
+P = LagTrack
+```
 
 - `run_name`: Run name to which particles are associated
 - `run_mode`: Forward (`1`) or backward (`2`) runs (see next section)
 - `vent`: Structure containing vent properties
     - `lat`, `lon`: Vent latitude and longitude (decimal degree)
     - `alt`: Vent elevation (m asl)
-- `date`: Eruption date (number of days since Jan 0, 0000)
+- `date`: Eruption date (number of days since Jan 0, 0000 - see the Matlab function `datenum`)
 - `path`: Structure containing paths to input parameters
     - `nc`: Path to the atmospheric data
     - `dem`: Path to the dem
@@ -176,6 +189,7 @@ In LagTrack, each particle belongs to a **run**. Multiple particles can depend o
     - `method`: Interpolation method. Accepts 'linear', 'nearest', 'pchip', 'cubic' and 'spline' (see `interpn` Matlab function)
     - `range`: If the interpolation iis set to 'subset', defines a range of points in each direction around the current particle location to interpolate the atmospheric data
     - `skip`: Number of `dt` between interpolations
+    - `mach`: Threshold of mach number above which the drag models described in the *Eject!* manual ([Mastin et al., 2001](https://pubs.usgs.gov/of/2001/0045/)) is preferred over the method of Bagheri and Bonadonna (2016).
 
 ### Run mode
 LagTrack can be used calculate the trajectory of particles either in a *forward* or *backward* mode.
@@ -206,12 +220,26 @@ get_trajectory({part1, part2, partn})
 ## Results
 ### Trajectory
 Upon run completion, each particle is saved as a ```.mat``` file in ```project/runName/particleName.mat```. Three fields are appended to the original structure:
-- ```run_check```: Status of the run - 1 if completed normally, 0 if the particle landed outside of the domain or did not hit the ground before the end of the atmospheric dataset
+- ```run_check```: Status of the run 
+  - `1` if completed normally
+  - `0` if the particle landed outside of the domain or did not hit the ground before the end of the atmospheric dataset
 - ```timestamp```: Time of impact with the ground
 - ```traj```: Structure containing the particle's properties at each time step
 
+| **Field** | **Value** |
+| ----------|-----------|
+| `x`, `y`, `z`, `t`    |  x and y offsets from release point, altitude and time of each iteration |
+| `lat`, `lon`          | Latitude and longitude |
+| `dis`, `disP`         | True and projected distance (m) |
+| `bear`                | Bearing |
+| `xi`, `yi`, `zi`, `ti`|  x, y, z and time indices relative to the atmospheric data |
+| `xd`, `yd`            |  x and y indices relative to the DEM |
+| `u`, `v`, `w`         |  Velocity components of the particle |
+| `uf`, `vf`, `wf`      |  Velocity components of the wind |
+
 ### Plot results
 Particles can be visualised using the functions ```map_part``` and ```plot_part```. These functions open GUIs and take no input arguments.
+
 
 
 ## Additional information
@@ -227,3 +255,9 @@ LagTrack has been initially developed using Matlab 2014b and has been tested to 
 | ```ll2utm```, ```utm2ll``` | Latitude/longitude to and from UTM coordinates | [François Beauducel](https://www.mathworks.com/matlabcentral/fileexchange/45699-ll2utm-and-utm2ll) |
 | ```GUI Layout toolbox``` | GUI tools | [ David Sampson](https://www.mathworks.com/matlabcentral/fileexchange/47982-gui-layout-toolbox)
 | `lat_lon_proportions` | Constrains map proportions | [Jonathan Sullivan](https://www.mathworks.com/matlabcentral/fileexchange/32462-correctly-proportion-a-lat-lon-plot) |
+
+## Roadmap
+- [ ] Implement various drag models
+- [ ] Make inclusion of vertical velocity smoother
+
+## References
