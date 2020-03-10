@@ -1,4 +1,4 @@
-function LagTrack(varargin)
+function varargout = LagTrack(varargin)
 % LagTrack Lagrangian particle tracking code
 %   LagTrack
 %       Opens the main GUI
@@ -9,6 +9,8 @@ function LagTrack(varargin)
 %       Summary of all usable functions
 %   LagTrack('particle')
 %       Summary of all parameters of a particle structure
+%   P = LagTrack
+%       Returns an empty particle
 
 
 % Add folders to search path
@@ -16,6 +18,10 @@ addpath(genpath('code/'));
 
 if nargin > 1
     error('Too many input arguments');
+elseif nargout == 1
+    part = load('code/var/default_part.mat');
+    varargout{1} = part.part;
+    return
 else
    if nargin == 1 && strcmpi(varargin{1}, 'functions')
        help LagTrack_functions
