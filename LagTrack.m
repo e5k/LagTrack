@@ -199,7 +199,7 @@ MAIN    = uix.VBoxFlex( 'Parent', f, 'BackgroundColor', BGC, 'Padding', 5 );
                         topL_adv_range      = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', '1', 'Tooltip', sprintf('Range of neighbor indexes used for subset interpolation (higher: slower interpolation)'), 'Tag', 'adv_range', 'callback', @check_var);
                         topL_adv_skip       = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', '0', 'Tooltip', sprintf('Number of time steps to skip between two interpolations (higher: faster interpolation)'), 'Tag', 'adv_skip', 'callback', @check_var);
                         uix.Empty( 'Parent', topL_adv );
-                        topL_adv_mach       = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', '-1', 'Tooltip', sprintf('Mach number above which to change drag model. Enter -1 to ignore'), 'Tag', 'adv_mach', 'callback', @check_var);
+                        topL_adv_mach       = uicontrol( 'Parent', topL_adv, 'Style', 'Edit', 'String', '-1', 'Tooltip', sprintf('Mach number above which to use the drag model of Eject!. \nEnter -1 to ignore or 0 to only use the Eject! drag model.'), 'Tag', 'adv_mach', 'callback', @check_var);
                         topL_adv_machMeth   = uicontrol( 'Parent', topL_adv, 'Style', 'Popupmenu', 'String', {'High cube', 'Low cube', 'Sphere', 'Cylinder'}, 'Tooltip', sprintf('Method to estimate drag coefficient at high Mach number'), 'Tag', 'adv_machMeth', 'callback', @check_var);
                         
                         set( topL_adv,  'Heights', [25 35 35 0 25 25 35 35 0 35 25], 'Widths', [120, -1] );
