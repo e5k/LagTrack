@@ -4,7 +4,7 @@ function LagTrack_particle
 % Add main functions to the path:
 %   >> addpath(genpath('code/')
 % Load default particle
-%   >> load default_part
+%   >> part = LagTrack
 % A variable called part is now created
 %
 % PARTICLE VARIABLES

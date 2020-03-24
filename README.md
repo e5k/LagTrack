@@ -199,7 +199,7 @@ LagTrack can be used calculate the trajectory of particles either in a *forward*
 ### Default particle
 It is possible to create a default particle with the command:
 ```
-load default_part
+P = LagTrack
 ```
 Details of particles requirements can be displayed in Matlab with the command:
 ```

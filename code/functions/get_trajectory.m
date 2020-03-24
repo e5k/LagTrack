@@ -215,12 +215,14 @@ while test_run == 0
     % Update particle state
     velr            = sqrt((part.u(i-1)-part.uf(i-1))^2 + (part.v(i-1)-part.vf(i-1))^2 + (part.w(i-1)-part.wf(i-1))^2);	% Particle relative velocity
 
-    if sqrt((part.u(i-1)-part.uf(i-1))^2+(part.v(i-1)-part.vf(i-1))^2)==0
+%     if sqrt((part.u(i-1)-part.uf(i-1))^2+(part.v(i-1)-part.vf(i-1))^2)==0
+    if (part.u(i-1)-part.uf(i-1))==0  
         theta       = 90;
     else
         % theta       = atand((part.vf(i-1) - part.v(i-1)) / sqrt((part.u(i-1) - part.uf(i-1))^2 + (part.v(i-1) - part.vf(i-1))^2));	% direction of particle in the horizontal plane (x-y)
         theta       = atand( (part.v(i-1) - part.vf(i-1)) / (part.u(i-1) - part.uf(i-1)) );	% direction of particle in the horizontal plane (x-y) % Fixed 2020-20-09
     end
+    
     if sqrt((part.u(i-1)-part.uf(i-1))^2+(part.v(i-1)-part.vf(i-1))^2)==0
         Beta        = 90;
     else
