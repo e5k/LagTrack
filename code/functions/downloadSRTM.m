@@ -85,7 +85,12 @@ else
     save(['input/dem/', filename, filesep, filename, '.mat'], 'dem');    
 end
 
+% Check if folder _rawdata exists
+if ~exist('input/dem/_rawdata', 'dir') == 7
+    mkdir('input/dem/_rawdata');
+end
 
+% Download tiles
 demTmp  = readhgt([dem.lat_min, dem.lat_max, dem.lon_min, dem.lon_max], 'interp', 'outdir', fullfile(pwd,'input','dem','_rawdata'), 'srtm1');
 dem.X   = repmat(demTmp.lon, numel(demTmp.lat), 1);
 dem.Y   = repmat(demTmp.lat, 1, numel(demTmp.lon));
@@ -97,47 +102,5 @@ save(['input/dem/', filename, filesep, filename, '.mat'], 'dem');
 
 disp('Done!')
 
-% % Main loop
-% disp('Accessing SRTM server, please wait...')
-% maindir = ['input/dem/', filename];
-% for i = 1:length(dem.tiles)
-%     outdir  = [maindir, filesep, dem.tiles{i}];    % Tmp directory
-%     fprintf('   Downloading SRTM tile %s (%d of %d)... \n', tiles{i}, i, length(dem.tiles))
-%     
-%     % Check if tile is already downloaded
-%     if exist(outdir, 'dir')==7 && exist([outdir, filesep, tiles{i}, '.asc'], 'file')
-%         continue
-%     end
-%     
-%     % Else download
-%     DL_check = 0;
-%     while DL_check == 0
-%         DL_check    = 1;    % Check download worked
-%         tile_check  = 1;    % Check that the tile exists (i.e. fails in the ocean)
-%         try
-%             websave([maindir, filesep, tiles{i}, '.zip'], ['http://srtm.csi.cgiar.org/SRT-ZIP/SRTM_v41/SRTM_Data_ArcASCII/', tiles{i}, '.zip']);
-%         catch ME
-%             if strcmp(ME.identifier, 'MATLAB:webservices:HTTP404StatusCodeError')
-%                 tile_check = 0;
-%             end
-%         end
-%         
-%         if tile_check == 1 % If the tile exists
-%             try
-%                 unzip([maindir, filesep, tiles{i}, '.zip'], outdir);
-%             catch ME
-%                 if strcmp(ME.identifier, 'MATLAB:unzip:invalidZipFile')
-%                     DL_check = 0;
-%                 end
-%             end
-%         else % If the file doesn't exist, then create a matrix filled with zeros
-%             fprintf('      SRTM tile %s does not exist... Creating an empty tile \n', tiles{i})
-%             mkdir([maindir, filesep, tiles{i}]);
-%             writeDEM([maindir, filesep, tiles{i}, filesep, tiles{i}, '.asc'],...
-%                 dem.lon(i), dem.lat(i,1), zeros(6001,6001), 0.00083333333333333);
-%         end
-%     end   
-% end
-% 
 %processSRTM(lat_min, lat_max, lon_min, lon_max, res, filename);
 

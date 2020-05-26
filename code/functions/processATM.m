@@ -166,5 +166,5 @@ atm.muair       = mu0.*(a./b).*(tempR./t0R).^(3/2)./10^3;                   % Dy
 % end
 
 display('Saving...')
-save(['input/wind/', ATMname, filesep, ATMname, '.mat'], 'atm');
+save(['input/wind/', ATMname, filesep, ATMname, '.mat'], 'atm', '-v7.3');
 display('Done!')

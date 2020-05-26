@@ -19,27 +19,34 @@ help LagTrack_functions
 
 ## Table of content
 
-  - [Input parameters](#input-parameters)
-    - [DEM](#dem)
-      - [Download the DEM](#download-the-dem)
-      - [DEM format](#dem-format)
-      - [Empty grid](#empty-grid)
-    - [Atmospheric data](#atmospheric-data)
-      - [Download atmospheric data](#download-atmospheric-data)
-      - [Format of atmospheric data](#format-of-atmospheric-data)
-      - [Post processing the atmospheric data](#post-processing-the-atmospheric-data)
-      - [Manually downloading Reanalysis data](#manually-downloading-reanalysis-data)
-      - [Standard atmosphere](#standard-atmosphere)
-  - [Running the model](#running-the-model)
-    - [Defining particles](#defining-particles)
-    - [Default particle](#default-particle)
-    - [Model run](#model-run)
-  - [Results](#results)
-    - [Trajectory](#trajectory)
-    - [Plot results](#plot-results)
-  - [Credits](#credits)
-    - [Requirements](#requirements)
-    - [Dependencies](#dependencies)
+- [Table of content](#table-of-content)
+- [Input parameters](#input-parameters)
+  - [DEM](#dem)
+    - [Download the DEM](#download-the-dem)
+    - [DEM format](#dem-format)
+    - [Empty grid](#empty-grid)
+  - [Atmospheric data](#atmospheric-data)
+    - [Download atmospheric data](#download-atmospheric-data)
+    - [Format of atmospheric data](#format-of-atmospheric-data)
+    - [Post processing the atmospheric data](#post-processing-the-atmospheric-data)
+    - [Manually downloading Reanalysis data](#manually-downloading-reanalysis-data)
+    - [Standard atmosphere](#standard-atmosphere)
+  - [Vertical velocity](#vertical-velocity)
+- [Running the model](#running-the-model)
+  - [Defining particles](#defining-particles)
+  - [Run mode](#run-mode)
+  - [Default particle](#default-particle)
+  - [Model run](#model-run)
+- [Results](#results)
+  - [Trajectory](#trajectory)
+  - [Plot results](#plot-results)
+- [Additional information](#additional-information)
+  - [Requirements](#requirements)
+  - [Dependencies](#dependencies)
+- [Known issues](#known-issues)
+  - [Java compatibility](#java-compatibility)
+- [Roadmap](#roadmap)
+- [References](#references)
 
 ## Input parameters
 
@@ -256,8 +263,32 @@ LagTrack has been initially developed using Matlab 2014b and has been tested to 
 | ```GUI Layout toolbox``` | GUI tools | [ David Sampson](https://www.mathworks.com/matlabcentral/fileexchange/47982-gui-layout-toolbox)
 | `lat_lon_proportions` | Constrains map proportions | [Jonathan Sullivan](https://www.mathworks.com/matlabcentral/fileexchange/32462-correctly-proportion-a-lat-lon-plot) |
 
+## Known issues
+### Java compatibility
+Java is used in some fancy components of the GUI, but it is known to cause issues with some OS/Matlab configurations. Commenting lines 198-202 of `codes/functions/GUI_util/check_var.m` can sometime solve problems:
+
+```matlab
+if typ == 0
+    jEdit.Border = javax.swing.border.LineBorder(java.awt.Color(1,0,0),1,false);
+else
+    jEdit.Border = javax.swing.border.LineBorder(java.awt.Color(.65,.65,.65),1,false);
+end
+```
+
+The expected type of error is:
+
+```matlab
+Error in check_var>change_frame (line 201)
+    jEdit.Border = javax.swing.border.LineBorder(java.awt.Color(.65,.65,.65),1,false);
+ 
+Error in check_var (line 10)
+    if isempty(tmp); change_frame(jEdit,src,0,err); part.run_name = -9999; else; change_frame(jEdit,src,1,' '); part.run_name =
+    tmp; end
+Error while evaluating UIControl Callback.
+```
+
 ## Roadmap
-- [ ] Implement various drag models
+- [x] Implement various drag models
 - [ ] Make inclusion of vertical velocity smoother
 
 ## References
