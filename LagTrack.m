@@ -70,7 +70,7 @@ uimenu(m2, 'Label', 'Display atmospheric data', 'Callback', @displayATM);
     uimenu(m22, 'Label', 'Set ERA-5 API key', 'callback', {@writeAPI, 1}, 'Separator', 'on');
     uimenu(m22, 'Label', 'Install ERA-5 API', 'callback', {@installAPI, 1});
 uimenu(m2, 'Label', 'Download SRTM DEM', 'Separator', 'on', 'Callback', @downloadSRTM);
-uimenu(m2, 'Label', 'Process SRTM DEM', 'Callback', @processSRTM);
+%uimenu(m2, 'Label', 'Process SRTM DEM', 'Callback', @processSRTM);
 uimenu(m2, 'Label', 'Create empty calculation grid', 'Callback', @makeDefaultGrid)
 m3 = uimenu('Label', 'Tools');
 uimenu(m3, 'Label', 'Get u,v,w velocities', 'Callback', @sphere2cart);

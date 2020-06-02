@@ -19,7 +19,7 @@ function downloadSRTM(varargin)
 
 % check number of input parameters
 if nargin == 0 || nargin == 2
-    answer      = inputdlg({'Minimum latitude (decimal degree, negative in S hemisphere)', 'Maximum latitude (decimal degree, negative in S hemisphere)', 'Minimum longitude (decimal degree, negative in W hemisphere)', 'Maximum longitude (decimal degree, negative in W hemisphere)', 'Resolution (m)', 'DEM name'}, 'Download SRTM DEM', 1, {'','','','','90',''});
+    answer      = inputdlg({'Minimum latitude (decimal degree, negative in S hemisphere)', 'Maximum latitude (decimal degree, negative in S hemisphere)', 'Minimum longitude (decimal degree, negative in W hemisphere)', 'Maximum longitude (decimal degree, negative in W hemisphere)', 'Downsampling factor (1/n)', 'DEM name'}, 'Download SRTM DEM', 1, {'','','','','1',''});
     if isempty(answer)
         return
     end
@@ -28,7 +28,9 @@ if nargin == 0 || nargin == 2
     lon_min     = str2double(answer{3});   
     lon_max     = str2double(answer{4});
     res         = str2double(answer{5});
-    filename    = answer{6};   
+    filename    = answer{6};
+%     login       = answer{7};
+%     passwd      = answer{8};
 elseif nargin == 6   
     lat_min     = varargin{1};
     lat_max     = varargin{2};
@@ -36,6 +38,8 @@ elseif nargin == 6
     lon_max     = varargin{4};
     res         = varargin{5};
     filename    = varargin{6};
+%     login       = varargin{7};
+%     passwd      = varargin{8};
 else
     error('Wrong number of input arguments, should be either 0 or 6');
 end
@@ -58,7 +62,7 @@ if exist(['input/dem/', filename], 'dir') == 7
             dem.lat_max = lat_max;
             dem.lon_min = lon_min;
             dem.lon_max = lon_max;
-            dem.res     = res;
+            %dem.res     = res;
             %dem.tiles   = tiles;
             %dem.lat     = LT;
             %dem.lon     = LN;
@@ -77,7 +81,7 @@ else
     dem.lat_max = lat_max;
     dem.lon_min = lon_min;
     dem.lon_max = lon_max;
-    dem.res     = res;
+    %dem.res     = res;
     %dem.tiles   = tiles;
     %dem.lat     = LT;
     %dem.lon     = LN;
@@ -91,16 +95,23 @@ if ~exist('input/dem/_rawdata', 'dir') == 7
 end
 
 % Download tiles
-demTmp  = readhgt([dem.lat_min, dem.lat_max, dem.lon_min, dem.lon_max], 'interp', 'outdir', fullfile(pwd,'input','dem','_rawdata'), 'srtm1');
+% demTmp  = readhgt([dem.lat_min, dem.lat_max, dem.lon_min, dem.lon_max], 'interp', 'outdir', fullfile(pwd,'input','dem','_rawdata'), 'srtm1', 'login', login, passwd);
+demTmp  = readhgt([dem.lat_min,dem.lat_max, dem.lon_min,dem.lon_max], ...
+    'interp', 'decim', res, ...
+    'outdir', fullfile(pwd,'input','dem','_rawdata'));%, ...
+    %'login', login, passwd);
+
+
 dem.X   = repmat(demTmp.lon, numel(demTmp.lat), 1);
 dem.Y   = repmat(demTmp.lat, 1, numel(demTmp.lon));
+dem.Y   = flipud(dem.Y);
 dem.Z   = double(demTmp.z);
+dem.Z   = flipud(dem.Z);
 clear demTmp;
 
 % Save
 save(['input/dem/', filename, filesep, filename, '.mat'], 'dem');
+disp(['DEM saved as: ', 'input/dem/', filename, filesep, filename, '.mat'])
 
-disp('Done!')
-
-%processSRTM(lat_min, lat_max, lon_min, lon_max, res, filename);
+% processSRTM(lat_min, lat_max, lon_min, lon_max, res, filename);
 

@@ -51,7 +51,7 @@ help LagTrack_functions
 ## Input parameters
 
 ### DEM
-The DEM is automatically retrieved using the [readhgt](https://uk.mathworks.com/matlabcentral/fileexchange/36379-readhgt-import-download-nasa-srtm-data-files-hgt) function.
+The DEM is automatically retrieved using the how-convenient [readhgt](https://uk.mathworks.com/matlabcentral/fileexchange/36379-readhgt-import-download-nasa-srtm-data-files-hgt) function from F. Beauducel. SRTM3 tiles are retrieved.
 
 #### Download the DEM
 Using the GUI:
@@ -63,20 +63,25 @@ downloadSRTM
 Using the command line:
 
 ```
-downloadSRTM(latMin, latMax, lonMin, lonMax, resolution, name)
+downloadSRTM(latMin, latMax, lonMin, lonMax, scalingFactor, name, )
 ```
 
 - ```latMin```, ```latMax```: Minimum and maximum latitudes in decimal degrees. Negative in southern hemisphere
 - ```lonMin```, ```lonMax```: Minimum and maximum longitudes in decimal degrees. Negative in western hemisphere
-- ```resolution```: Resolution to interpolate the DEM (m). This is obsolete (but still required for now), as the code will automatically attempt retrieving SRTM1 data
+- ```scalingFactor```: Resolution to interpolate the DEM (m). This is obsolete (but still required for now), as the code will automatically attempt retrieving SRTM1 data
 - ```name```: Name of the DEM dataset stored in ```input/dem/```
 
+The raw SRTM files are stored in `input/dem/_rawdata`. Example for downloading the topography around Sakurajima volcano and downsampling the resolution by a factor 2:
+```matlab
+downloadSRTM(31.5, 31.65, 130.55, 130.75, 2, 'sakurajima')
+```
+
 #### DEM format
-The DEM format in LagTrack is a Matlab structure containing called ```dem``` and containing the following fields, where *m* and *n* are the number of cells in the *y* and *x* dimensions, respectively. Adopt this convention to use a DEM obtained from a different source in LagTrack. 
+The DEM format in LagTrack is a Matlab structure containing called `dem` and containing the following fields, where *m* and *n* are the number of cells in the *y* and *x* dimensions, respectively. Adopt this convention to use a DEM obtained from a different source in LagTrack. 
 - ```X```: *[m×n]* matrix of longitudes
 - ```Y```: *[m×n]* matrix of latitudes. In the Matlab matrix, ```dem.Y(1,:)``` should be the southernmost points and ```dem.Y(end,:)``` the northernmost
 - ```Z```: *[m×n]* matrix of elevations (m asl). The orientation should be the same as ```dem.Y```
-- ```res```: Cell size (m) (obsolete)
+<!-- - ```res```: Cell size (m) (obsolete) -->
 
 #### Empty grid
 For calculations of particles trajectories that do not require a DEM, LagTrack can create an empty calculation grid specifying only an elevation used to stop the particle:

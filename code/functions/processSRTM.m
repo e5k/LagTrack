@@ -100,7 +100,7 @@ for yy = lat_maxI:lat_minI
         % Here, first flipud so the highest latitude is on index 1 in y
         % axis
         disp(['   Reading tile ', tile, '...'])
-        [tmpX, tmpY, tmpZ] = readDEM([pwd, filesep, outdir, filesep, tile, '.asc']);
+        [tmpX, tmpY, tmpZ] = readDEM([pwd, filesep, outdir, filesep, tile, '.hgt']);
         cellsize        = tmpX(1,2) - tmpX(1,1);            
         [xq,yq]         = meshgrid(tmpX(1,1):res*cellsize/90:tmpX(1,end),tmpY(1,1):res*cellsize/90:tmpY(end,1));
         zq              = interp2(tmpX,tmpY,tmpZ,xq,yq);
