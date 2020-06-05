@@ -46,6 +46,11 @@ help LagTrack_functions
 - [Known issues](#known-issues)
   - [Java compatibility](#java-compatibility)
 - [Roadmap](#roadmap)
+- [Notes to myself](#notes-to-myself)
+  - [Merge and subset NetCDF files downloaded from Era5](#merge-and-subset-netcdf-files-downloaded-from-era5)
+    - [Get cdo](#get-cdo)
+    - [Merge files](#merge-files)
+    - [Extract spatial subset](#extract-spatial-subset)
 - [References](#references)
 
 ## Input parameters
@@ -295,5 +300,31 @@ Error while evaluating UIControl Callback.
 ## Roadmap
 - [x] Implement various drag models
 - [ ] Make inclusion of vertical velocity smoother
+
+## Notes to myself
+### Merge and subset NetCDF files downloaded from Era5
+
+#### Get cdo
+Download [cdo](https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf) - for instance from homebrew:
+
+```shell
+brew tap moffat/sciencebits
+brew install cdo
+```
+
+#### Merge files
+Merge using `mergetime` (assuming that files were split per year):
+
+```shell
+cdo -b 64 mergetime *.nc out.nc
+```
+
+#### Extract spatial subset
+Spatial subset based on bounding box. Note that there should be no space after commas.
+
+```shell
+cdo sellonlatbox,99.9,100.1,14.9,15.1 in.nc out.nc
+```
+
 
 ## References
