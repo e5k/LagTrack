@@ -8,7 +8,7 @@ function downloadSRTM(varargin)
 %           lat_max:  Maximum latitude (decimal degree, negative in S hemisphere)
 %           lon_min:  Minimum longitude (decimal degree, negative in W hemisphere)
 %           lon_max:  Maximum longitude (decimal degree, negative in W hemisphere)
-%           res    :  Resolution (m) (Leave 90 m for no interpolation)
+%           res    :  Downsampling factor at 1/res the resolution (1=30m, 3=90m)
 %           name   :  File name, saved in input/dem/
 %
 %   see also processSRTM, makeDefaultGrid.
